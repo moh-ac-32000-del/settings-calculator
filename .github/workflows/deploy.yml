@@ -79,7 +79,7 @@ jobs:
               "zod": "^3.25.76"
           }
 
-          for p in root.rglob("package.json"):
+          for p in Path(".").rglob("package.json"):
               try:
                   data = json.loads(p.read_text())
               except Exception:
@@ -91,6 +91,12 @@ jobs:
                           if value == "catalog:" and name in catalog:
                               data[section][name] = catalog[name]
                               changed = True
+              if p.as_posix().endswith("/artifacts/settings-calculator/package.json"):
+                  deps = data.get("dependencies", {})
+                  if deps.get("@workspace/green-interface") == "workspace:*":
+                      deps["@workspace/green-interface"] = "file:../green-interface"
+                      changed = True
+                  deps.pop("@workspace/api-client-react", None)
               if changed:
                   p.write_text(json.dumps(data, indent=2) + "\n")
 
@@ -104,11 +110,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          ROOT="$(dirname "$(find . -name pnpm-workspace.yaml -print -quit)")"
-          cd "$ROOT"
-          corepack enable
-          corepack prepare pnpm@10 --activate
-          pnpm install --no-frozen-lockfile
+          APP="$(dirname "$(find . -path "*/artifacts/settings-calculator/package.json" -print -quit)")"
+          cd "$APP"
+          npm install --legacy-peer-deps
 
       - name: Build application
         env:
@@ -116,10 +120,10 @@ jobs:
           PORT: 4173
           BASE_PATH: /settings-calculator/
         run: |
-          ROOT="$(dirname "$(find . -name pnpm-workspace.yaml -print -quit)")"
-          cd "$ROOT"
-          pnpm --filter @workspace/settings-calculator build
-          DIST="$(find . -type d -path "*/artifacts/settings-calculator/dist/public" -print -quit)"
+          APP="$(dirname "$(find . -path "*/artifacts/settings-calculator/package.json" -print -quit)")"
+          cd "$APP"
+          npm run build
+          DIST="$APP/dist/public"
           rm -rf "$GITHUB_WORKSPACE/pages"
           mkdir -p "$GITHUB_WORKSPACE/pages"
           cp -R "$DIST"/. "$GITHUB_WORKSPACE/pages"/
