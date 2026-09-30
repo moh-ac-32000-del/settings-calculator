@@ -38,7 +38,7 @@ jobs:
           from pathlib import Path
           import re
 
-          root = Path("buildspace/workspace")
+          root = Path(next((p.parent for p in Path("buildspace").rglob("pnpm-workspace.yaml")), Path("buildspace")))
           for p in root.rglob("package.json"):
               try:
                   data = json.loads(p.read_text())
@@ -95,7 +95,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd buildspace/workspace
+          ROOT="$(dirname "$(find buildspace -name pnpm-workspace.yaml -print -quit)")"
+          cd "$ROOT"
           corepack enable
           corepack prepare pnpm@10 --activate
           pnpm install --no-frozen-lockfile
@@ -106,8 +107,13 @@ jobs:
           PORT: 4173
           BASE_PATH: /settings-calculator/
         run: |
-          cd buildspace/workspace
+          ROOT="$(dirname "$(find buildspace -name pnpm-workspace.yaml -print -quit)")"
+          cd "$ROOT"
           pnpm --filter @workspace/settings-calculator build
+          DIST="$(find . -type d -path "*/artifacts/settings-calculator/dist/public" -print -quit)"
+          rm -rf "$GITHUB_WORKSPACE/pages"
+          mkdir -p "$GITHUB_WORKSPACE/pages"
+          cp -R "$DIST"/. "$GITHUB_WORKSPACE/pages"/
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -115,7 +121,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: buildspace/workspace/artifacts/settings-calculator/dist/public
+          path: pages
 
   deploy:
     needs: build
