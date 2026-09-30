@@ -55,6 +55,37 @@ jobs:
               if changed:
                   p.write_text(json.dumps(data, indent=2) + "\n")
 
+          # Resolve pnpm catalog: specs to concrete versions so this extracted
+          # project can build independently of Replit's workspace catalog.
+          ws = root / "pnpm-workspace.yaml"
+          catalog = {}
+          if ws.exists():
+              in_catalog = False
+              for line in ws.read_text().splitlines():
+                  if line.strip() == "catalog:":
+                      in_catalog = True
+                      continue
+                  if in_catalog and line and not line.startswith("  "):
+                      break
+                  if in_catalog and line.startswith("  ") and ":" in line:
+                      name, version = line.strip().split(":", 1)
+                      catalog[name.strip("'\"")] = version.strip().strip("'\"")
+
+          for p in root.rglob("package.json"):
+              try:
+                  data = json.loads(p.read_text())
+              except Exception:
+                  continue
+              changed = False
+              for section in ("dependencies", "devDependencies", "peerDependencies", "optionalDependencies"):
+                  if section in data:
+                      for name, value in list(data[section].items()):
+                          if value == "catalog:" and name in catalog:
+                              data[section][name] = catalog[name]
+                              changed = True
+              if changed:
+                  p.write_text(json.dumps(data, indent=2) + "\n")
+
           for p in root.rglob("vite.config.ts"):
               s = p.read_text()
               s = re.sub(r"^import runtimeErrorOverlay from ['\"]@replit/vite-plugin-runtime-error-modal['\"];\s*\n", "", s, flags=re.M)
