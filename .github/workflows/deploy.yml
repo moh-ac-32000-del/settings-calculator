@@ -28,8 +28,7 @@ jobs:
 
       - name: Extract project
         run: |
-          mkdir -p buildspace
-          tar -xzf project-backup.tar.gz -C buildspace
+          tar -xzf project-backup.tar.gz -C .
 
       - name: Remove Replit-only build integrations
         run: |
@@ -38,7 +37,7 @@ jobs:
           from pathlib import Path
           import re
 
-          root = Path(next((p.parent for p in Path("buildspace").rglob("pnpm-workspace.yaml")), Path("buildspace")))
+          root = Path(next((p.parent for p in Path(".").rglob("pnpm-workspace.yaml")), Path(".")))
           for p in root.rglob("package.json"):
               try:
                   data = json.loads(p.read_text())
@@ -95,7 +94,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          ROOT="$(dirname "$(find buildspace -name pnpm-workspace.yaml -print -quit)")"
+          ROOT="$(dirname "$(find . -name pnpm-workspace.yaml -print -quit)")"
           cd "$ROOT"
           corepack enable
           corepack prepare pnpm@10 --activate
@@ -107,7 +106,7 @@ jobs:
           PORT: 4173
           BASE_PATH: /settings-calculator/
         run: |
-          ROOT="$(dirname "$(find buildspace -name pnpm-workspace.yaml -print -quit)")"
+          ROOT="$(dirname "$(find . -name pnpm-workspace.yaml -print -quit)")"
           cd "$ROOT"
           pnpm --filter @workspace/settings-calculator build
           DIST="$(find . -type d -path "*/artifacts/settings-calculator/dist/public" -print -quit)"
