@@ -34,8 +34,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          APP="$(dirname "$(find . -path "*/package.json" -print -quit)")"
-          cd "$APP"
           npm install --legacy-peer-deps --no-audit --no-fund
 
       - name: Build application
@@ -44,8 +42,6 @@ jobs:
           PORT: 4173
           BASE_PATH: /settings-calculator/
         run: |
-          APP="$(dirname "$(find . -path "*/package.json" -print -quit)")"
-          cd "$APP"
           npm run build
           rm -rf "$GITHUB_WORKSPACE/pages"
           mkdir -p "$GITHUB_WORKSPACE/pages"
