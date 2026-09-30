@@ -32,7 +32,11 @@ jobs:
 
       - name: Remove Replit-only build integrations
         run: |
-          python3 - <<'PY'
+          echo "=== extracted structure ==="
+          find . -maxdepth 5 -type f -name package.json -print | head -80
+          echo "=== workspace files ==="
+          find . -maxdepth 5 -name pnpm-workspace.yaml -print
+          python3 - <<'PY
           import json
           from pathlib import Path
           import re
