@@ -115,7 +115,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: buildspace/artifacts/settings-calculator/dist/public
+          path: buildspace/workspace/artifacts/settings-calculator/dist/public
 
   deploy:
     needs: build
