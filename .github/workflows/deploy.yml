@@ -26,93 +26,17 @@ jobs:
         with:
           node-version: 22
 
-      - name: Extract project
+      - name: Extract standalone app
         run: |
           tar -xzf project-backup.tar.gz -C .
-
-      - name: Remove Replit-only build integrations
-        run: |
-          echo "=== extracted structure ==="
-          find . -maxdepth 5 -type f -name package.json -print | head -80
-          echo "=== workspace files ==="
-          find . -maxdepth 5 -name pnpm-workspace.yaml -print
-          python3 - <<'PY
-          import json
-          from pathlib import Path
-          import re
-
-          root = Path(next((p.parent for p in Path(".").rglob("pnpm-workspace.yaml")), Path(".")))
-          for p in root.rglob("package.json"):
-              try:
-                  data = json.loads(p.read_text())
-              except Exception:
-                  continue
-              changed = False
-              for section in ("dependencies", "devDependencies", "peerDependencies", "optionalDependencies"):
-                  if section in data:
-                      for name in list(data[section]):
-                          if name.startswith("@replit/") or name == "@workspace/api-client-react":
-                              del data[section][name]
-                              changed = True
-              if changed:
-                  p.write_text(json.dumps(data, indent=2) + "\n")
-
-          # Replace catalog: references with concrete versions for standalone CI.
-          catalog = {
-              "@tailwindcss/vite": "^4.1.14",
-              "@tanstack/react-query": "^5.90.21",
-              "@types/node": "^25.3.3",
-              "@types/react": "^19.2.0",
-              "@types/react-dom": "^19.2.0",
-              "@vitejs/plugin-react": "^5.0.4",
-              "class-variance-authority": "^0.7.1",
-              "clsx": "^2.1.1",
-              "framer-motion": "^12.23.24",
-              "lucide-react": "^0.545.0",
-              "react": "19.1.0",
-              "react-dom": "19.1.0",
-              "tailwind-merge": "^3.3.1",
-              "tailwindcss": "^4.1.14",
-              "tsx": "^4.21.0",
-              "vite": "^7.3.2",
-              "wouter": "^3.3.5",
-              "zod": "^3.25.76"
-          }
-
-          for p in Path(".").rglob("package.json"):
-              try:
-                  data = json.loads(p.read_text())
-              except Exception:
-                  continue
-              changed = False
-              for section in ("dependencies", "devDependencies", "peerDependencies", "optionalDependencies"):
-                  if section in data:
-                      for name, value in list(data[section].items()):
-                          if value == "catalog:" and name in catalog:
-                              data[section][name] = catalog[name]
-                              changed = True
-              if p.as_posix().endswith("/artifacts/settings-calculator/package.json"):
-                  deps = data.get("dependencies", {})
-                  if deps.get("@workspace/green-interface") == "workspace:*":
-                      deps["@workspace/green-interface"] = "file:../green-interface"
-                      changed = True
-                  deps.pop("@workspace/api-client-react", None)
-              if changed:
-                  p.write_text(json.dumps(data, indent=2) + "\n")
-
-          for p in root.rglob("vite.config.ts"):
-              s = p.read_text()
-              s = re.sub(r"^import runtimeErrorOverlay from ['\"]@replit/vite-plugin-runtime-error-modal['\"];\s*\n", "", s, flags=re.M)
-              s = re.sub(r"\n\s*runtimeErrorOverlay\(\),", "", s)
-              s = re.sub(r"\n\s*\.\.\.\(process\.env\.NODE_ENV !== ['\"]production['\"][\s\S]*?\n\s*\],\n", "\n", s)
-              p.write_text(s)
-          PY
+          echo "Application package:"
+          find . -maxdepth 4 -path "*/package.json" -print
 
       - name: Install dependencies
         run: |
-          APP="$(dirname "$(find . -path "*/artifacts/settings-calculator/package.json" -print -quit)")"
+          APP="$(dirname "$(find . -path "*/package.json" -print -quit)")"
           cd "$APP"
-          npm install --legacy-peer-deps
+          npm install --legacy-peer-deps --no-audit --no-fund
 
       - name: Build application
         env:
@@ -120,13 +44,12 @@ jobs:
           PORT: 4173
           BASE_PATH: /settings-calculator/
         run: |
-          APP="$(dirname "$(find . -path "*/artifacts/settings-calculator/package.json" -print -quit)")"
+          APP="$(dirname "$(find . -path "*/package.json" -print -quit)")"
           cd "$APP"
           npm run build
-          DIST="$APP/dist/public"
           rm -rf "$GITHUB_WORKSPACE/pages"
           mkdir -p "$GITHUB_WORKSPACE/pages"
-          cp -R "$DIST"/. "$GITHUB_WORKSPACE/pages"/
+          cp -R dist/public/. "$GITHUB_WORKSPACE/pages"/
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
