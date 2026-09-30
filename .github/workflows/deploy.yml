@@ -31,6 +31,38 @@ jobs:
           mkdir -p buildspace
           tar -xzf project-backup.tar.gz -C buildspace
 
+      - name: Remove Replit-only build integrations
+        working-directory: buildspace
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          import re
+
+          root = Path(".")
+          for p in root.rglob("package.json"):
+              try:
+                  data = json.loads(p.read_text())
+              except Exception:
+                  continue
+              changed = False
+              for section in ("dependencies", "devDependencies", "peerDependencies", "optionalDependencies"):
+                  if section in data:
+                      for name in list(data[section]):
+                          if name.startswith("@replit/"):
+                              del data[section][name]
+                              changed = True
+              if changed:
+                  p.write_text(json.dumps(data, indent=2) + "\n")
+
+          for p in root.rglob("vite.config.ts"):
+              s = p.read_text()
+              s = re.sub(r"^import runtimeErrorOverlay from ['\"]@replit/vite-plugin-runtime-error-modal['\"];\s*\n", "", s, flags=re.M)
+              s = re.sub(r"\n\s*runtimeErrorOverlay\(\),", "", s)
+              s = re.sub(r"\n\s*\.\.\.\(process\.env\.NODE_ENV !== ['\"]production['\"][\s\S]*?\n\s*\],\n", "\n", s)
+              p.write_text(s)
+          PY
+
       - name: Install dependencies
         working-directory: buildspace
         run: |
