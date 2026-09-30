@@ -32,7 +32,6 @@ jobs:
           tar -xzf project-backup.tar.gz -C buildspace
 
       - name: Remove Replit-only build integrations
-        working-directory: buildspace/workspace
         run: |
           python3 - <<'PY'
           import json
@@ -95,19 +94,20 @@ jobs:
           PY
 
       - name: Install dependencies
-        working-directory: buildspace/workspace
         run: |
+          cd buildspace/workspace
           corepack enable
           corepack prepare pnpm@10 --activate
           pnpm install --no-frozen-lockfile
 
       - name: Build application
-        working-directory: buildspace/workspace
         env:
           NODE_ENV: production
           PORT: 4173
           BASE_PATH: /settings-calculator/
-        run: pnpm --filter @workspace/settings-calculator build
+        run: |
+          cd buildspace/workspace
+          pnpm --filter @workspace/settings-calculator build
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
