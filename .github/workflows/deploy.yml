@@ -1,0 +1,66 @@
+name: Deploy settings-calculator to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Extract project
+        run: |
+          mkdir -p buildspace
+          tar -xzf project-backup.tar.gz -C buildspace
+
+      - name: Install dependencies
+        working-directory: buildspace/workspace
+        run: |
+          corepack enable
+          corepack prepare pnpm@10 --activate
+          pnpm install --frozen-lockfile
+
+      - name: Build application
+        working-directory: buildspace/workspace
+        env:
+          NODE_ENV: production
+          PORT: 4173
+          BASE_PATH: /settings-calculator/
+        run: pnpm --filter @workspace/settings-calculator build
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: buildspace/workspace/artifacts/settings-calculator/dist/public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
