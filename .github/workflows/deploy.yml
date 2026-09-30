@@ -32,6 +32,28 @@ jobs:
           echo "Application package:"
           find . -maxdepth 4 -path "*/package.json" -print
 
+      - name: Make TypeScript config standalone
+        run: |
+          python3 - <<'PY'
+          import json
+          p = "tsconfig.json"
+          d = json.load(open(p))
+          d.pop("extends", None)
+          d.pop("references", None)
+          d.setdefault("compilerOptions", {})
+          d["compilerOptions"].update({
+              "noEmit": True,
+              "jsx": "preserve",
+              "lib": ["esnext", "dom", "dom.iterable"],
+              "resolveJsonModule": True,
+              "allowImportingTsExtensions": True,
+              "moduleResolution": "bundler",
+              "types": ["node", "vite/client"],
+              "paths": {"@/*": ["./src/*"]}
+          })
+          json.dump(d, open(p, "w"), indent=2)
+          PY
+
       - name: Install dependencies
         run: |
           npm install --legacy-peer-deps --no-audit --no-fund
