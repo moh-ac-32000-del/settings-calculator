@@ -32,14 +32,14 @@ jobs:
           tar -xzf project-backup.tar.gz -C buildspace
 
       - name: Install dependencies
-        working-directory: buildspace/workspace
+        working-directory: buildspace
         run: |
           corepack enable
           corepack prepare pnpm@10 --activate
           pnpm install --frozen-lockfile
 
       - name: Build application
-        working-directory: buildspace/workspace
+        working-directory: buildspace
         env:
           NODE_ENV: production
           PORT: 4173
@@ -52,7 +52,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: buildspace/workspace/artifacts/settings-calculator/dist/public
+          path: buildspace/artifacts/settings-calculator/dist/public
 
   deploy:
     needs: build
