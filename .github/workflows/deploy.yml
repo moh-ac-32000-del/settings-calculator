@@ -38,7 +38,7 @@ jobs:
           from pathlib import Path
           import re
 
-          root = Path(".")
+          root = Path("buildspace/workspace")
           for p in root.rglob("package.json"):
               try:
                   data = json.loads(p.read_text())
