@@ -47,7 +47,7 @@ jobs:
               for section in ("dependencies", "devDependencies", "peerDependencies", "optionalDependencies"):
                   if section in data:
                       for name in list(data[section]):
-                          if name.startswith("@replit/"):
+                          if name.startswith("@replit/") or name == "@workspace/api-client-react":
                               del data[section][name]
                               changed = True
               if changed:
