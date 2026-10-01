@@ -111,9 +111,14 @@ jobs:
           Path("public/icons/icon-512.png").write_bytes(png_bytes(512))
           for p in ["public/icons/icon-192.png", "public/icons/icon-512.png"]:
               data = Path(p).read_bytes()
-              assert data[:8] == bytes.fromhex("89504e470d0a1a0a"), f"Invalid PNG: {p}"
-              assert len(data) > 1000, f"PNG too small: {p}"
-              print(f"OK: {p} ({len(data)} bytes)")
+              assert data[:8] == bytes.fromhex("89504e470d0a1a0a"), f"Invalid PNG signature: {p}"
+              assert data[12:16] == b"IHDR", f"Missing IHDR: {p}"
+              width = int.from_bytes(data[16:20], "big")
+              height = int.from_bytes(data[20:24], "big")
+              expected = 192 if p.endswith("icon-192.png") else 512
+              assert (width, height) == (expected, expected), f"Invalid dimensions: {p} ({width}x{height})"
+              assert data[-12:-8] == b"IEND", f"Missing IEND: {p}"
+              print(f"OK: {p} ({len(data)} bytes, {width}x{height})")
 
           index = Path("index.html")
           text = index.read_text(encoding="utf-8")
