@@ -117,7 +117,7 @@ jobs:
               height = int.from_bytes(data[20:24], "big")
               expected = 192 if p.endswith("icon-192.png") else 512
               assert (width, height) == (expected, expected), f"Invalid dimensions: {p} ({width}x{height})"
-              assert data[-12:-8] == b"IEND", f"Missing IEND: {p}"
+              assert data[-8:-4] == b"IEND", f"Missing IEND: {p}"
               print(f"OK: {p} ({len(data)} bytes, {width}x{height})")
 
           index = Path("index.html")
