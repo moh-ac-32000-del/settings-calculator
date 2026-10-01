@@ -102,15 +102,16 @@ jobs:
                   for col in range(3):
                       x0=int((.25+col*.17)*s); y0=int((.44+row*.13)*s)
                       rect(x0,y0,x0+int(.10*s),y0+int(.07*s),(67,72,86,255),int(.015*s))
-              raw=b''.join(b'\x00'+bytes(pix[y*s*4:(y+1)*s*4]) for y in range(s))
+              raw=b''.join(bytes([0])+bytes(pix[y*s*4:(y+1)*s*4]) for y in range(s))
               def chunk(t,d): return struct.pack('>I',len(d))+t+d+struct.pack('>I',zlib.crc32(t+d)&0xffffffff)
-              return b'\x89PNG\r\n\\x1a\\n'+chunk(b'IHDR',struct.pack('>IIBBBBB',s,s,8,6,0,0,0))+chunk(b'IDAT',zlib.compress(raw,9))+chunk(b'IEND',b'')
+              png_signature = bytes.fromhex("89504e470d0a1a0a")
+              return png_signature+chunk(b'IHDR',struct.pack('>IIBBBBB',s,s,8,6,0,0,0))+chunk(b'IDAT',zlib.compress(raw,9))+chunk(b'IEND',b'')
           Path("public/icons").mkdir(exist_ok=True)
           Path("public/icons/icon-192.png").write_bytes(png_bytes(192))
           Path("public/icons/icon-512.png").write_bytes(png_bytes(512))
           for p in ["public/icons/icon-192.png", "public/icons/icon-512.png"]:
               data = Path(p).read_bytes()
-              assert data[:8] == b'\x89PNG\r\n\\x1a\\n', f"Invalid PNG: {p}"
+              assert data[:8] == bytes.fromhex("89504e470d0a1a0a"), f"Invalid PNG: {p}"
               assert len(data) > 1000, f"PNG too small: {p}"
               print(f"OK: {p} ({len(data)} bytes)")
 
