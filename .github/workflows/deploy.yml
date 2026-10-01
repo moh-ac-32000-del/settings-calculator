@@ -113,11 +113,11 @@ jobs:
           text = index.read_text(encoding="utf-8")
           import re
           # Remove old manifest/icon tags and install the project-root PWA metadata.
-          text = re.sub(r'<link[^>]+rel=["\\']manifest["\\'][^>]*>', '', text, flags=re.I)
-          text = re.sub(r'<link[^>]+rel=["\\']apple-touch-icon["\\'][^>]*>', '', text, flags=re.I)
+          text = re.sub(r"<link[^>]+rel=['\"]manifest['\"][^>]*>", '', text, flags=re.I)
+          text = re.sub(r"<link[^>]+rel=['\"]apple-touch-icon['\"][^>]*>", '', text, flags=re.I)
           head = '<link rel="manifest" href="/settings-calculator/manifest.webmanifest"><meta name="theme-color" content="#0b0d12"><link rel="apple-touch-icon" sizes="192x192" href="/settings-calculator/icons/icon-192.png">'
           text = text.replace("</head>", head + "</head>")
-          text = re.sub(r'<script>if\\("serviceWorker" in navigator\\).*?</script>', '', text, flags=re.S)
+          text = re.sub(r'<script>if\("serviceWorker" in navigator\).*?</script>', '', text, flags=re.S)
           reg = '<script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("/settings-calculator/sw.js",{scope:"/settings-calculator/"}))}</script>'
           text = text.replace("</body>", reg + "</body>")
           index.write_text(text, encoding="utf-8")
