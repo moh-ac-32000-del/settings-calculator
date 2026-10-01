@@ -44,6 +44,9 @@ jobs:
             "name": "Settings Calculator",
             "short_name": "Calculator",
             "description": "Business pricing calculator",
+            "id": "/settings-calculator/",
+            "lang": "ar",
+            "dir": "rtl",
             "start_url": "/settings-calculator/",
             "scope": "/settings-calculator/",
             "display": "standalone",
@@ -51,13 +54,15 @@ jobs:
             "background_color": "#0b0d12",
             "theme_color": "#0b0d12",
             "icons": [
-              {"src":"/settings-calculator/icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
-              {"src":"/settings-calculator/icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+              {"src":"/settings-calculator/icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+              {"src":"/settings-calculator/icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"maskable"},
+              {"src":"/settings-calculator/icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
+              {"src":"/settings-calculator/icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
             ]
           }\n'''
           Path("public/manifest.webmanifest").write_text(manifest, encoding="utf-8")
 
-          sw = '''const CACHE = "settings-calculator-v1";
+          sw = '''const CACHE = "settings-calculator-v2";
           const BASE = "/settings-calculator/";
           self.addEventListener("install", (event) => {
             event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll([BASE, BASE + "manifest.webmanifest"])).then(() => self.skipWaiting()));
