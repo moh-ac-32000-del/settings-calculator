@@ -32,6 +32,89 @@ jobs:
           echo "Application package:"
           find . -maxdepth 4 -path "*/package.json" -print
 
+      - name: Add PWA files
+        run: |
+          python3 - <<'PY'
+          import os, struct, zlib
+          from pathlib import Path
+
+          Path("public").mkdir(exist_ok=True)
+
+          manifest = '''{
+            "name": "Settings Calculator",
+            "short_name": "Calculator",
+            "description": "Business pricing calculator",
+            "start_url": "/settings-calculator/",
+            "scope": "/settings-calculator/",
+            "display": "standalone",
+            "orientation": "portrait",
+            "background_color": "#0b0d12",
+            "theme_color": "#0b0d12",
+            "icons": [
+              {"src":"/settings-calculator/icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
+              {"src":"/settings-calculator/icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+            ]
+          }\n'''
+          Path("public/manifest.webmanifest").write_text(manifest, encoding="utf-8")
+
+          sw = '''const CACHE = "settings-calculator-v1";
+          const BASE = "/settings-calculator/";
+          self.addEventListener("install", (event) => {
+            event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll([BASE, BASE + "manifest.webmanifest"])).then(() => self.skipWaiting()));
+          });
+          self.addEventListener("activate", (event) => {
+            event.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
+          });
+          self.addEventListener("fetch", (event) => {
+            if (event.request.method !== "GET" || !event.request.url.startsWith(self.location.origin)) return;
+            event.respondWith(fetch(event.request).then((response) => {
+              const copy = response.clone();
+              caches.open(CACHE).then((cache) => cache.put(event.request, copy));
+              return response;
+            }).catch(() => caches.match(event.request).then((cached) => cached || (event.request.mode === "navigate" ? caches.match(BASE) : undefined))));
+          });\n'''
+          Path("public/sw.js").write_text(sw, encoding="utf-8")
+
+          # Generate real PNG icons without external packages.
+          def png_bytes(size):
+              pix = bytearray([11,13,18,255]) * (size*size)
+              def setpx(x,y,c):
+                  if 0 <= x < size and 0 <= y < size:
+                      i=(y*size+x)*4; pix[i:i+4]=bytes(c)
+              def rect(x0,y0,x1,y1,c,r=0):
+                  for y in range(y0,y1):
+                      for x in range(x0,x1):
+                          if r and ((x<x0+r and y<y0+r and (x-(x0+r))**2+(y-(y0+r))**2>r*r) or
+                                    (x>=x1-r and y<y0+r and (x-(x1-r-1))**2+(y-(y0+r))**2>r*r) or
+                                    (x<x0+r and y>=y1-r and (x-(x0+r))**2+(y-(y1-r-1))**2>r*r) or
+                                    (x>=x1-r and y>=y1-r and (x-(x1-r-1))**2+(y-(y1-r-1))**2>r*r)):
+                              continue
+                          setpx(x,y,c)
+              s=size
+              rect(int(.18*s),int(.10*s),int(.82*s),int(.90*s),(31,35,45,255),int(.08*s))
+              rect(int(.25*s),int(.18*s),int(.75*s),int(.35*s),(217,179,74,255),int(.025*s))
+              for row in range(3):
+                  for col in range(3):
+                      x0=int((.25+col*.17)*s); y0=int((.44+row*.13)*s)
+                      rect(x0,y0,x0+int(.10*s),y0+int(.07*s),(67,72,86,255),int(.015*s))
+              raw=b''.join(b'\\x00'+bytes(pix[y*s*4:(y+1)*s*4]) for y in range(s))
+              def chunk(t,d): return struct.pack('>I',len(d))+t+d+struct.pack('>I',zlib.crc32(t+d)&0xffffffff)
+              return b'\\x89PNG\\r\\n\\x1a\\n'+chunk(b'IHDR',struct.pack('>IIBBBBB',s,s,8,6,0,0,0))+chunk(b'IDAT',zlib.compress(raw,9))+chunk(b'IEND',b'')
+          Path("public/icons").mkdir(exist_ok=True)
+          Path("public/icons/icon-192.png").write_bytes(png_bytes(192))
+          Path("public/icons/icon-512.png").write_bytes(png_bytes(512))
+
+          index = Path("index.html")
+          text = index.read_text(encoding="utf-8")
+          head = '<link rel="manifest" href="/settings-calculator/manifest.webmanifest">\\n<meta name="theme-color" content="#0b0d12">\\n<link rel="apple-touch-icon" href="/settings-calculator/icons/icon-192.png">'
+          if "manifest.webmanifest" not in text:
+              text = text.replace("</head>", head + "\\n</head>")
+          reg = '<script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("/settings-calculator/sw.js"))}</script>'
+          if "navigator.serviceWorker.register" not in text:
+              text = text.replace("</body>", reg + "\\n</body>")
+          index.write_text(text, encoding="utf-8")
+          PY
+
       - name: Make TypeScript config standalone
         run: |
           python3 - <<'PY'
