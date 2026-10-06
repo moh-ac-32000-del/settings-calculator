@@ -32,6 +32,13 @@ jobs:
           echo "Application package:"
           find . -maxdepth 4 -path "*/package.json" -print
 
+      - name: Inspect extracted calculator source
+        run: |
+          echo "=== SOURCE FILES ==="
+          find src -type f \( -name "*.tsx" -o -name "*.ts" \) -print | sort
+          echo "=== EXPENSE/SHIPPING/LANGUAGE MATCHES ==="
+          grep -RniE "مصاريف|الشحن|shipping|language|اللغة|نوع العمل|archive|localStorage" src --include='*.tsx' --include='*.ts' | head -n 300 || true
+
       - name: Add PWA files
         run: |
           python3 - <<'PY'
