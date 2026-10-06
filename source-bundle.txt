@@ -1895,7 +1895,7 @@ export default function OperationsPage() {
               {selectedWork && (noSectionsForWork || orderedAvailableSections.length === 0) ? (
                 <EmptyState title={translateKey('noSectionsForThisWork')} detail={translateKey('linkASectionToThisWorkTypeInSettingsThenReturnToTheCalc')} />
               ) : selectedWork && entries.length === 0 ? (
-                <EmptyState title=translateKey('preparingTheFirstSection') detail=translateKey('currentSectionDataWillAppearHere') />
+                <EmptyState title={translateKey('preparingTheFirstSection')} detail={translateKey('currentSectionDataWillAppearHere')} />
               ) : selectedWork ? (
                 <div className="mt-3 space-y-2">
                   {visibleSections.map((section) => {
@@ -2176,8 +2176,8 @@ function MaterialForm({ initial, onSave, onClose }: { initial?: Material; onSave
   const valid = name.trim().length > 0 && Number(price) >= 0 && price !== '';
   return (
     <form onSubmit={(event) => { event.preventDefault(); if (valid) onSave(name, Number(normalizePriceInput(price))); }} className="space-y-5">
-      <Field label=translateKey('materialName')><input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder={translateKey('exampleSatinMetal')} data-testid="input-material-name" className="field-input" /></Field>
-      <Field label=translateKey('unitPrice') hint=translateKey('pricesAreSavedLocallyOnThisDevice')>
+      <Field label={translateKey('materialName')}><input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder={translateKey('exampleSatinMetal')} data-testid="input-material-name" className="field-input" /></Field>
+      <Field label={translateKey('unitPrice')} hint={translateKey('pricesAreSavedLocallyOnThisDevice')}>
         <div className="relative"><Coins size={15} className="pointer-events-none absolute right-3 top-3.5 text-[hsl(var(--muted-foreground))]" /><input type="text" inputMode="decimal" value={price} onChange={(e) => setPrice(normalizePriceInput(e.target.value))} placeholder="0.00" data-testid="input-material-price" className="field-input pr-10" dir="ltr" /></div>
       </Field>
       <div className="flex justify-start gap-2 border-t border-[hsl(var(--border))] pt-5">
@@ -2196,8 +2196,8 @@ function SectionForm({ initial, materials, onSave, onClose }: { initial?: Sectio
   const valid = name.trim().length > 0;
   return (
     <form onSubmit={(event) => { event.preventDefault(); if (valid) onSave(name, mode, materialIds); }} className="space-y-5">
-      <Field label=translateKey('sectionName')><input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder={translateKey(translateKey('exampleSurfaceFinish'))} data-testid="input-section-name" className="field-input" /></Field>
-      <Field label=translateKey('calculationMethod') hint={modeCopy[mode].description}>
+      <Field label={translateKey('sectionName')}><input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder={translateKey('exampleSurfaceFinish')} data-testid="input-section-name" className="field-input" /></Field>
+      <Field label={translateKey('calculationMethod')} hint={modeCopy[mode].description}>
         <div className="grid gap-2 sm:grid-cols-2">
           {(Object.keys(modeCopy) as CalculationMode[]).map((key) => (
             <button type="button" key={key} onClick={() => setMode(key)} data-testid={`button-mode-${key}`} className={cn('rounded-xl border p-3 text-right transition-colors', mode === key ? 'border-[hsl(var(--accent))] bg-[hsl(var(--accent)/.13)]' : 'border-[hsl(var(--border))] hover:bg-[hsl(var(--muted))]')}>
@@ -2207,7 +2207,7 @@ function SectionForm({ initial, materials, onSave, onClose }: { initial?: Sectio
           ))}
         </div>
       </Field>
-      <Field label=translateKey('materialsInThisSection') hint=translateKey('referencesStayLinkedToCurrentMaterialPrice')>
+      <Field label={translateKey('materialsInThisSection')} hint={translateKey('referencesStayLinkedToCurrentMaterialPrice')}>
         <div className="space-y-2">
           {materialIds.length === 0 ? <div className="rounded-xl border border-dashed border-[hsl(var(--border))] px-3 py-3 text-xs text-[hsl(var(--muted-foreground))]">{translateKey('noMaterialsHaveBeenAddedYet')}</div> : materialIds.map((id) => {
             const material = materials.find((item) => item.id === id);
@@ -2226,8 +2226,8 @@ function WorkForm({ initial, sections, onSave, onClose }: { initial?: WorkType; 
   const valid = name.trim().length > 0;
   return (
     <form onSubmit={(event) => { event.preventDefault(); if (valid) onSave(name, sectionIds); }} className="space-y-5">
-      <Field label=translateKey('workTypeName')><input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder={translateKey('exampleStoreSetup')} data-testid="input-work-name" className="field-input" /></Field>
-      <Field label=translateKey('includedSections') hint=translateKey('chooseTheSectionsUsedByThisWorkType')>
+      <Field label={translateKey('workTypeName')}><input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder={translateKey('exampleStoreSetup')} data-testid="input-work-name" className="field-input" /></Field>
+      <Field label={translateKey('includedSections')} hint={translateKey('chooseTheSectionsUsedByThisWorkType')}>
         <div className="space-y-2">{sections.length === 0 ? <div className="rounded-xl border border-dashed border-[hsl(var(--border))] px-3 py-3 text-xs text-[hsl(var(--muted-foreground))]">{translateKey('createASectionFirstToLinkItHere')}</div> : sections.map((section) => <label key={section.id} className={cn('flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors', sectionIds.includes(section.id) ? 'border-[hsl(var(--accent))] bg-[hsl(var(--accent)/.13)]' : 'border-[hsl(var(--border))] hover:bg-[hsl(var(--muted))]')}><input type="checkbox" checked={sectionIds.includes(section.id)} onChange={(e) => setSectionIds((current) => e.target.checked ? [...current, section.id] : current.filter((id) => id !== section.id))} data-testid={`checkbox-work-section-${section.id}`} className="size-4 accent-[hsl(var(--primary))]" /><span className="text-xs font-semibold">{section.name}</span><span className="mr-auto font-mono text-[10px] text-[hsl(var(--muted-foreground))]">{translateKey('materialCount').replace('{count}', formatWesternNumber(section.materialIds.length))}</span></label>)}</div>
       </Field>
       <div className="flex justify-start gap-2 border-t border-[hsl(var(--border))] pt-5"><Button type="submit" variant="primary" disabled={!valid} data-testid="button-save-work"><Check size={14} />{initial ? translateKey('saveChanges') : translateKey('addWorkType')}</Button><Button type="button" variant="ghost" onClick={onClose} data-testid="button-cancel-work">{translateKey('cancel')}</Button></div>
@@ -2296,7 +2296,7 @@ function ShippingExpensesSection({
                 </label>
                 {setting && (
                   <div className="mt-3 grid gap-2 border-t border-[hsl(var(--border))] pt-3 sm:grid-cols-2">
-                    <Field label=translateKey('referenceQuantity') hint=translateKey('mustBeGreaterThanZero')>
+                    <Field label={translateKey('referenceQuantity')} hint={translateKey('mustBeGreaterThanZero')}>
                       <input
                         type="text"
                         inputMode="decimal"
@@ -2307,7 +2307,7 @@ function ShippingExpensesSection({
                         data-testid={`input-shipping-quantity-${section.id}`}
                       />
                     </Field>
-                    <Field label=translateKey('referenceShippingExpense')>
+                    <Field label={translateKey('referenceShippingExpense')}>
                       <input
                         type="text"
                         inputMode="decimal"
@@ -2541,18 +2541,18 @@ export default function SettingsPage() {
       {modal?.kind === 'section' && <Modal title={modal.item ? translateKey('editSection') : translateKey('addSection')} eyebrow={translateKey('calculationUnit')} onClose={() => setModal(null)}><SectionForm initial={modal.item as Section | undefined} materials={state.materials} onClose={() => setModal(null)} onSave={(name, mode, ids) => saveSection((modal.item as Section | undefined)?.id, name, mode, ids)} /></Modal>}
       {modal?.kind === 'work' && <Modal title={modal.item ? translateKey('editWorkType') : translateKey('addWorkType')} eyebrow={translateKey('workTemplate')} onClose={() => setModal(null)}><WorkForm initial={modal.item as WorkType | undefined} sections={state.sections} onClose={() => setModal(null)} onSave={(name, ids) => saveWork((modal.item as WorkType | undefined)?.id, name, ids)} /></Modal>}
       {modal?.kind === 'delete' && <DeleteModal target={modal.target} item={modal.item} detail={deleteDetail} onClose={() => setModal(null)} onConfirm={confirmDelete} />}
-      {modal?.kind === 'share-settings' && <Modal title=translateKey('shareSettings') eyebrow=translateKey('settingsCode') onClose={() => setModal(null)}>
+      {modal?.kind === 'share-settings' && <Modal title={translateKey('shareSettings')} eyebrow={translateKey('settingsCode')} onClose={() => setModal(null)}>
         <p className="text-xs leading-6 text-[hsl(var(--muted-foreground))]">{translateKey(translateKey('shareCodeDescription'))}</p>
         <textarea value={modal.code} readOnly spellCheck={false} dir="ltr" className="field-input mt-4 min-h-28 resize-y font-mono text-[10px] leading-5" aria-label={translateKey('settingsCode')} />
         <div className="mt-4 flex justify-start gap-2"><Button variant="primary" onClick={() => copySettingsCode(modal.code)} data-testid="button-copy-settings-code"><Clipboard size={14} />{translateKey('copyCode')}</Button><Button variant="ghost" onClick={() => setModal(null)} data-testid="button-close-share-settings">{translateKey('close')}</Button></div>
         {transferMessage && <p role="status" className={cn('mt-3 rounded-lg border px-3 py-2 text-xs leading-5', transferMessage.type === 'error' ? 'border-[hsl(var(--destructive)/.3)] bg-[hsl(var(--destructive)/.08)] text-[hsl(var(--destructive))]' : 'border-[hsl(var(--accent)/.3)] bg-[hsl(var(--accent)/.08)] text-[hsl(var(--accent-foreground))]')}>{transferMessage.text}</p>}
       </Modal>}
-      {modal?.kind === 'import-settings' && <Modal title=translateKey('importSettings') eyebrow=translateKey('pasteSettingsCode') onClose={() => setModal(null)}>
+      {modal?.kind === 'import-settings' && <Modal title={translateKey('importSettings')} eyebrow={translateKey('pasteSettingsCode')} onClose={() => setModal(null)}>
         <label className="block"><span className="mb-2 block text-xs font-bold">{translateKey('pasteSettingsCodeHere')}</span><textarea autoFocus value={modal.code} onChange={(event) => updateTransferCode(event.target.value)} spellCheck={false} dir="ltr" className="field-input min-h-36 resize-y font-mono text-[10px] leading-5" aria-label={translateKey('pasteSettingsCodeHere')} placeholder="SC1...." /></label>
         <div className="mt-4 flex flex-wrap justify-start gap-2"><Button variant="secondary" onClick={pasteSettingsCode} data-testid="button-paste-settings-code"><ClipboardPaste size={14} />{translateKey('pasteFromClipboard')}</Button><Button variant="primary" onClick={() => submitImportCode(modal.code)} disabled={!modal.code.trim()} data-testid="button-submit-settings-code"><Check size={14} />{translateKey('importSettings')}</Button><Button variant="ghost" onClick={() => setModal(null)} data-testid="button-cancel-settings-code">{translateKey('cancel')}</Button></div>
         {transferMessage && <p role="status" className={cn('mt-3 rounded-lg border px-3 py-2 text-xs leading-5', transferMessage.type === 'error' ? 'border-[hsl(var(--destructive)/.3)] bg-[hsl(var(--destructive)/.08)] text-[hsl(var(--destructive))]' : 'border-[hsl(var(--accent)/.3)] bg-[hsl(var(--accent)/.08)] text-[hsl(var(--accent-foreground))]')}>{transferMessage.text}</p>}
       </Modal>}
-      {modal?.kind === 'import-preview' && <Modal title=translateKey('importPreview') eyebrow=translateKey('settingsFile') onClose={() => setModal(null)}>
+      {modal?.kind === 'import-preview' && <Modal title={translateKey('importPreview')} eyebrow={translateKey('settingsFile')} onClose={() => setModal(null)}>
         <div className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--background)/.38)] p-4">
           <p className="text-sm font-bold">{translateKey('ayarNizlemesi')}</p>
           <div className="mt-4 grid gap-2 text-xs text-[hsl(var(--muted-foreground))]">{transferCounts(modal.candidate).map((count) => <div key={count} className="flex items-center justify-between rounded-lg bg-[hsl(var(--muted)/.45)] px-3 py-2"><span>{count.split(': ')[0]}</span><span className="font-mono text-[hsl(var(--foreground))]">{count.split(': ')[1]}</span></div>)}</div>
@@ -2672,7 +2672,7 @@ export default function ArchivePage() {
               className="field-input pr-10"
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder=translateKey('searchByCustomerOrWorkType')
+              placeholder={translateKey('searchByCustomerOrWorkType')}
               autoComplete="off"
               data-testid="input-archive-search"
             />
