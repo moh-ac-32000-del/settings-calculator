@@ -7,4 +7,5 @@ export function loadLanguage(): AppLanguage {
 }
 export function saveLanguage(language: AppLanguage) {
   window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+  window.dispatchEvent(new Event('settings-calculator-language-change'));
 }
