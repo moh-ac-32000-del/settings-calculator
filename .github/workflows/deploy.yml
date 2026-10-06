@@ -171,6 +171,10 @@ jobs:
           rm -rf "$GITHUB_WORKSPACE/pages"
           mkdir -p "$GITHUB_WORKSPACE/pages"
           cp -R dist/public/. "$GITHUB_WORKSPACE/pages"/
+          # GitHub Pages serves 404.html for direct refreshes of SPA routes.
+          # Without this fallback, refreshing /settings-calculator/<route> shows GitHub's 404 page.
+          cp "$GITHUB_WORKSPACE/pages/index.html" "$GITHUB_WORKSPACE/pages/404.html"
+          test -s "$GITHUB_WORKSPACE/pages/404.html"
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
