@@ -19,8 +19,8 @@ type ModalState =
   | null;
 
 const modeCopy: Record<CalculationMode, { label: string; description: string; short: string }> = {
-  SELECT_ONE_MULTIPLY: { label: 'اختيار واحد', description: 'اختيار مادة واحدة ثم ضربها في الكمية.', short: 'مرجع واحد' },
-  SUM_SELECTED_MULTIPLY: { label: 'جمع المختار', description: 'جمع المواد المختارة ثم ضرب مجموعها.', short: 'مراجع متعددة' },
+  SELECT_ONE_MULTIPLY: { label: 'اختيار واحد', description: translateKey('singleChoiceDescription'), short: translateKey('singleChoiceShort') },
+  SUM_SELECTED_MULTIPLY: { label: 'جمع المختار', description: translateKey('sumSelectedDescription'), short: translateKey('sumSelectedShort') },
 };
 
 const areaCopy: Record<Area, { label: string; title: string; description: string; eyebrow: string }> = {
@@ -28,19 +28,19 @@ const areaCopy: Record<Area, { label: string; title: string; description: string
     label: 'المواد والأسعار',
     title: 'المواد والأسعار',
     description: 'سجل واحد للمواد التي تشتريها أو تستخدمها، مع سعر كل وحدة.',
-    eyebrow: '01 / سجل الأسعار',
+    eyebrow: translateKey('priceRegisterEyebrow'),
   },
   sections: {
     label: 'الأقسام',
     title: 'الأقسام',
     description: 'مجموعات قابلة لإعادة الاستخدام من المواد مع قاعدة حساب واضحة.',
-    eyebrow: '02 / وحدات الحساب',
+    eyebrow: translateKey('calculationUnitsEyebrow'),
   },
   work: {
     label: 'أنواع الأعمال',
     title: 'أنواع الأعمال',
     description: 'اجمع الأقسام في أنواع الأعمال التي تعود إليها باستمرار.',
-    eyebrow: '03 / قوالب العمل',
+    eyebrow: translateKey('workTemplatesEyebrow'),
   },
 };
 
@@ -134,7 +134,7 @@ function MaterialForm({ initial, onSave, onClose }: { initial?: Material; onSave
         <div className="relative"><Coins size={15} className="pointer-events-none absolute right-3 top-3.5 text-[hsl(var(--muted-foreground))]" /><input type="text" inputMode="decimal" value={price} onChange={(e) => setPrice(normalizePriceInput(e.target.value))} placeholder="0.00" data-testid="input-material-price" className="field-input pr-10" dir="ltr" /></div>
       </Field>
       <div className="flex justify-start gap-2 border-t border-[hsl(var(--border))] pt-5">
-        <Button type="submit" variant="primary" disabled={!valid} data-testid="button-save-material"><Check size={14} />{initial ? 'حفظ التعديلات' : 'إضافة المادة'}</Button>
+        <Button type="submit" variant="primary" disabled={!valid} data-testid="button-save-material"><Check size={14} />{initial ? 'حفظ التعديلات' : translateKey('addMaterial')}</Button>
         <Button type="button" variant="ghost" onClick={onClose} data-testid="button-cancel-material">{translateKey('cancel')}</Button>
       </div>
     </form>
@@ -168,7 +168,7 @@ function SectionForm({ initial, materials, onSave, onClose }: { initial?: Sectio
           })}</div>
         <div className="relative mt-2"><select value="" onChange={(e) => { if (e.target.value) setMaterialIds((current) => [...current, e.target.value]); }} disabled={!available.length} aria-label={translateKey('addMaterialToSection')} data-testid="select-section-material" className="field-input appearance-none pl-8"><option value="">{available.length ? 'إضافة مادة موجودة' : 'تمت إضافة كل المواد'}</option>{available.map((material) => <option key={material.id} value={material.id}>{material.name} · {money(material.price)}</option>)}</select><ChevronDown size={14} className="pointer-events-none absolute left-3 top-3.5 text-[hsl(var(--muted-foreground))]" /></div>
       </Field>
-      <div className="flex justify-start gap-2 border-t border-[hsl(var(--border))] pt-5"><Button type="submit" variant="primary" disabled={!valid} data-testid="button-save-section"><Check size={14} />{initial ? 'حفظ التعديلات' : 'إضافة القسم'}</Button><Button type="button" variant="ghost" onClick={onClose} data-testid="button-cancel-section">{translateKey('cancel')}</Button></div>
+      <div className="flex justify-start gap-2 border-t border-[hsl(var(--border))] pt-5"><Button type="submit" variant="primary" disabled={!valid} data-testid="button-save-section"><Check size={14} />{initial ? 'حفظ التعديلات' : translateKey('addSection')}</Button><Button type="button" variant="ghost" onClick={onClose} data-testid="button-cancel-section">{translateKey('cancel')}</Button></div>
     </form>
   );
 }
@@ -183,7 +183,7 @@ function WorkForm({ initial, sections, onSave, onClose }: { initial?: WorkType; 
       <Field label="الأقسام المضمنة" hint="اختر الأقسام التي يستخدمها نوع العمل هذا.">
         <div className="space-y-2">{sections.length === 0 ? <div className="rounded-xl border border-dashed border-[hsl(var(--border))] px-3 py-3 text-xs text-[hsl(var(--muted-foreground))]">{translateKey('createASectionFirstToLinkItHere')}</div> : sections.map((section) => <label key={section.id} className={cn('flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors', sectionIds.includes(section.id) ? 'border-[hsl(var(--accent))] bg-[hsl(var(--accent)/.13)]' : 'border-[hsl(var(--border))] hover:bg-[hsl(var(--muted))]')}><input type="checkbox" checked={sectionIds.includes(section.id)} onChange={(e) => setSectionIds((current) => e.target.checked ? [...current, section.id] : current.filter((id) => id !== section.id))} data-testid={`checkbox-work-section-${section.id}`} className="size-4 accent-[hsl(var(--primary))]" /><span className="text-xs font-semibold">{section.name}</span><span className="mr-auto font-mono text-[10px] text-[hsl(var(--muted-foreground))]">{formatWesternNumber(section.materialIds.length)} مواد</span></label>)}</div>
       </Field>
-      <div className="flex justify-start gap-2 border-t border-[hsl(var(--border))] pt-5"><Button type="submit" variant="primary" disabled={!valid} data-testid="button-save-work"><Check size={14} />{initial ? 'حفظ التعديلات' : 'إضافة نوع العمل'}</Button><Button type="button" variant="ghost" onClick={onClose} data-testid="button-cancel-work">{translateKey('cancel')}</Button></div>
+      <div className="flex justify-start gap-2 border-t border-[hsl(var(--border))] pt-5"><Button type="submit" variant="primary" disabled={!valid} data-testid="button-save-work"><Check size={14} />{initial ? 'حفظ التعديلات' : translateKey('addWorkType')}</Button><Button type="button" variant="ghost" onClick={onClose} data-testid="button-cancel-work">{translateKey('cancel')}</Button></div>
     </form>
   );
 }
@@ -283,7 +283,7 @@ function ShippingExpensesSection({
 }
 
 function DeleteModal({ target, item, onClose, onConfirm, detail }: { target: EntityKind; item: Material | Section | WorkType; onClose: () => void; onConfirm: () => void; detail: string }) {
-  const label = target === 'material' ? 'المادة' : target === 'section' ? 'القسم' : 'نوع العمل';
+  const label = target === 'material' ? translateKey('material') : target === 'section' ? translateKey('section') : 'نوع العمل';
   return (
     <Modal title={`حذف ${label}؟`} eyebrow="تأكيد مطلوب" onClose={onClose}>
       <div className="flex gap-3 rounded-xl border border-[hsl(var(--destructive)/.28)] bg-[hsl(var(--destructive)/.07)] p-3"><AlertTriangle size={18} className="mt-0.5 shrink-0 text-[hsl(var(--destructive))]" /><p className="text-xs leading-6 text-[hsl(var(--foreground))]">{detail}</p></div>
