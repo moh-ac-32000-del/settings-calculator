@@ -1,8 +1,6 @@
 import type { SettingsState } from '@/lib/settings-store';
 
 export const OPERATIONS_ORDER_STORAGE_KEY = 'settings-calculator-operations-order';
-export const FREE_WORK_ORDER_ID = 'free';
-
 export type OperationsOrder = {
   workOrder: string[];
   sectionOrder: string[];
@@ -17,7 +15,7 @@ function normalizeIds(current: string[] | undefined, availableIds: string[]) {
 }
 
 export function normalizeOperationsOrder(order: Partial<OperationsOrder> | null | undefined, settings: SettingsState): OperationsOrder {
-  const workOrder = normalizeIds(order?.workOrder, [...settings.workTypes.map((work) => work.id), FREE_WORK_ORDER_ID]);
+  const workOrder = normalizeIds(order?.workOrder, settings.workTypes.map((work) => work.id));
   const sectionOrder = normalizeIds(order?.sectionOrder, settings.sections.map((section) => section.id));
   const rawWorkSectionOrders = order?.workSectionOrders && typeof order.workSectionOrders === 'object'
     ? order.workSectionOrders
