@@ -1,0 +1,40 @@
+{
+  "id": "/",
+  "name": "حاسبة العمليات",
+  "short_name": "العمليات",
+  "description": "حاسبة الأعمال والعمليات وإدارة مصاريفها.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0D1616",
+  "theme_color": "#0D1616",
+  "icons": [
+    {
+      "src": "/icons/operations-calculator-192-v2.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/operations-calculator-512-v2.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/operations-calculator-maskable-192-v2.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/operations-calculator-maskable-512-v2.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
