@@ -1211,7 +1211,7 @@ export default function OperationsPage() {
           : translateKey('transferEmptyMaterial').replace('{target}', issue.targetName).replace('{position}', formatWesternNumber(issue.position));
       });
       if (transfer.unfilledTargetPositions.length > 0) {
-        issueMessages.push(translateKey('transferUnfilledPositions').replace('{positions}', transfer.unfilledTargetPositions.join('، ')));
+        issueMessages.push(translateKey('transferUnfilledPositions').replace('{positions}', transfer.unfilledTargetPositions.join(', ')));
       }
 
       setSelectedWork(targetWork);
@@ -1558,7 +1558,7 @@ export default function OperationsPage() {
                         data-testid="input-manual-shipping"
                       />
                       <p className="mt-2 text-[10px] text-[hsl(var(--muted-foreground))]">
-                        الحساب التلقائي الحالي: <span className="font-mono" dir="ltr">{formatWesternNumber(calculatedShippingTotal.toLocaleString('en-US'))}</span>. {translateKey('thisChangeAppliesToThisOperationOnly')}
+                         {translateKey('currentAutomaticCalculationLabel').replace('{amount}', formatWesternNumber(calculatedShippingTotal.toLocaleString('en-US')))}
                       </p>
                     </div>
                   )}
