@@ -5,6 +5,7 @@ import { CalculationMode, createId, loadSettings, Material, saveSettings, Sectio
 import { createSettingsCode, parseSettingsCode } from '@/lib/settings-transfer';
 import { reconcileOperationsOrderAfterSettingsChange } from '@/lib/operations-order-store';
 import { loadLanguage, saveLanguage, type AppLanguage } from '@/lib/language-store';
+import { translateText } from '@/lib/i18n';
 import AppBottomNav from '@/components/app-bottom-nav';
 
 type Area = 'materials' | 'sections' | 'work';
@@ -134,7 +135,7 @@ function MaterialForm({ initial, onSave, onClose }: { initial?: Material; onSave
       </Field>
       <div className="flex justify-start gap-2 border-t border-[hsl(var(--border))] pt-5">
         <Button type="submit" variant="primary" disabled={!valid} data-testid="button-save-material"><Check size={14} />{initial ? 'حفظ التعديلات' : 'إضافة المادة'}</Button>
-        <Button type="button" variant="ghost" onClick={onClose} data-testid="button-cancel-material">إلغاء</Button>
+        <Button type="button" variant="ghost" onClick={onClose} data-testid="button-cancel-material">{translateText("إلغاء")}</Button>
       </div>
     </form>
   );
@@ -161,13 +162,13 @@ function SectionForm({ initial, materials, onSave, onClose }: { initial?: Sectio
       </Field>
       <Field label="المواد في هذا القسم" hint="تبقى المراجع مرتبطة بسعر المادة الحالي.">
         <div className="space-y-2">
-          {materialIds.length === 0 ? <div className="rounded-xl border border-dashed border-[hsl(var(--border))] px-3 py-3 text-xs text-[hsl(var(--muted-foreground))]">لم تتم إضافة مواد بعد.</div> : materialIds.map((id) => {
+          {materialIds.length === 0 ? <div className="rounded-xl border border-dashed border-[hsl(var(--border))] px-3 py-3 text-xs text-[hsl(var(--muted-foreground))]">{translateText("لم تتم إضافة مواد بعد.")}</div> : materialIds.map((id) => {
             const material = materials.find((item) => item.id === id);
             return material ? <div className="flex items-center justify-between rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--background)/.5)] px-3 py-2.5" key={id}><div><p className="text-xs font-semibold">{material.name}</p><p className="font-mono text-[10px] text-[hsl(var(--muted-foreground))]">{money(material.price)}</p></div><button type="button" onClick={() => setMaterialIds((current) => current.filter((value) => value !== id))} className="flex size-9 items-center justify-center rounded-lg text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--muted))] hover:text-[hsl(var(--destructive))]" aria-label={`إزالة ${material.name}`} data-testid={`button-remove-material-${id}`}><Minus size={14} /></button></div> : null;
           })}</div>
         <div className="relative mt-2"><select value="" onChange={(e) => { if (e.target.value) setMaterialIds((current) => [...current, e.target.value]); }} disabled={!available.length} aria-label="إضافة مادة إلى القسم" data-testid="select-section-material" className="field-input appearance-none pl-8"><option value="">{available.length ? 'إضافة مادة موجودة' : 'تمت إضافة كل المواد'}</option>{available.map((material) => <option key={material.id} value={material.id}>{material.name} · {money(material.price)}</option>)}</select><ChevronDown size={14} className="pointer-events-none absolute left-3 top-3.5 text-[hsl(var(--muted-foreground))]" /></div>
       </Field>
-      <div className="flex justify-start gap-2 border-t border-[hsl(var(--border))] pt-5"><Button type="submit" variant="primary" disabled={!valid} data-testid="button-save-section"><Check size={14} />{initial ? 'حفظ التعديلات' : 'إضافة القسم'}</Button><Button type="button" variant="ghost" onClick={onClose} data-testid="button-cancel-section">إلغاء</Button></div>
+      <div className="flex justify-start gap-2 border-t border-[hsl(var(--border))] pt-5"><Button type="submit" variant="primary" disabled={!valid} data-testid="button-save-section"><Check size={14} />{initial ? 'حفظ التعديلات' : 'إضافة القسم'}</Button><Button type="button" variant="ghost" onClick={onClose} data-testid="button-cancel-section">{translateText("إلغاء")}</Button></div>
     </form>
   );
 }
@@ -180,9 +181,9 @@ function WorkForm({ initial, sections, onSave, onClose }: { initial?: WorkType; 
     <form onSubmit={(event) => { event.preventDefault(); if (valid) onSave(name, sectionIds); }} className="space-y-5">
       <Field label="اسم نوع العمل"><input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder="مثال: تجهيز متجر" data-testid="input-work-name" className="field-input" /></Field>
       <Field label="الأقسام المضمنة" hint="اختر الأقسام التي يستخدمها نوع العمل هذا.">
-        <div className="space-y-2">{sections.length === 0 ? <div className="rounded-xl border border-dashed border-[hsl(var(--border))] px-3 py-3 text-xs text-[hsl(var(--muted-foreground))]">أنشئ قسمًا أولًا لربطه هنا.</div> : sections.map((section) => <label key={section.id} className={cn('flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors', sectionIds.includes(section.id) ? 'border-[hsl(var(--accent))] bg-[hsl(var(--accent)/.13)]' : 'border-[hsl(var(--border))] hover:bg-[hsl(var(--muted))]')}><input type="checkbox" checked={sectionIds.includes(section.id)} onChange={(e) => setSectionIds((current) => e.target.checked ? [...current, section.id] : current.filter((id) => id !== section.id))} data-testid={`checkbox-work-section-${section.id}`} className="size-4 accent-[hsl(var(--primary))]" /><span className="text-xs font-semibold">{section.name}</span><span className="mr-auto font-mono text-[10px] text-[hsl(var(--muted-foreground))]">{formatWesternNumber(section.materialIds.length)} مواد</span></label>)}</div>
+        <div className="space-y-2">{sections.length === 0 ? <div className="rounded-xl border border-dashed border-[hsl(var(--border))] px-3 py-3 text-xs text-[hsl(var(--muted-foreground))]">{translateText("أنشئ قسمًا أولًا لربطه هنا.")}</div> : sections.map((section) => <label key={section.id} className={cn('flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors', sectionIds.includes(section.id) ? 'border-[hsl(var(--accent))] bg-[hsl(var(--accent)/.13)]' : 'border-[hsl(var(--border))] hover:bg-[hsl(var(--muted))]')}><input type="checkbox" checked={sectionIds.includes(section.id)} onChange={(e) => setSectionIds((current) => e.target.checked ? [...current, section.id] : current.filter((id) => id !== section.id))} data-testid={`checkbox-work-section-${section.id}`} className="size-4 accent-[hsl(var(--primary))]" /><span className="text-xs font-semibold">{section.name}</span><span className="mr-auto font-mono text-[10px] text-[hsl(var(--muted-foreground))]">{formatWesternNumber(section.materialIds.length)} مواد</span></label>)}</div>
       </Field>
-      <div className="flex justify-start gap-2 border-t border-[hsl(var(--border))] pt-5"><Button type="submit" variant="primary" disabled={!valid} data-testid="button-save-work"><Check size={14} />{initial ? 'حفظ التعديلات' : 'إضافة نوع العمل'}</Button><Button type="button" variant="ghost" onClick={onClose} data-testid="button-cancel-work">إلغاء</Button></div>
+      <div className="flex justify-start gap-2 border-t border-[hsl(var(--border))] pt-5"><Button type="submit" variant="primary" disabled={!valid} data-testid="button-save-work"><Check size={14} />{initial ? 'حفظ التعديلات' : 'إضافة نوع العمل'}</Button><Button type="button" variant="ghost" onClick={onClose} data-testid="button-cancel-work">{translateText("إلغاء")}</Button></div>
     </form>
   );
 }
@@ -219,8 +220,8 @@ function ShippingExpensesSection({
       <div className="section-heading">
         <div>
           <p className="eyebrow">04 / تكلفة إضافية</p>
-          <h2>إعداد مصاريف الشحن</h2>
-          <p className="section-description">حدد الأقسام التي ترتبط بمصاريف شحن مرجعية. تُحسب تلقائيًا في صفحة العمليات حسب كمية القسم.</p>
+          <h2>{translateText("إعداد مصاريف الشحن")}</h2>
+          <p className="section-description">{translateText("حدد الأقسام التي ترتبط بمصاريف شحن مرجعية. تُحسب تلقائيًا في صفحة العمليات حسب كمية القسم.")}</p>
         </div>
         <Truck size={21} className="text-[hsl(var(--accent-foreground))]" />
       </div>
@@ -286,8 +287,8 @@ function DeleteModal({ target, item, onClose, onConfirm, detail }: { target: Ent
   return (
     <Modal title={`حذف ${label}؟`} eyebrow="تأكيد مطلوب" onClose={onClose}>
       <div className="flex gap-3 rounded-xl border border-[hsl(var(--destructive)/.28)] bg-[hsl(var(--destructive)/.07)] p-3"><AlertTriangle size={18} className="mt-0.5 shrink-0 text-[hsl(var(--destructive))]" /><p className="text-xs leading-6 text-[hsl(var(--foreground))]">{detail}</p></div>
-      <p className="mt-5 text-sm leading-7">سيتم حذف <strong>{item.name}</strong>. لا يمكن التراجع عن هذا الإجراء.</p>
-      <div className="mt-6 flex justify-start gap-2"><Button variant="danger" onClick={onConfirm} data-testid={`button-confirm-delete-${target}`}><Trash2 size={14} />حذف {label}</Button><Button variant="ghost" onClick={onClose} data-testid="button-cancel-delete">الاحتفاظ به</Button></div>
+      <p className="mt-5 text-sm leading-7">{translateText("سيتم حذف")} <strong>{item.name}</strong>. لا يمكن التراجع عن هذا الإجراء.</p>
+      <div className="mt-6 flex justify-start gap-2"><Button variant="danger" onClick={onConfirm} data-testid={`button-confirm-delete-${target}`}><Trash2 size={14} />حذف {label}</Button><Button variant="ghost" onClick={onClose} data-testid="button-cancel-delete">{translateText("الاحتفاظ به")}</Button></div>
     </Modal>
   );
 }
@@ -418,12 +419,12 @@ export default function SettingsPage() {
         <header className="pb-5 pt-5 sm:pb-7 sm:pt-8">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <div className="mb-3 flex items-center gap-2 text-[10px] font-medium text-[hsl(var(--accent-foreground))]"><span className="flex size-7 items-center justify-center rounded-lg bg-[hsl(var(--accent)/.13)]"><Hammer size={14} /></span><span>إعدادات الحاسبة</span></div>
-              <h1 className="text-2xl font-extrabold tracking-[-.06em] sm:text-3xl">إعداداتك المحلية</h1>
-              <p className="mt-2 max-w-md text-xs leading-6 text-[hsl(var(--muted-foreground))]">أدر المواد والأسعار والأقسام وأنواع الأعمال من مكان واحد.</p>
+              <div className="mb-3 flex items-center gap-2 text-[10px] font-medium text-[hsl(var(--accent-foreground))]"><span className="flex size-7 items-center justify-center rounded-lg bg-[hsl(var(--accent)/.13)]"><Hammer size={14} /></span><span>{translateText("إعدادات الحاسبة")}</span></div>
+              <h1 className="text-2xl font-extrabold tracking-[-.06em] sm:text-3xl">{translateText("إعداداتك المحلية")}</h1>
+              <p className="mt-2 max-w-md text-xs leading-6 text-[hsl(var(--muted-foreground))]">{translateText("أدر المواد والأسعار والأقسام وأنواع الأعمال من مكان واحد.")}</p>
             </div>
             <div className="stat-chip hidden shrink-0 px-3 py-2 text-left sm:block">
-              <p className="font-mono text-[9px] text-[hsl(var(--muted-foreground))]">محفوظ على الجهاز</p>
+              <p className="font-mono text-[9px] text-[hsl(var(--muted-foreground))]">{translateText("محفوظ على الجهاز")}</p>
               <p className="mt-1 text-xs font-bold text-[hsl(var(--accent-foreground))]">{counts}</p>
             </div>
           </div>
@@ -438,17 +439,17 @@ export default function SettingsPage() {
 
         <main>
           <div className="mb-5 flex items-center justify-between gap-3 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card)/.45)] px-3.5 py-3 text-xs text-[hsl(var(--muted-foreground))]">
-            <div className="flex items-center gap-2"><CircleHelp size={15} className="shrink-0 text-[hsl(var(--accent-foreground))]" /><span>تُحفظ التغييرات تلقائيًا على هذا المتصفح.</span></div>
+            <div className="flex items-center gap-2"><CircleHelp size={15} className="shrink-0 text-[hsl(var(--accent-foreground))]" /><span>{translateText("تُحفظ التغييرات تلقائيًا على هذا المتصفح.")}</span></div>
             {savedAt && <span className="hidden font-mono text-[10px] sm:inline">آخر حفظ {formatWesternNumber(savedAt.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }))}</span>}
           </div>
           <section className="mb-5 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card)/.45)] p-4 sm:p-5" data-testid="language-settings">
             <div className="flex items-start gap-3">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[hsl(var(--accent)/.13)] text-[hsl(var(--accent-foreground))]"><Settings2 size={17} /></div>
               <div className="flex-1">
-                <h2 className="text-sm font-extrabold">اللغة / Language / Dil</h2>
-                <p className="mt-1 text-xs leading-6 text-[hsl(var(--muted-foreground))]">اختر لغة واجهة التطبيق.</p>
+                <h2 className="text-sm font-extrabold">{translateText("اللغة / Language / Dil")}</h2>
+                <p className="mt-1 text-xs leading-6 text-[hsl(var(--muted-foreground))]">{translateText("اختر لغة واجهة التطبيق.")}</p>
                 <select value={language} onChange={(event) => setLanguage(event.target.value as AppLanguage)} className="field-input mt-3" data-testid="select-language">
-                  <option value="ar">العربية</option>
+                  <option value="ar">{translateText("العربية")}</option>
                   <option value="tr">Türkçe</option>
                   <option value="en">English</option>
                 </select>
@@ -459,13 +460,13 @@ export default function SettingsPage() {
             <div className="flex items-start gap-3">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[hsl(var(--accent)/.13)] text-[hsl(var(--accent-foreground))]"><Share2 size={17} /></div>
               <div>
-                <h2 className="text-sm font-extrabold">مشاركة واستيراد الإعدادات</h2>
-                <p className="mt-1 text-xs leading-6 text-[hsl(var(--muted-foreground))]">انقل المواد والأقسام وأنواع الأعمال عبر كود نصي محلي.</p>
+                <h2 className="text-sm font-extrabold">{translateText("مشاركة واستيراد الإعدادات")}</h2>
+                <p className="mt-1 text-xs leading-6 text-[hsl(var(--muted-foreground))]">{translateText("انقل المواد والأقسام وأنواع الأعمال عبر كود نصي محلي.")}</p>
               </div>
             </div>
             <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-              <Button variant="secondary" onClick={openShareSettings} data-testid="button-share-settings"><Share2 size={14} />مشاركة الإعدادات</Button>
-              <Button variant="secondary" onClick={openImportSettings} data-testid="button-import-settings"><ClipboardPaste size={14} />استيراد الإعدادات</Button>
+              <Button variant="secondary" onClick={openShareSettings} data-testid="button-share-settings"><Share2 size={14} />{translateText("مشاركة الإعدادات")}</Button>
+              <Button variant="secondary" onClick={openImportSettings} data-testid="button-import-settings"><ClipboardPaste size={14} />{translateText("استيراد الإعدادات")}</Button>
             </div>
             {transferMessage && <p role="status" className={cn('mt-3 flex items-center gap-2 rounded-lg border px-3 py-2 text-xs leading-5', transferMessage.type === 'error' ? 'border-[hsl(var(--destructive)/.3)] bg-[hsl(var(--destructive)/.08)] text-[hsl(var(--destructive))]' : 'border-[hsl(var(--accent)/.3)] bg-[hsl(var(--accent)/.08)] text-[hsl(var(--accent-foreground))]')}><span className="size-1.5 shrink-0 rounded-full bg-current" />{transferMessage.text}</p>}
           </section>
@@ -476,14 +477,14 @@ export default function SettingsPage() {
             </div>
 
             {activeArea === 'materials' && (state.materials.length === 0
-              ? <EmptyState icon={PackageOpen} title="سجل الأسعار فارغ" detail="أضف مادة للبدء في بناء أقسام حساب قابلة لإعادة الاستخدام." action={<Button variant="primary" onClick={() => openCreate('material')} data-testid="button-empty-add-material"><Plus size={14} />إضافة أول مادة</Button>} />
-              : <div className="overflow-hidden rounded-xl border border-[hsl(var(--border))]"><div className="list-header"><span>المادة</span><span>سعر الوحدة</span><span className="text-left">الإجراءات</span></div>{state.materials.map((material, index) => <div key={material.id} className="list-row" data-testid={`row-material-${material.id}`}><div className="flex min-w-0 items-center gap-3"><span className="index-mark">{formatWesternNumber(String(index + 1).padStart(2, '0'))}</span><span className="truncate text-sm font-semibold">{material.name}</span></div><span className="font-mono text-xs">{money(material.price)}</span><div className="flex justify-end gap-1"><Button variant="ghost" className="size-10 p-0" onClick={() => setModal({ kind: 'material', item: material })} aria-label={`تعديل ${material.name}`} data-testid={`button-edit-material-${material.id}`}><Pencil size={14} /></Button><Button variant="ghost" className="size-10 p-0 hover:text-[hsl(var(--destructive))]" onClick={() => setModal({ kind: 'delete', target: 'material', item: material })} aria-label={`حذف ${material.name}`} data-testid={`button-delete-material-${material.id}`}><Trash2 size={14} /></Button></div></div>)}</div>)}
+              ? <EmptyState icon={PackageOpen} title="سجل الأسعار فارغ" detail="أضف مادة للبدء في بناء أقسام حساب قابلة لإعادة الاستخدام." action={<Button variant="primary" onClick={() => openCreate('material')} data-testid="button-empty-add-material"><Plus size={14} />{translateText("إضافة أول مادة")}</Button>} />
+              : <div className="overflow-hidden rounded-xl border border-[hsl(var(--border))]"><div className="list-header"><span>{translateText("المادة")}</span><span>{translateText("سعر الوحدة")}</span><span className="text-left">{translateText("الإجراءات")}</span></div>{state.materials.map((material, index) => <div key={material.id} className="list-row" data-testid={`row-material-${material.id}`}><div className="flex min-w-0 items-center gap-3"><span className="index-mark">{formatWesternNumber(String(index + 1).padStart(2, '0'))}</span><span className="truncate text-sm font-semibold">{material.name}</span></div><span className="font-mono text-xs">{money(material.price)}</span><div className="flex justify-end gap-1"><Button variant="ghost" className="size-10 p-0" onClick={() => setModal({ kind: 'material', item: material })} aria-label={`تعديل ${material.name}`} data-testid={`button-edit-material-${material.id}`}><Pencil size={14} /></Button><Button variant="ghost" className="size-10 p-0 hover:text-[hsl(var(--destructive))]" onClick={() => setModal({ kind: 'delete', target: 'material', item: material })} aria-label={`حذف ${material.name}`} data-testid={`button-delete-material-${material.id}`}><Trash2 size={14} /></Button></div></div>)}</div>)}
             {activeArea === 'sections' && (state.sections.length === 0
-              ? <EmptyState icon={Layers3} title="لا توجد أقسام بعد" detail="حوّل مجموعة من المواد إلى جزء قابل لإعادة الاستخدام." action={<Button variant="primary" onClick={() => openCreate('section')} data-testid="button-empty-add-section"><Plus size={14} />إضافة أول قسم</Button>} />
-              : <div className="grid gap-3 lg:grid-cols-2">{state.sections.map((section, index) => <div className="section-tile" key={section.id} data-testid={`card-section-${section.id}`}><div className="flex items-start justify-between gap-3"><div className="flex items-start gap-3"><span className="index-mark mt-0.5">{formatWesternNumber(String(index + 1).padStart(2, '0'))}</span><div><h3 className="text-sm font-extrabold">{section.name}</h3><span className="mt-2 inline-flex rounded-full bg-[hsl(var(--accent)/.14)] px-2 py-1 text-[9px] font-bold text-[hsl(var(--accent-foreground))]">{modeCopy[section.calculationMode].label}</span></div></div><div className="flex gap-1"><Button variant="ghost" className="size-10 p-0" onClick={() => setModal({ kind: 'section', item: section })} aria-label={`تعديل ${section.name}`} data-testid={`button-edit-section-${section.id}`}><Pencil size={14} /></Button><Button variant="ghost" className="size-10 p-0 hover:text-[hsl(var(--destructive))]" onClick={() => setModal({ kind: 'delete', target: 'section', item: section })} aria-label={`حذف ${section.name}`} data-testid={`button-delete-section-${section.id}`}><Trash2 size={14} /></Button></div></div><div className="mt-5 border-t border-[hsl(var(--border))] pt-3">{section.materialIds.length ? <div className="flex flex-wrap gap-1.5">{section.materialIds.map((id) => { const material = materialById.get(id); return material ? <span key={id} className="inline-flex items-center gap-1.5 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--background)/.55)] px-2 py-1.5 text-[11px] font-semibold"><span className="size-1.5 rounded-full bg-[hsl(var(--accent))]" />{material.name}<span className="font-mono text-[10px] font-normal text-[hsl(var(--muted-foreground))]">{money(material.price)}</span></span> : null; })}</div> : <p className="text-xs italic leading-6 text-[hsl(var(--muted-foreground))]">لا توجد مواد مرتبطة — عدّل القسم لإضافة مراجع.</p>}</div></div>)}</div>)}
+              ? <EmptyState icon={Layers3} title="لا توجد أقسام بعد" detail="حوّل مجموعة من المواد إلى جزء قابل لإعادة الاستخدام." action={<Button variant="primary" onClick={() => openCreate('section')} data-testid="button-empty-add-section"><Plus size={14} />{translateText("إضافة أول قسم")}</Button>} />
+              : <div className="grid gap-3 lg:grid-cols-2">{state.sections.map((section, index) => <div className="section-tile" key={section.id} data-testid={`card-section-${section.id}`}><div className="flex items-start justify-between gap-3"><div className="flex items-start gap-3"><span className="index-mark mt-0.5">{formatWesternNumber(String(index + 1).padStart(2, '0'))}</span><div><h3 className="text-sm font-extrabold">{section.name}</h3><span className="mt-2 inline-flex rounded-full bg-[hsl(var(--accent)/.14)] px-2 py-1 text-[9px] font-bold text-[hsl(var(--accent-foreground))]">{modeCopy[section.calculationMode].label}</span></div></div><div className="flex gap-1"><Button variant="ghost" className="size-10 p-0" onClick={() => setModal({ kind: 'section', item: section })} aria-label={`تعديل ${section.name}`} data-testid={`button-edit-section-${section.id}`}><Pencil size={14} /></Button><Button variant="ghost" className="size-10 p-0 hover:text-[hsl(var(--destructive))]" onClick={() => setModal({ kind: 'delete', target: 'section', item: section })} aria-label={`حذف ${section.name}`} data-testid={`button-delete-section-${section.id}`}><Trash2 size={14} /></Button></div></div><div className="mt-5 border-t border-[hsl(var(--border))] pt-3">{section.materialIds.length ? <div className="flex flex-wrap gap-1.5">{section.materialIds.map((id) => { const material = materialById.get(id); return material ? <span key={id} className="inline-flex items-center gap-1.5 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--background)/.55)] px-2 py-1.5 text-[11px] font-semibold"><span className="size-1.5 rounded-full bg-[hsl(var(--accent))]" />{material.name}<span className="font-mono text-[10px] font-normal text-[hsl(var(--muted-foreground))]">{money(material.price)}</span></span> : null; })}</div> : <p className="text-xs italic leading-6 text-[hsl(var(--muted-foreground))]">{translateText("لا توجد مواد مرتبطة — عدّل القسم لإضافة مراجع.")}</p>}</div></div>)}</div>)}
             {activeArea === 'work' && (state.workTypes.length === 0
-              ? <EmptyState icon={Settings2} title="لا توجد أنواع أعمال بعد" detail="أنشئ نوع عمل عندما تتكرر مجموعة من الأقسام." action={<Button variant="primary" onClick={() => openCreate('work')} data-testid="button-empty-add-work"><Plus size={14} />إضافة أول نوع عمل</Button>} />
-              : <div className="overflow-hidden rounded-xl border border-[hsl(var(--border))]"><div className="list-header"><span>نوع العمل</span><span>الأقسام المضمنة</span><span className="text-left">الإجراءات</span></div>{state.workTypes.map((work, index) => <div key={work.id} className="list-row" data-testid={`row-work-${work.id}`}><div className="flex min-w-0 items-center gap-3"><span className="index-mark">{formatWesternNumber(String(index + 1).padStart(2, '0'))}</span><span className="truncate text-sm font-semibold">{work.name}</span></div><div className="flex flex-wrap gap-1">{work.sectionIds.length ? work.sectionIds.map((id) => <span key={id} className="rounded-lg bg-[hsl(var(--muted))] px-2 py-1 text-[10px] font-semibold">{state.sections.find((section) => section.id === id)?.name ?? 'قسم غير موجود'}</span>) : <span className="text-xs italic text-[hsl(var(--muted-foreground))]">لا توجد أقسام</span>}</div><div className="flex justify-end gap-1"><Button variant="ghost" className="size-10 p-0" onClick={() => setModal({ kind: 'work', item: work })} aria-label={`تعديل ${work.name}`} data-testid={`button-edit-work-${work.id}`}><Pencil size={14} /></Button><Button variant="ghost" className="size-10 p-0 hover:text-[hsl(var(--destructive))]" onClick={() => setModal({ kind: 'delete', target: 'work', item: work })} aria-label={`حذف ${work.name}`} data-testid={`button-delete-work-${work.id}`}><Trash2 size={14} /></Button></div></div>)}</div>)}
+              ? <EmptyState icon={Settings2} title="لا توجد أنواع أعمال بعد" detail="أنشئ نوع عمل عندما تتكرر مجموعة من الأقسام." action={<Button variant="primary" onClick={() => openCreate('work')} data-testid="button-empty-add-work"><Plus size={14} />{translateText("إضافة أول نوع عمل")}</Button>} />
+              : <div className="overflow-hidden rounded-xl border border-[hsl(var(--border))]"><div className="list-header"><span>{translateText("نوع العمل")}</span><span>{translateText("الأقسام المضمنة")}</span><span className="text-left">{translateText("الإجراءات")}</span></div>{state.workTypes.map((work, index) => <div key={work.id} className="list-row" data-testid={`row-work-${work.id}`}><div className="flex min-w-0 items-center gap-3"><span className="index-mark">{formatWesternNumber(String(index + 1).padStart(2, '0'))}</span><span className="truncate text-sm font-semibold">{work.name}</span></div><div className="flex flex-wrap gap-1">{work.sectionIds.length ? work.sectionIds.map((id) => <span key={id} className="rounded-lg bg-[hsl(var(--muted))] px-2 py-1 text-[10px] font-semibold">{state.sections.find((section) => section.id === id)?.name ?? 'قسم غير موجود'}</span>) : <span className="text-xs italic text-[hsl(var(--muted-foreground))]">{translateText("لا توجد أقسام")}</span>}</div><div className="flex justify-end gap-1"><Button variant="ghost" className="size-10 p-0" onClick={() => setModal({ kind: 'work', item: work })} aria-label={`تعديل ${work.name}`} data-testid={`button-edit-work-${work.id}`}><Pencil size={14} /></Button><Button variant="ghost" className="size-10 p-0 hover:text-[hsl(var(--destructive))]" onClick={() => setModal({ kind: 'delete', target: 'work', item: work })} aria-label={`حذف ${work.name}`} data-testid={`button-delete-work-${work.id}`}><Trash2 size={14} /></Button></div></div>)}</div>)}
           </section>
           <ShippingExpensesSection sections={state.sections} shippingExpenses={state.shippingExpenses} onChange={updateShippingExpenses} />
         </main>
@@ -494,23 +495,23 @@ export default function SettingsPage() {
       {modal?.kind === 'work' && <Modal title={modal.item ? 'تعديل نوع عمل' : 'إضافة نوع عمل'} eyebrow="قالب عمل" onClose={() => setModal(null)}><WorkForm initial={modal.item as WorkType | undefined} sections={state.sections} onClose={() => setModal(null)} onSave={(name, ids) => saveWork((modal.item as WorkType | undefined)?.id, name, ids)} /></Modal>}
       {modal?.kind === 'delete' && <DeleteModal target={modal.target} item={modal.item} detail={deleteDetail} onClose={() => setModal(null)} onConfirm={confirmDelete} />}
       {modal?.kind === 'share-settings' && <Modal title="مشاركة الإعدادات" eyebrow="كود الإعدادات" onClose={() => setModal(null)}>
-        <p className="text-xs leading-6 text-[hsl(var(--muted-foreground))]">انسخ الكود وأرسله للشخص الذي تريد مشاركة إعداداتك معه.</p>
+        <p className="text-xs leading-6 text-[hsl(var(--muted-foreground))]">{translateText("انسخ الكود وأرسله للشخص الذي تريد مشاركة إعداداتك معه.")}</p>
         <textarea value={modal.code} readOnly spellCheck={false} dir="ltr" className="field-input mt-4 min-h-28 resize-y font-mono text-[10px] leading-5" aria-label="كود الإعدادات" />
-        <div className="mt-4 flex justify-start gap-2"><Button variant="primary" onClick={() => copySettingsCode(modal.code)} data-testid="button-copy-settings-code"><Clipboard size={14} />نسخ الكود</Button><Button variant="ghost" onClick={() => setModal(null)} data-testid="button-close-share-settings">إغلاق</Button></div>
+        <div className="mt-4 flex justify-start gap-2"><Button variant="primary" onClick={() => copySettingsCode(modal.code)} data-testid="button-copy-settings-code"><Clipboard size={14} />{translateText("نسخ الكود")}</Button><Button variant="ghost" onClick={() => setModal(null)} data-testid="button-close-share-settings">{translateText("إغلاق")}</Button></div>
         {transferMessage && <p role="status" className={cn('mt-3 rounded-lg border px-3 py-2 text-xs leading-5', transferMessage.type === 'error' ? 'border-[hsl(var(--destructive)/.3)] bg-[hsl(var(--destructive)/.08)] text-[hsl(var(--destructive))]' : 'border-[hsl(var(--accent)/.3)] bg-[hsl(var(--accent)/.08)] text-[hsl(var(--accent-foreground))]')}>{transferMessage.text}</p>}
       </Modal>}
       {modal?.kind === 'import-settings' && <Modal title="استيراد الإعدادات" eyebrow="لصق كود الإعدادات" onClose={() => setModal(null)}>
-        <label className="block"><span className="mb-2 block text-xs font-bold">الصق كود الإعدادات هنا</span><textarea autoFocus value={modal.code} onChange={(event) => updateTransferCode(event.target.value)} spellCheck={false} dir="ltr" className="field-input min-h-36 resize-y font-mono text-[10px] leading-5" aria-label="الصق كود الإعدادات هنا" placeholder="SC1...." /></label>
-        <div className="mt-4 flex flex-wrap justify-start gap-2"><Button variant="secondary" onClick={pasteSettingsCode} data-testid="button-paste-settings-code"><ClipboardPaste size={14} />لصق من الحافظة</Button><Button variant="primary" onClick={() => submitImportCode(modal.code)} disabled={!modal.code.trim()} data-testid="button-submit-settings-code"><Check size={14} />استيراد الإعدادات</Button><Button variant="ghost" onClick={() => setModal(null)} data-testid="button-cancel-settings-code">إلغاء</Button></div>
+        <label className="block"><span className="mb-2 block text-xs font-bold">{translateText("الصق كود الإعدادات هنا")}</span><textarea autoFocus value={modal.code} onChange={(event) => updateTransferCode(event.target.value)} spellCheck={false} dir="ltr" className="field-input min-h-36 resize-y font-mono text-[10px] leading-5" aria-label="الصق كود الإعدادات هنا" placeholder="SC1...." /></label>
+        <div className="mt-4 flex flex-wrap justify-start gap-2"><Button variant="secondary" onClick={pasteSettingsCode} data-testid="button-paste-settings-code"><ClipboardPaste size={14} />{translateText("لصق من الحافظة")}</Button><Button variant="primary" onClick={() => submitImportCode(modal.code)} disabled={!modal.code.trim()} data-testid="button-submit-settings-code"><Check size={14} />{translateText("استيراد الإعدادات")}</Button><Button variant="ghost" onClick={() => setModal(null)} data-testid="button-cancel-settings-code">{translateText("إلغاء")}</Button></div>
         {transferMessage && <p role="status" className={cn('mt-3 rounded-lg border px-3 py-2 text-xs leading-5', transferMessage.type === 'error' ? 'border-[hsl(var(--destructive)/.3)] bg-[hsl(var(--destructive)/.08)] text-[hsl(var(--destructive))]' : 'border-[hsl(var(--accent)/.3)] bg-[hsl(var(--accent)/.08)] text-[hsl(var(--accent-foreground))]')}>{transferMessage.text}</p>}
       </Modal>}
       {modal?.kind === 'import-preview' && <Modal title="معاينة الاستيراد" eyebrow="ملف الإعدادات" onClose={() => setModal(null)}>
         <div className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--background)/.38)] p-4">
-          <p className="text-sm font-bold">معاينة الإعدادات</p>
+          <p className="text-sm font-bold">{translateText("معاينة الإعدادات")}</p>
           <div className="mt-4 grid gap-2 text-xs text-[hsl(var(--muted-foreground))]">{transferCounts(modal.candidate).map((count) => <div key={count} className="flex items-center justify-between rounded-lg bg-[hsl(var(--muted)/.45)] px-3 py-2"><span>{count.split(': ')[0]}</span><span className="font-mono text-[hsl(var(--foreground))]">{count.split(': ')[1]}</span></div>)}</div>
         </div>
-        <div className="mt-5 flex gap-3 rounded-xl border border-[hsl(var(--destructive)/.28)] bg-[hsl(var(--destructive)/.07)] p-3"><AlertTriangle size={18} className="mt-0.5 shrink-0 text-[hsl(var(--destructive))]" /><p className="text-xs leading-6">استيراد هذه الإعدادات سيستبدل الإعدادات الحالية.</p></div>
-        <div className="mt-6 flex justify-start gap-2"><Button variant="danger" onClick={confirmImport} data-testid="button-confirm-import"><Check size={14} />تأكيد الاستيراد</Button><Button variant="ghost" onClick={() => setModal(null)} data-testid="button-cancel-import-preview">إلغاء</Button></div>
+        <div className="mt-5 flex gap-3 rounded-xl border border-[hsl(var(--destructive)/.28)] bg-[hsl(var(--destructive)/.07)] p-3"><AlertTriangle size={18} className="mt-0.5 shrink-0 text-[hsl(var(--destructive))]" /><p className="text-xs leading-6">{translateText("استيراد هذه الإعدادات سيستبدل الإعدادات الحالية.")}</p></div>
+        <div className="mt-6 flex justify-start gap-2"><Button variant="danger" onClick={confirmImport} data-testid="button-confirm-import"><Check size={14} />{translateText("تأكيد الاستيراد")}</Button><Button variant="ghost" onClick={() => setModal(null)} data-testid="button-cancel-import-preview">{translateText("إلغاء")}</Button></div>
       </Modal>}
       <AppBottomNav />
     </div>
