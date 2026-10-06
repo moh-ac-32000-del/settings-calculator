@@ -1477,7 +1477,7 @@ export default function OperationsPage() {
               {selectedWork && (noSectionsForWork || orderedAvailableSections.length === 0) ? (
                 <EmptyState title={translateKey('noSectionsForThisWork')} detail={translateKey('linkASectionToThisWorkTypeInSettingsThenReturnToTheCalc')} />
               ) : selectedWork && entries.length === 0 ? (
-                <EmptyState title=translateKey('preparingTheFirstSection') detail=translateKey('currentSectionDataWillAppearHere') />
+                <EmptyState title={translateKey('preparingTheFirstSection')} detail={translateKey('currentSectionDataWillAppearHere')} />
               ) : selectedWork ? (
                 <div className="mt-3 space-y-2">
                   {visibleSections.map((section) => {
