@@ -16,6 +16,7 @@ import { getOperationFromArchive, saveOperationToArchive, updateOperationInArchi
 import { FREE_WORK_ORDER_ID, getSectionOrderForWork, loadOperationsOrder, normalizeOperationsOrder, OperationsOrder, saveOperationsOrder } from '@/lib/operations-order-store';
 import { transferEntriesByPosition, type TransferIssue } from '@/lib/operation-transfer';
 import AppBottomNav from '@/components/app-bottom-nav';
+import { translateText } from '@/lib/i18n';
 
 type WorkChoice = 'free' | string;
 type OperationEntry = {
@@ -113,11 +114,11 @@ function QuantityKeypad({
 
   const keys = ['7', '8', '9', '4', '5', '6', '1', '2', '3', 'clear', '0', 'backspace'];
   return (
-    <div ref={keypadRef} tabIndex={-1} className="quantity-keypad" aria-label="لوحة إدخال الكمية" data-testid="quantity-keypad">
+    <div ref={keypadRef} tabIndex={-1} className="quantity-keypad" aria-label={translateText("لوحة إدخال الكمية")} data-testid="quantity-keypad">
       <div className="mb-3 flex items-center justify-between gap-3">
         <div>
-          <p className="text-[10px] font-bold text-[hsl(var(--accent-foreground))]">إدخال سريع</p>
-          <p className="mt-1 text-[11px] text-[hsl(var(--muted-foreground))]">تعديل كمية هذا القسم فقط</p>
+          <p className="text-[10px] font-bold text-[hsl(var(--accent-foreground))]">{translateText("إدخال سريع")}</p>
+          <p className="mt-1 text-[11px] text-[hsl(var(--muted-foreground))]">{translateText("تعديل كمية هذا القسم فقط")}</p>
         </div>
          <span className="keypad-value" dir="ltr">{value || '0'}</span>
       </div>
@@ -162,14 +163,14 @@ function FinishOperationModal({
         <div className="flex items-start gap-3">
           <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[hsl(var(--destructive)/.1)] text-[hsl(var(--destructive))]"><AlertTriangle size={18} /></span>
           <div>
-            <p className="eyebrow">تأكيد العملية</p>
+            <p className="eyebrow">{translateText("تأكيد العملية")}</p>
             <h2 className="mt-2 text-lg font-extrabold">{title}</h2>
             <p className="mt-2 text-xs leading-6 text-[hsl(var(--muted-foreground))]">{description}</p>
           </div>
         </div>
         <div className="mt-6 flex justify-start gap-2">
           <button type="button" className="finish-confirm-button" onClick={onConfirm} data-testid="button-confirm-finish-operation">{confirmLabel}</button>
-          <button type="button" className="finish-cancel-button" onClick={onClose} data-testid="button-cancel-finish-operation">إلغاء</button>
+          <button type="button" className="finish-cancel-button" onClick={onClose} data-testid="button-cancel-finish-operation">{translateText("إلغاء")}</button>
         </div>
       </div>
     </div>
@@ -194,16 +195,16 @@ function TransferWorkTypeModal({
       <div className="dialog-panel w-full max-w-md rounded-t-2xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-5 shadow-2xl sm:rounded-2xl sm:p-6" role="dialog" aria-modal="true" aria-labelledby="transfer-work-title">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="eyebrow">نقل العملية</p>
-            <h2 id="transfer-work-title" className="mt-2 text-lg font-extrabold">اختر نوع العمل الذي تريد نقل العملية إليه</h2>
-            <p className="mt-2 text-xs leading-6 text-[hsl(var(--muted-foreground))]">سيُحفظ العمل الحالي في الأرشيف قبل النقل، ويبقى اسم العميل كما هو.</p>
+            <p className="eyebrow">{translateText("نقل العملية")}</p>
+            <h2 id="transfer-work-title" className="mt-2 text-lg font-extrabold">{translateText("اختر نوع العمل الذي تريد نقل العملية إليه")}</h2>
+            <p className="mt-2 text-xs leading-6 text-[hsl(var(--muted-foreground))]">{translateText("سيُحفظ العمل الحالي في الأرشيف قبل النقل، ويبقى اسم العميل كما هو.")}</p>
           </div>
-          <button type="button" className="dialog-close-button shrink-0" onClick={onClose} aria-label="إغلاق نافذة نقل العملية" data-testid="button-close-transfer">
+          <button type="button" className="dialog-close-button shrink-0" onClick={onClose} aria-label={translateText("إغلاق نافذة نقل العملية")} data-testid="button-close-transfer">
             <X size={17} />
           </button>
         </div>
         {choices.length === 0 ? (
-          <p className="mt-5 rounded-xl border border-dashed border-[hsl(var(--border))] p-4 text-xs text-[hsl(var(--muted-foreground))]">لا توجد أنواع عمل أخرى متاحة للنقل إليها.</p>
+          <p className="mt-5 rounded-xl border border-dashed border-[hsl(var(--border))] p-4 text-xs text-[hsl(var(--muted-foreground))]">{translateText("لا توجد أنواع عمل أخرى متاحة للنقل إليها.")}</p>
         ) : (
           <div className="mt-5 grid max-h-[50dvh] gap-2 overflow-y-auto">
             {choices.map((choice) => (
@@ -221,7 +222,7 @@ function TransferWorkTypeModal({
           </div>
         )}
         <div className="mt-5 flex justify-start">
-          <button type="button" className="finish-cancel-button" onClick={onClose} data-testid="button-cancel-transfer">إلغاء</button>
+          <button type="button" className="finish-cancel-button" onClick={onClose} data-testid="button-cancel-transfer">{translateText("إلغاء")}</button>
         </div>
       </div>
     </div>
@@ -281,7 +282,7 @@ function SectionOperation({
     <article className="operation-card" data-testid={`card-operation-section-${section.id}`}>
       <div className="operation-card-heading">
         <div className="min-w-0">
-          <p className="eyebrow">قسم الحساب</p>
+          <p className="eyebrow">{translateText("قسم الحساب")}</p>
           <h2 className="mt-1 truncate text-base font-extrabold tracking-[-.035em]">{section.name}</h2>
         </div>
         <span className="mode-tag">{isSingle ? 'اختيار واحد' : 'جمع المختار'}</span>
@@ -290,13 +291,13 @@ function SectionOperation({
       {sectionMaterials.length === 0 ? (
         <div className="safe-empty" data-testid={`empty-materials-${section.id}`}>
           <SlidersHorizontal size={15} />
-          <span>لا توجد مواد متاحة لهذا القسم حاليًا.</span>
+          <span>{translateText("لا توجد مواد متاحة لهذا القسم حاليًا.")}</span>
         </div>
       ) : isSingle ? (
         <div className="mt-4">
           <div className="mb-2 flex items-center justify-between">
-            <p className="text-xs font-bold">المواد</p>
-            <p className="text-[10px] text-[hsl(var(--muted-foreground))]">اختر مادة واحدة</p>
+            <p className="text-xs font-bold">{translateText("المواد")}</p>
+            <p className="text-[10px] text-[hsl(var(--muted-foreground))]">{translateText("اختر مادة واحدة")}</p>
           </div>
           <div className="material-choice-list">
             {sectionMaterials.map((material) => (
@@ -312,8 +313,8 @@ function SectionOperation({
       ) : (
         <div className="mt-4">
           <div className="mb-2 flex items-center justify-between">
-            <p className="text-xs font-bold">المواد</p>
-            <p className="text-[10px] text-[hsl(var(--muted-foreground))]">محددة من إعدادات القسم</p>
+            <p className="text-xs font-bold">{translateText("المواد")}</p>
+            <p className="text-[10px] text-[hsl(var(--muted-foreground))]">{translateText("محددة من إعدادات القسم")}</p>
           </div>
           <div className="material-summary">
             {sectionMaterials.map((material) => (
@@ -328,8 +329,8 @@ function SectionOperation({
 
       <div className="quantity-row">
         <div>
-          <p className="text-xs font-bold">الكمية</p>
-          <p className="mt-1 text-[10px] text-[hsl(var(--muted-foreground))]">اضغط لإدخال الرقم</p>
+          <p className="text-xs font-bold">{translateText("الكمية")}</p>
+          <p className="mt-1 text-[10px] text-[hsl(var(--muted-foreground))]">{translateText("اضغط لإدخال الرقم")}</p>
         </div>
         <button
           type="button"
@@ -346,7 +347,7 @@ function SectionOperation({
       {active && <QuantityKeypad value={entry.quantity} onKey={onQuantityKey} />}
 
       <div className="operation-result" data-testid={`result-section-${section.id}`}>
-        <span>نتيجة القسم</span>
+        <span>{translateText("نتيجة القسم")}</span>
         <strong dir="ltr">{formatAmount(result)}</strong>
       </div>
     </article>
@@ -366,8 +367,8 @@ function WorkPicker({
     <section className="work-picker work-choice-screen" data-testid="work-picker">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="eyebrow">اختر نوع العمل</p>
-          <p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">اختر قالبًا للبدء بالحساب.</p>
+          <p className="eyebrow">{translateText("اختر نوع العمل")}</p>
+          <p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">{translateText("اختر قالبًا للبدء بالحساب.")}</p>
         </div>
         <Button type="button" variant="outline" size="sm" className="order-operations-button" onClick={onOpenOrder} data-testid="button-open-operations-order">
           <ListOrdered size={15} />
@@ -574,14 +575,14 @@ function OrderEditorModal({
   return (
     <div className="operations-order-modal" style={ORDER_THEME_STYLE}>
       <div className="order-modal-backdrop dialog-backdrop fixed inset-0 z-40 flex items-end justify-center p-0 sm:items-center sm:p-4" role="presentation">
-      <div className="order-dialog-panel w-full max-w-lg rounded-t-2xl border p-5 shadow-2xl sm:rounded-2xl sm:p-6" role="dialog" aria-modal="true" aria-label="ترتيب العمليات">
+      <div className="order-dialog-panel w-full max-w-lg rounded-t-2xl border p-5 shadow-2xl sm:rounded-2xl sm:p-6" role="dialog" aria-modal="true" aria-label={translateText("ترتيب العمليات")}>
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="eyebrow">تخصيص العرض</p>
-            <h2 className="mt-2 text-lg font-extrabold">ترتيب العمليات</h2>
-            <p className="mt-2 text-xs leading-6 text-[hsl(var(--muted-foreground))]">رتّب أنواع الأعمال أولًا، ثم افتح أي نوع لترتيب أقسامه.</p>
+            <p className="eyebrow">{translateText("تخصيص العرض")}</p>
+            <h2 className="mt-2 text-lg font-extrabold">{translateText("ترتيب العمليات")}</h2>
+            <p className="mt-2 text-xs leading-6 text-[hsl(var(--muted-foreground))]">{translateText("رتّب أنواع الأعمال أولًا، ثم افتح أي نوع لترتيب أقسامه.")}</p>
           </div>
-          <button type="button" className="dialog-close-button" onClick={onClose} aria-label="إغلاق" data-testid="button-close-operations-order">
+          <button type="button" className="dialog-close-button" onClick={onClose} aria-label={translateText("إغلاق")} data-testid="button-close-operations-order">
             <X size={17} />
           </button>
         </div>
@@ -600,14 +601,14 @@ function OrderEditorModal({
               </button>
               <div className="order-subview-heading">
                 <div>
-                  <p className="eyebrow">ترتيب الأقسام</p>
+                  <p className="eyebrow">{translateText("ترتيب الأقسام")}</p>
                   <h3 className="mt-2 text-base font-extrabold">ترتيب أقسام {activeWork.workLabel}</h3>
-                  <p className="mt-1 text-[10px] leading-5 text-[hsl(var(--muted-foreground))]">اسحب الصف كاملًا لترتيب الأقسام، أو استخدم الأسهم.</p>
+                  <p className="mt-1 text-[10px] leading-5 text-[hsl(var(--muted-foreground))]">{translateText("اسحب الصف كاملًا لترتيب الأقسام، أو استخدم الأسهم.")}</p>
                 </div>
                 <Layers3 size={18} className="text-[hsl(var(--accent-foreground))]" />
               </div>
               {activeWork.items.length === 0 ? (
-                <p className="order-empty-note">لا توجد أقسام مرتبطة بهذا النوع بعد.</p>
+                <p className="order-empty-note">{translateText("لا توجد أقسام مرتبطة بهذا النوع بعد.")}</p>
               ) : (
                 <SortableOrderList
                   items={activeWork.items}
@@ -627,8 +628,8 @@ function OrderEditorModal({
             <>
               <div className="order-editor-heading">
                 <div>
-                  <p className="text-xs font-bold">ترتيب أنواع الأعمال</p>
-                  <p className="mt-1 text-[10px] text-[hsl(var(--muted-foreground))]">يشمل «عمل حر» كخيار مستقل. اضغط أي صف لترتيب أقسامه.</p>
+                  <p className="text-xs font-bold">{translateText("ترتيب أنواع الأعمال")}</p>
+                  <p className="mt-1 text-[10px] text-[hsl(var(--muted-foreground))]">{translateText("يشمل «عمل حر» كخيار مستقل. اضغط أي صف لترتيب أقسامه.")}</p>
                 </div>
                 <Calculator size={17} className="text-[hsl(var(--accent-foreground))]" />
               </div>
@@ -645,8 +646,8 @@ function OrderEditorModal({
           <section className="order-editor-section">
             <div className="order-editor-heading">
               <div>
-                <p className="text-xs font-bold">ترتيب الأقسام العام</p>
-                <p className="mt-1 text-[10px] text-[hsl(var(--muted-foreground))]">هذا الترتيب هو fallback لأي نوع عمل لا يملك تخصيصًا مستقلًا.</p>
+                <p className="text-xs font-bold">{translateText("ترتيب الأقسام العام")}</p>
+                <p className="mt-1 text-[10px] text-[hsl(var(--muted-foreground))]">{translateText("هذا الترتيب هو fallback لأي نوع عمل لا يملك تخصيصًا مستقلًا.")}</p>
               </div>
               <Layers3 size={17} className="text-[hsl(var(--accent-foreground))]" />
             </div>
@@ -704,11 +705,11 @@ function SectionProgress({
           <h2 className="operation-progress-title" data-testid="active-section-name">{activeSection.name}</h2>
         </div>
         <div className="auto-advance-toggle">
-          <span id="auto-advance-label">الانتقال التلقائي</span>
+          <span id="auto-advance-label">{translateText("الانتقال التلقائي")}</span>
           <Switch
             checked={autoAdvanceEnabled}
             onCheckedChange={onAutoAdvanceChange}
-            aria-label="الانتقال التلقائي بين الأقسام"
+            aria-label={translateText("الانتقال التلقائي بين الأقسام")}
             aria-labelledby="auto-advance-label"
             data-testid="switch-auto-advance"
           />
@@ -1336,7 +1337,7 @@ export default function OperationsPage() {
                   size="sm"
                   className="operation-back-button"
                   onClick={returnToWorkChoices}
-                  aria-label="العودة إلى اختيار نوع العمل"
+                  aria-label={translateText("العودة إلى اختيار نوع العمل")}
                   data-testid="button-back-work-choice"
                 >
                   <ChevronLeft size={15} />
@@ -1351,7 +1352,7 @@ export default function OperationsPage() {
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button type="button" variant="outline" size="icon" className="operation-menu-button" aria-label="إجراءات العملية" data-testid="button-open-operation-menu">
+                  <Button type="button" variant="outline" size="icon" className="operation-menu-button" aria-label={translateText("إجراءات العملية")} data-testid="button-open-operation-menu">
                     <MoreVertical size={17} />
                   </Button>
                 </DropdownMenuTrigger>
@@ -1384,7 +1385,7 @@ export default function OperationsPage() {
               <div>
                 <div className="mb-3 flex items-center gap-2 text-[10px] font-medium text-[hsl(var(--accent-foreground))]">
                   <span className="flex size-7 items-center justify-center rounded-lg bg-[hsl(var(--accent)/.13)]"><Calculator size={14} /></span>
-                  <span>حاسبة العمليات</span>
+                  <span>{translateText("حاسبة العمليات")}</span>
                 </div>
                 <h1 className="text-2xl font-extrabold tracking-[-.06em] sm:text-3xl">{isArchiveEditing ? 'تعديل عملية محفوظة' : 'اختر نوع العمل'}</h1>
                 <p className="mt-2 max-w-md text-xs leading-6 text-[hsl(var(--muted-foreground))]">
@@ -1394,7 +1395,7 @@ export default function OperationsPage() {
               {!isArchiveEditing && (
                 <Link href="/settings" className="settings-link" data-testid="link-settings">
                   <Settings2 size={15} />
-                  <span className="hidden sm:inline">الإعدادات</span>
+                  <span className="hidden sm:inline">{translateText("الإعدادات")}</span>
                 </Link>
               )}
             </div>
@@ -1405,7 +1406,7 @@ export default function OperationsPage() {
           <>
             {noWorkTypes && !isArchiveEditing && (
               <div className="operations-notice" data-testid="notice-no-work-types">
-                <span>لا توجد أنواع أعمال محفوظة. يمكنك استخدام «عمل حر» أو فتح الإعدادات لإنشاء قالب.</span>
+                <span>{translateText("لا توجد أنواع أعمال محفوظة. يمكنك استخدام «عمل حر» أو فتح الإعدادات لإنشاء قالب.")}</span>
                 <Link href="/settings" className="operation-link" data-testid="link-notice-settings">
                   <Settings2 size={14} />
                   الإعدادات
@@ -1414,7 +1415,7 @@ export default function OperationsPage() {
             )}
             {(isArchiveEditing || customerNameVisible || workName.trim() || workNameValidationError) && (
               <section className="customer-name-panel" data-testid="current-work-name">
-                <label htmlFor="input-current-work-name" className="eyebrow">اسم العميل</label>
+                <label htmlFor="input-current-work-name" className="eyebrow">{translateText("اسم العميل")}</label>
                 <input
                   id="input-current-work-name"
                   ref={customerNameInputRef}
@@ -1429,7 +1430,7 @@ export default function OperationsPage() {
                       setBackNavigationNotice('');
                     }
                   }}
-                  placeholder="مثال: أحمد"
+                  placeholder={translateText("مثال: أحمد")}
                   autoComplete="off"
                   aria-invalid={Boolean(workNameValidationError)}
                   aria-describedby={workNameValidationError ? 'work-name-validation-error' : undefined}
@@ -1511,7 +1512,7 @@ export default function OperationsPage() {
               {selectedWork && visibleSections.length > 0 && (
                 <>
                   <div className="shipping-total" data-testid="shipping-expenses-total">
-                    <span>مصاريف الشحن</span>
+                    <span>{translateText("مصاريف الشحن")}</span>
                     <strong dir="ltr">{formatWesternNumber(Math.round(shippingTotal).toLocaleString('en-US'))}</strong>
                   </div>
                   <label className="shipping-option" data-testid="shipping-expenses-toggle">
@@ -1524,7 +1525,7 @@ export default function OperationsPage() {
                       }}
                       data-testid="checkbox-include-shipping"
                     />
-                    <span>احتساب مصاريف الشحن</span>
+                    <span>{translateText("احتساب مصاريف الشحن")}</span>
                   </label>
                   <label className="shipping-option" data-testid="manual-shipping-toggle">
                     <input
@@ -1536,11 +1537,11 @@ export default function OperationsPage() {
                       }}
                       data-testid="checkbox-manual-shipping"
                     />
-                    <span>تعديل يدوي لمصاريف الشحن</span>
+                    <span>{translateText("تعديل يدوي لمصاريف الشحن")}</span>
                   </label>
                   {manualShippingEnabled && (
                     <div className="mt-2 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card)/.55)] p-3" data-testid="manual-shipping-input-wrap">
-                      <label htmlFor="input-manual-shipping" className="text-xs font-bold">قيمة مصاريف الشحن لهذه العملية</label>
+                      <label htmlFor="input-manual-shipping" className="text-xs font-bold">{translateText("قيمة مصاريف الشحن لهذه العملية")}</label>
                       <input
                         id="input-manual-shipping"
                         type="number"
@@ -1565,13 +1566,13 @@ export default function OperationsPage() {
                     <div className="flex items-center justify-between gap-3">
                       <label className="shipping-option m-0 flex-1">
                         <input type="checkbox" checked={additionalExpensesEnabled} onChange={(event) => { cancelAutoAdvance(); const enabled = event.target.checked; setAdditionalExpensesEnabled(enabled); if (!enabled) setAdditionalExpensesValue('0'); }} data-testid="checkbox-additional-expenses" />
-                        <span>مصاريف إضافية</span>
+                        <span>{translateText("مصاريف إضافية")}</span>
                       </label>
                       <strong className="font-mono text-xs" dir="ltr">{formatWesternNumber(additionalExpensesAmount.toLocaleString('en-US'))}</strong>
                     </div>
                     {additionalExpensesEnabled && (
                       <div className="mt-2">
-                        <label htmlFor="input-additional-expenses" className="text-xs font-bold">قيمة المصاريف الإضافية لهذه العملية</label>
+                        <label htmlFor="input-additional-expenses" className="text-xs font-bold">{translateText("قيمة المصاريف الإضافية لهذه العملية")}</label>
                         <input id="input-additional-expenses" type="text" inputMode="decimal" dir="ltr" className="field-input mt-2 text-left font-mono" value={additionalExpensesValue} onChange={(event) => { cancelAutoAdvance(); setAdditionalExpensesValue(event.target.value); }} data-testid="input-additional-expenses" />
                       </div>
                     )}
@@ -1579,8 +1580,8 @@ export default function OperationsPage() {
                   <div className="final-total" data-testid="final-total">
                     <div className="final-total-summary">
                       <div>
-                        <p className="eyebrow">إجمالي العملية</p>
-                        <p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">مجموع نتائج الأقسام الحالية + مصاريف الشحن</p>
+                        <p className="eyebrow">{translateText("إجمالي العملية")}</p>
+                        <p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">{translateText("مجموع نتائج الأقسام الحالية + مصاريف الشحن")}</p>
                       </div>
                       <strong dir="ltr">{formatAmount(finalTotal)}</strong>
                     </div>
