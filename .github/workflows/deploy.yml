@@ -52,7 +52,7 @@ jobs:
               out.append(p.read_text(encoding="utf-8"))
           Path("source-bundle.txt").write_text("".join(out),encoding="utf-8")
           PY
-          for path in src package.json tsconfig.json index.html public vite.config.ts postcss.config.js tailwind.config.ts tailwind.config.js; do
+          for path in src package.json tsconfig.json index.html public; do
             [ -e "$path" ] && git add -f "$path"
           done
           git add -f source-bundle.txt
@@ -171,73 +171,6 @@ jobs:
           text = text.replace("</body>", reg + '<script src="/settings-calculator/archive-share.js?v=4"></script></body>')
           index.write_text(text, encoding="utf-8")
           PY
-
-      - name: Make TypeScript config standalone
-        run: |
-          python3 - <<'PY'
-          import json
-          p = "tsconfig.json"
-          d = json.load(open(p))
-          d.pop("extends", None)
-          d.pop("references", None)
-          d.setdefault("compilerOptions", {})
-          d["compilerOptions"].update({
-              "noEmit": True,
-              "jsx": "preserve",
-              "lib": ["esnext", "dom", "dom.iterable"],
-              "resolveJsonModule": True,
-              "allowImportingTsExtensions": True,
-              "moduleResolution": "bundler",
-              "types": ["node", "vite/client"],
-              "paths": {"@/*": ["./src/*"]}
-          })
-          json.dump(d, open(p, "w"), indent=2)
-          PY
-
-      - name: Install dependencies
-        run: |
-          npm install --legacy-peer-deps --no-audit --no-fund
-
-      - name: Build application
-        env:
-          NODE_ENV: production
-          PORT: 4173
-          BASE_PATH: /settings-calculator/
-        run: |
-          npm run build
-          rm -rf "$GITHUB_WORKSPACE/pages"
-          mkdir -p "$GITHUB_WORKSPACE/pages"
-          cp -R dist/public/. "$GITHUB_WORKSPACE/pages"/
-          # GitHub Pages serves 404.html for direct refreshes of SPA routes.
-          # Without this fallback, refreshing /settings-calculator/<route> shows GitHub's 404 page.
-          cp "$GITHUB_WORKSPACE/pages/index.html" "$GITHUB_WORKSPACE/pages/404.html"
-          test -s "$GITHUB_WORKSPACE/pages/404.html"
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
-        with:
-          path: pages
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
- | head -n 1)"
-            test -n "$member"
-            tar -xzf project-backup.tar.gz "$member"
-            cp "$member" vite.config.ts
-          fi
 
       - name: Make TypeScript config standalone
         run: |
