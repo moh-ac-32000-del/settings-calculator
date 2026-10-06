@@ -93,6 +93,7 @@ const dictionaries: Record<AppLanguage, Dictionary> = {
 };
 
 const ATTRIBUTES = ['placeholder', 'aria-label', 'title'] as const;
+const originalTextByNode = new WeakMap<Text, string>();
 
 function translateTree(language: AppLanguage) {
   const dictionary = dictionaries[language];
@@ -108,8 +109,8 @@ function translateTree(language: AppLanguage) {
     const parent = textNode.parentElement;
     if (!parent || ['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(parent.tagName)) continue;
 
-    const original = textNode.dataset.originalText ?? textNode.nodeValue ?? '';
-    if (!textNode.dataset.originalText) textNode.dataset.originalText = original;
+    const original = originalTextByNode.get(textNode) ?? textNode.nodeValue ?? '';
+    if (!originalTextByNode.has(textNode)) originalTextByNode.set(textNode, original);
 
     const trimmed = original.trim();
     if (!trimmed) continue;
