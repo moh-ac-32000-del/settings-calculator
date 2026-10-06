@@ -323,10 +323,10 @@ function translateValue(value: string, dictionary: Dictionary) {
   // Source components contain both Arabic and English strings. Resolve either
   // language through the Arabic canonical key so switching is complete.
   for (const canonical of Object.keys(dictionaries.tr)) {
-    if (dictionaries.tr[canonical] === value) return dictionary[canonical] ?? value;
+    if (dictionaries.tr[canonical] === value) return dictionary[canonical] ?? (Object.keys(dictionary).length === 0 ? canonical : value);
   }
   for (const canonical of Object.keys(dictionaries.en)) {
-    if (dictionaries.en[canonical] === value) return dictionary[canonical] ?? value;
+    if (dictionaries.en[canonical] === value) return dictionary[canonical] ?? (Object.keys(dictionary).length === 0 ? canonical : value);
   }
 
   if (value.startsWith('تعديل كمية ')) return dictionary['تعديل كمية هذا القسم فقط']?.replace('هذا القسم', value.slice('تعديل كمية '.length)) ?? value;
