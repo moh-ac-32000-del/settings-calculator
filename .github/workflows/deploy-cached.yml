@@ -1,0 +1,140 @@
+name: Deploy cached production artifact
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-cached-v1
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Download last successful Pages artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          curl -fsSL -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json"             "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/11425772716/zip"             -o pages.zip
+          rm -rf pages
+          mkdir pages
+          unzip -q pages.zip -d pages
+          tar -xf pages/artifact.tar -C pages
+          rm -f pages/artifact.tar pages.zip
+          test -f pages/index.html
+
+      - name: Patch deployed translations
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+
+          js_files = list(Path("pages").glob("assets/*.js"))
+          if len(js_files) != 1:
+              raise SystemExit(f"Expected one application JS bundle, found {len(js_files)}")
+          p = js_files[0]
+          s = p.read_text(encoding="utf-8")
+
+          translations = {
+              "tr": {
+                  "أدر المواد والأسعار والأقسام وأنواع الأعمال من مكان واحد.": "Malzemeleri, fiyatları, bölümleri ve iş türlerini tek yerden yönetin.",
+                  "العمليات المسماة محفوظة هنا لمدة 3 أيام، ثم تُحذف تلقائيًا من هذا الجهاز.": "Adlandırılmış işlemler burada 3 gün saklanır ve sonra bu cihazdan otomatik silinir.",
+                  "احتساب مصاريف الشحن": "Nakliye masrafını hesaba kat",
+                  "تعديل يدوي لمصاريف الشحن": "Nakliye masrafını manuel düzenle",
+                  "الانتقال التلقائي": "Otomatik geçiş",
+                  "لا توجد أقسام لهذا العمل": "Bu iş için bölüm yok",
+                  "اربط قسمًا بنوع العمل من الإعدادات، ثم عد إلى الحاسبة.": "Ayarlar bölümünden bir bölümü iş türüne bağlayın, sonra hesaplayıcıya dönün.",
+                  "الإجراءات": "İşlemler",
+                  "أقسام الإعدادات": "Ayar bölümleri",
+                  "تُحفظ الأسعار محليًا على هذا الجهاز.": "Fiyatlar bu cihazda yerel olarak kaydedilir.",
+                  "تأكيد مطلوب": "Onay gerekli",
+                  "هل تريد إنهاء العملية الحالية؟": "Mevcut işlemi bitirmek istiyor musunuz?",
+                  "هل تريد حفظ تعديلات هذا السجل؟": "Bu kaydın değişikliklerini kaydetmek istiyor musunuz?",
+                  "مثال: تجهيز متجر": "Örnek: mağaza hazırlama",
+                  "مثال: معدن ساتان": "Örnek: saten metal",
+                  "لوحة إدخال الكمية": "Miktar giriş paneli",
+              },
+              "en": {
+                  "أدر المواد والأسعار والأقسام وأنواع الأعمال من مكان واحد.": "Manage materials, prices, sections, and work types in one place.",
+                  "العمليات المسماة محفوظة هنا لمدة 3 أيام، ثم تُحذف تلقائيًا من هذا الجهاز.": "Named operations are kept here for 3 days, then automatically deleted from this device.",
+                  "احتساب مصاريف الشحن": "Include shipping expense",
+                  "تعديل يدوي لمصاريف الشحن": "Edit shipping expense manually",
+                  "الانتقال التلقائي": "Auto advance",
+                  "لا توجد أقسام لهذا العمل": "No sections for this work",
+                  "اربط قسمًا بنوع العمل من الإعدادات، ثم عد إلى الحاسبة.": "Link a section to this work type in Settings, then return to the calculator.",
+                  "الإجراءات": "Actions",
+                  "أقسام الإعدادات": "Settings sections",
+                  "تُحفظ الأسعار محليًا على هذا الجهاز.": "Prices are saved locally on this device.",
+                  "تأكيد مطلوب": "Confirmation required",
+                  "هل تريد إنهاء العملية الحالية؟": "Do you want to finish the current operation?",
+                  "هل تريد حفظ تعديلات هذا السجل؟": "Do you want to save changes to this record?",
+                  "مثال: تجهيز متجر": "Example: store setup",
+                  "مثال: معدن ساتان": "Example: satin metal",
+                  "لوحة إدخال الكمية": "Quantity input panel",
+              },
+          }
+
+          def object_end(text, object_start):
+              depth = 0
+              quote = None
+              escape = False
+              for i in range(object_start, len(text)):
+                  ch = text[i]
+                  if quote:
+                      if escape:
+                          escape = False
+                      elif ch == "\\":
+                          escape = True
+                      elif ch == quote:
+                          quote = None
+                      continue
+                  if ch in "'\"":
+                      quote = ch
+                  elif ch == "{":
+                      depth += 1
+                  elif ch == "}":
+                      depth -= 1
+                      if depth == 0:
+                          return i
+              raise ValueError("Unclosed dictionary")
+
+          for lang, entries in translations.items():
+              marker = f"{lang}:{{"
+              marker_pos = s.find(marker)
+              if marker_pos < 0:
+                  raise SystemExit(f"Missing dictionary: {lang}")
+              start = s.find("{", marker_pos)
+              end = object_end(s, start)
+              existing = s[start:end+1]
+              additions = []
+              for key, value in entries.items():
+                  if key not in existing:
+                      additions.append("," + json.dumps(key, ensure_ascii=False) + ":" + json.dumps(value, ensure_ascii=False))
+              if additions:
+                  s = s[:end] + "".join(additions) + s[end:]
+          p.write_text(s, encoding="utf-8")
+          print("Patched translations:", p)
+
+          PY
+          test -s pages/index.html
+          find pages/assets -type f -name '*.js' -print -exec wc -c {} \;
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: pages
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
