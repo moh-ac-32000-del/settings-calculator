@@ -1,0 +1,405 @@
+=== FILES ===
+src/App.tsx
+src/components/app-bottom-nav.tsx
+src/components/error-boundary.tsx
+src/components/ui/accordion.tsx
+src/components/ui/alert-dialog.tsx
+src/components/ui/alert.tsx
+src/components/ui/aspect-ratio.tsx
+src/components/ui/avatar.tsx
+src/components/ui/badge.tsx
+src/components/ui/breadcrumb.tsx
+src/components/ui/button-group.tsx
+src/components/ui/button.tsx
+src/components/ui/calendar.tsx
+src/components/ui/card.tsx
+src/components/ui/carousel.tsx
+src/components/ui/chart.tsx
+src/components/ui/checkbox.tsx
+src/components/ui/collapsible.tsx
+src/components/ui/command.tsx
+src/components/ui/context-menu.tsx
+src/components/ui/dialog.tsx
+src/components/ui/drawer.tsx
+src/components/ui/dropdown-menu.tsx
+src/components/ui/empty.tsx
+src/components/ui/field.tsx
+src/components/ui/form.tsx
+src/components/ui/hover-card.tsx
+src/components/ui/input-group.tsx
+src/components/ui/input-otp.tsx
+src/components/ui/input.tsx
+src/components/ui/item.tsx
+src/components/ui/kbd.tsx
+src/components/ui/label.tsx
+src/components/ui/menubar.tsx
+src/components/ui/navigation-menu.tsx
+src/components/ui/pagination.tsx
+src/components/ui/popover.tsx
+src/components/ui/progress.tsx
+src/components/ui/radio-group.tsx
+src/components/ui/resizable.tsx
+src/components/ui/scroll-area.tsx
+src/components/ui/select.tsx
+src/components/ui/separator.tsx
+src/components/ui/sheet.tsx
+src/components/ui/sidebar.tsx
+src/components/ui/skeleton.tsx
+src/components/ui/slider.tsx
+src/components/ui/sonner.tsx
+src/components/ui/spinner.tsx
+src/components/ui/switch.tsx
+src/components/ui/table.tsx
+src/components/ui/tabs.tsx
+src/components/ui/textarea.tsx
+src/components/ui/toast.tsx
+src/components/ui/toaster.tsx
+src/components/ui/toggle-group.tsx
+src/components/ui/toggle.tsx
+src/components/ui/tooltip.tsx
+src/hooks/use-mobile.tsx
+src/hooks/use-toast.ts
+src/lib/operation-transfer.test.ts
+src/lib/operation-transfer.ts
+src/lib/operations-archive-store.test.ts
+src/lib/operations-archive-store.ts
+src/lib/operations-order-store.ts
+src/lib/operations-utils.test.ts
+src/lib/operations-utils.ts
+src/lib/settings-store.ts
+src/lib/settings-transfer.ts
+src/lib/utils.ts
+src/main.tsx
+src/pages/archive-page.tsx
+src/pages/not-found.tsx
+src/pages/operations-page.tsx
+src/pages/settings-page.tsx
+=== MATCHES ===
+src/components/app-bottom-nav.tsx:1:import { Archive, Calculator, Settings2 } from 'lucide-react';
+src/components/app-bottom-nav.tsx:8:  const archiveActive = location === '/archive';
+src/components/app-bottom-nav.tsx:24:        href="/archive"
+src/components/app-bottom-nav.tsx:25:        className={cn('app-bottom-nav-item', archiveActive && 'app-bottom-nav-item-active')}
+src/components/app-bottom-nav.tsx:26:        data-active={archiveActive}
+src/components/app-bottom-nav.tsx:27:        aria-current={archiveActive ? 'page' : undefined}
+src/components/app-bottom-nav.tsx:28:        data-testid="bottom-nav-archive"
+src/components/app-bottom-nav.tsx:30:        <Archive size={17} strokeWidth={1.8} />
+src/lib/operations-order-store.ts:41:    const parsed = JSON.parse(window.localStorage.getItem(OPERATIONS_ORDER_STORAGE_KEY) ?? '');
+src/lib/operations-order-store.ts:49:  window.localStorage.setItem(OPERATIONS_ORDER_STORAGE_KEY, JSON.stringify(order));
+src/lib/operations-archive-store.ts:1:export const OPERATIONS_ARCHIVE_STORAGE_KEY = 'settings-calculator-archive';
+src/lib/operations-archive-store.ts:2:export const OPERATIONS_ARCHIVE_SCHEMA_VERSION = 2;
+src/lib/operations-archive-store.ts:3:export const OPERATIONS_ARCHIVE_MAX_AGE_MS = 3 * 24 * 60 * 60 * 1000;
+src/lib/operations-archive-store.ts:5:export type ArchivedMaterial = {
+src/lib/operations-archive-store.ts:11:export type ArchivedSection = {
+src/lib/operations-archive-store.ts:15:  materials: ArchivedMaterial[];
+src/lib/operations-archive-store.ts:19:  availableMaterials?: ArchivedMaterial[];
+src/lib/operations-archive-store.ts:20:  shippingReference?: { referenceQuantity: number; referenceCost: number } | null;
+src/lib/operations-archive-store.ts:23:export type ArchivedOperationDraft = {
+src/lib/operations-archive-store.ts:27:  sections: ArchivedSection[];
+src/lib/operations-archive-store.ts:29:  shipping: {
+src/lib/operations-archive-store.ts:39:export type ArchivedOperation = ArchivedOperationDraft & {
+src/lib/operations-archive-store.ts:45:type ArchiveEnvelope = {
+src/lib/operations-archive-store.ts:47:  records: ArchivedOperation[];
+src/lib/operations-archive-store.ts:50:function isArchivedOperation(value: unknown): value is ArchivedOperation {
+src/lib/operations-archive-store.ts:52:  const record = value as Partial<ArchivedOperation>;
+src/lib/operations-archive-store.ts:53:  const shipping = record.shipping;
+src/lib/operations-archive-store.ts:87:      && (section.shippingReference === undefined
+src/lib/operations-archive-store.ts:88:        || section.shippingReference === null
+src/lib/operations-archive-store.ts:90:          typeof section.shippingReference.referenceQuantity === 'number'
+src/lib/operations-archive-store.ts:91:          && Number.isFinite(section.shippingReference.referenceQuantity)
+src/lib/operations-archive-store.ts:92:          && typeof section.shippingReference.referenceCost === 'number'
+src/lib/operations-archive-store.ts:93:          && Number.isFinite(section.shippingReference.referenceCost)
+src/lib/operations-archive-store.ts:97:    && shipping !== undefined
+src/lib/operations-archive-store.ts:98:    && typeof shipping.amount === 'number'
+src/lib/operations-archive-store.ts:99:    && typeof shipping.automaticAmount === 'number'
+src/lib/operations-archive-store.ts:100:    && typeof shipping.manualAmount === 'number'
+src/lib/operations-archive-store.ts:101:    && (shipping.mode === 'automatic' || shipping.mode === 'manual')
+src/lib/operations-archive-store.ts:102:    && typeof shipping.included === 'boolean'
+src/lib/operations-archive-store.ts:107:function getArchiveState(): { records: ArchivedOperation[]; canWrite: boolean } {
+src/lib/operations-archive-store.ts:110:    const raw = window.localStorage.getItem(OPERATIONS_ARCHIVE_STORAGE_KEY);
+src/lib/operations-archive-store.ts:114:      return { records: parsed.filter(isArchivedOperation), canWrite: true };
+src/lib/operations-archive-store.ts:117:    const envelope = parsed as Partial<ArchiveEnvelope>;
+src/lib/operations-archive-store.ts:118:    if (typeof envelope.schemaVersion === 'number' && envelope.schemaVersion > OPERATIONS_ARCHIVE_SCHEMA_VERSION) {
+src/lib/operations-archive-store.ts:122:    return { records: envelope.records.filter(isArchivedOperation), canWrite: true };
+src/lib/operations-archive-store.ts:128:function persistArchive(records: ArchivedOperation[]) {
+src/lib/operations-archive-store.ts:130:  const envelope: ArchiveEnvelope = {
+src/lib/operations-archive-store.ts:131:    schemaVersion: OPERATIONS_ARCHIVE_SCHEMA_VERSION,
+src/lib/operations-archive-store.ts:134:  window.localStorage.setItem(OPERATIONS_ARCHIVE_STORAGE_KEY, JSON.stringify(envelope));
+src/lib/operations-archive-store.ts:137:export function cleanupOperationsArchive(now = Date.now()) {
+src/lib/operations-archive-store.ts:138:  const state = getArchiveState();
+src/lib/operations-archive-store.ts:140:    .filter((record) => now - record.createdAt < OPERATIONS_ARCHIVE_MAX_AGE_MS)
+src/lib/operations-archive-store.ts:142:  if (state.canWrite) persistArchive(records);
+src/lib/operations-archive-store.ts:146:export function saveOperationToArchive(draft: ArchivedOperationDraft, now = Date.now()) {
+src/lib/operations-archive-store.ts:149:  const record: ArchivedOperation = {
+src/lib/operations-archive-store.ts:156:  const records = cleanupOperationsArchive(now);
+src/lib/operations-archive-store.ts:157:  persistArchive([record, ...records]);
+src/lib/operations-archive-store.ts:161:export function getOperationFromArchive(id: string) {
+src/lib/operations-archive-store.ts:162:  return cleanupOperationsArchive().find((record) => record.id === id) ?? null;
+src/lib/operations-archive-store.ts:165:export function updateOperationInArchive(id: string, draft: ArchivedOperationDraft, now = Date.now()) {
+src/lib/operations-archive-store.ts:168:  const records = cleanupOperationsArchive(now);
+src/lib/operations-archive-store.ts:171:  const updated: ArchivedOperation = {
+src/lib/operations-archive-store.ts:179:  persistArchive(records
+src/lib/settings-transfer.ts:7:  ShippingExpenseSetting,
+src/lib/settings-transfer.ts:9:  normalizeShippingExpenses,
+src/lib/settings-transfer.ts:17:  shippingExpenses: ShippingExpenseSetting[];
+src/lib/settings-transfer.ts:51:    shippingExpenses: state.shippingExpenses.map(({ sectionId, referenceQuantity, referenceCost }) => ({ sectionId, referenceQuantity, referenceCost })),
+src/lib/settings-transfer.ts:72:  if (!isRecord(value) || !hasOnlyKeys(value, ['schemaVersion', 'materials', 'sections', 'workTypes', 'shippingExpenses'])) {
+src/lib/settings-transfer.ts:110:  const shippingExpenses = value.schemaVersion === 2
+src/lib/settings-transfer.ts:112:    : normalizeShippingExpenses(value.shippingExpenses, sections);
+src/lib/settings-transfer.ts:113:  if (value.schemaVersion === SETTINGS_SCHEMA_VERSION && !Array.isArray(value.shippingExpenses)) {
+src/lib/settings-transfer.ts:114:    throw new Error('إعدادات مصاريف الشحن غير صالحة.');
+src/lib/settings-transfer.ts:122:    shippingExpenses,
+src/lib/operations-utils.test.ts:3:import { calculateShippingExpense, resolveShippingExpense } from './operations-utils.ts';
+src/lib/operations-utils.test.ts:5:test('shipping stays at half the reference cost up to half the reference quantity', () => {
+src/lib/operations-utils.test.ts:6:  assert.equal(calculateShippingExpense(1000, 300, 0), 0);
+src/lib/operations-utils.test.ts:7:  assert.equal(calculateShippingExpense(1000, 300, 1), 500);
+src/lib/operations-utils.test.ts:8:  assert.equal(calculateShippingExpense(1000, 300, 68), 500);
+src/lib/operations-utils.test.ts:9:  assert.equal(calculateShippingExpense(1000, 300, 150), 500);
+src/lib/operations-utils.test.ts:12:test('shipping returns to proportional calculation above half quantity and rounds to an integer', () => {
+src/lib/operations-utils.test.ts:13:  assert.equal(calculateShippingExpense(1000, 300, 151), 503);
+src/lib/operations-utils.test.ts:14:  assert.equal(calculateShippingExpense(1000, 300, 200), 667);
+src/lib/operations-utils.test.ts:15:  assert.equal(calculateShippingExpense(1000, 300, 300), 1000);
+src/lib/operations-utils.test.ts:16:  assert.equal(calculateShippingExpense(1000, 300, 500), 1667);
+src/lib/operations-utils.test.ts:17:  assert.equal(calculateShippingExpense(1001, 300, 150), 501);
+src/lib/operations-utils.test.ts:20:test('manual shipping overrides automatic shipping only when enabled and included', () => {
+src/lib/operations-utils.test.ts:21:  assert.equal(resolveShippingExpense(1667, false, 2000, true), 1667);
+src/lib/operations-utils.test.ts:22:  assert.equal(resolveShippingExpense(1667, true, 2000, true), 2000);
+src/lib/operations-utils.test.ts:23:  assert.equal(resolveShippingExpense(1667, true, 2000, false), 0);
+src/lib/operations-utils.test.ts:24:  assert.equal(resolveShippingExpense(1667, true, Number.NaN, true), 0);
+src/lib/operations-utils.ts:24:export function calculateShippingExpense(referenceCost: number, referenceQuantity: number, quantity: number) {
+src/lib/operations-utils.ts:37:export function resolveShippingExpense(
+src/lib/settings-store.ts:8:export type ShippingExpenseSetting = { sectionId: string; referenceQuantity: number; referenceCost: number };
+src/lib/settings-store.ts:14:  shippingExpenses: ShippingExpenseSetting[];
+src/lib/settings-store.ts:22:  shippingExpenses: [],
+src/lib/settings-store.ts:33:export function normalizeShippingExpenses(value: unknown, sections: Section[]): ShippingExpenseSetting[] {
+src/lib/settings-store.ts:67:    const parsed = JSON.parse(window.localStorage.getItem(SETTINGS_STORAGE_KEY) ?? '');
+src/lib/settings-store.ts:77:        shippingExpenses: normalizeShippingExpenses(parsed.shippingExpenses, parsed.sections),
+src/lib/settings-store.ts:87:  window.localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(state));
+src/lib/operations-archive-store.test.ts:4:  cleanupOperationsArchive,
+src/lib/operations-archive-store.test.ts:5:  OPERATIONS_ARCHIVE_MAX_AGE_MS,
+src/lib/operations-archive-store.test.ts:6:  OPERATIONS_ARCHIVE_SCHEMA_VERSION,
+src/lib/operations-archive-store.test.ts:7:  OPERATIONS_ARCHIVE_STORAGE_KEY,
+src/lib/operations-archive-store.test.ts:8:  updateOperationInArchive,
+src/lib/operations-archive-store.test.ts:9:  saveOperationToArchive,
+src/lib/operations-archive-store.test.ts:10:} from './operations-archive-store.ts';
+src/lib/operations-archive-store.test.ts:18:      localStorage: {
+src/lib/operations-archive-store.test.ts:46:    shippingReference: { referenceQuantity: 300, referenceCost: 1000 },
+src/lib/operations-archive-store.test.ts:49:  shipping: {
+src/lib/operations-archive-store.test.ts:63:    const saved = saveOperationToArchive(operationDraft, now);
+src/lib/operations-archive-store.test.ts:73:    assert.deepEqual(saved.sections[0]?.shippingReference, { referenceQuantity: 300, referenceCost: 1000 });
+src/lib/operations-archive-store.test.ts:75:    assert.equal(saved.shipping.mode, 'manual');
+src/lib/operations-archive-store.test.ts:76:    assert.equal(saved.shipping.amount, 2000);
+src/lib/operations-archive-store.test.ts:78:    const stored = JSON.parse(storage.data.get(OPERATIONS_ARCHIVE_STORAGE_KEY) ?? '{}');
+src/lib/operations-archive-store.test.ts:79:    assert.equal(stored.schemaVersion, OPERATIONS_ARCHIVE_SCHEMA_VERSION);
+src/lib/operations-archive-store.test.ts:89:    assert.equal(saveOperationToArchive({ ...operationDraft, name: '   ' }, 1000), null);
+src/lib/operations-archive-store.test.ts:90:    assert.equal(storage.data.has(OPERATIONS_ARCHIVE_STORAGE_KEY), false);
+src/lib/operations-archive-store.test.ts:96:test('editing an archived operation replaces the same record and refreshes its retention timestamp', () => {
+src/lib/operations-archive-store.test.ts:100:    const saved = saveOperationToArchive(operationDraft, originalTime);
+src/lib/operations-archive-store.test.ts:104:    const updated = updateOperationInArchive(saved.id, {
+src/lib/operations-archive-store.test.ts:108:      shipping: { ...operationDraft.shipping, amount: 2100 },
+src/lib/operations-archive-store.test.ts:117:    const stored = JSON.parse(storage.data.get(OPERATIONS_ARCHIVE_STORAGE_KEY) ?? '{}');
+src/lib/operations-archive-store.test.ts:122:      cleanupOperationsArchive(editedTime + OPERATIONS_ARCHIVE_MAX_AGE_MS - 1).map((record) => record.id),
+src/lib/operations-archive-store.test.ts:125:    assert.deepEqual(cleanupOperationsArchive(editedTime + OPERATIONS_ARCHIVE_MAX_AGE_MS), []);
+src/lib/operations-archive-store.test.ts:131:test('archive cleanup removes records older than three days using timestamps and migrates an array', () => {
+src/lib/operations-archive-store.test.ts:135:    const current = { ...operationDraft, id: 'recent', createdAt: now - OPERATIONS_ARCHIVE_MAX_AGE_MS + 1, createdAtIso: 'not-used-for-expiry' };
+src/lib/operations-archive-store.test.ts:136:    const expired = { ...operationDraft, id: 'expired', createdAt: now - OPERATIONS_ARCHIVE_MAX_AGE_MS, createdAtIso: new Date(now).toISOString() };
+src/lib/operations-archive-store.test.ts:137:    storage.data.set(OPERATIONS_ARCHIVE_STORAGE_KEY, JSON.stringify([expired, current]));
+src/lib/operations-archive-store.test.ts:139:    const records = cleanupOperationsArchive(now);
+src/lib/operations-archive-store.test.ts:141:    const migrated = JSON.parse(storage.data.get(OPERATIONS_ARCHIVE_STORAGE_KEY) ?? '{}');
+src/lib/operations-archive-store.test.ts:142:    assert.equal(migrated.schemaVersion, OPERATIONS_ARCHIVE_SCHEMA_VERSION);
+src/App.tsx:6:import { cleanupOperationsArchive } from '@/lib/operations-archive-store';
+src/App.tsx:8:import ArchivePage from '@/pages/archive-page';
+src/App.tsx:29:          <Route path="/archive" component={ArchivePage} />
+src/App.tsx:44:    cleanupOperationsArchive();
+src/pages/archive-page.tsx:2:import { Archive, ChevronDown, Clock3, Layers3, Pencil, Search } from 'lucide-react';
+src/pages/archive-page.tsx:4:import { cleanupOperationsArchive, type ArchivedOperation } from '@/lib/operations-archive-store';
+src/pages/archive-page.tsx:8:function formatArchiveDate(timestamp: number) {
+src/pages/archive-page.tsx:17:function formatArchiveTime(timestamp: number) {
+src/pages/archive-page.tsx:26:export default function ArchivePage() {
+src/pages/archive-page.tsx:27:  const [records, setRecords] = useState<ArchivedOperation[]>([]);
+src/pages/archive-page.tsx:31:    setRecords(cleanupOperationsArchive());
+src/pages/archive-page.tsx:48:            <span className="flex size-7 items-center justify-center rounded-lg bg-[hsl(var(--accent)/.13)]"><Archive size={14} /></span>
+src/pages/archive-page.tsx:55:              data-testid="archive-count"
+src/pages/archive-page.tsx:68:          <label htmlFor="input-archive-search" className="eyebrow">البحث في الأرشيف</label>
+src/pages/archive-page.tsx:72:              id="input-archive-search"
+src/pages/archive-page.tsx:77:              placeholder="ابحث باسم العميل أو نوع العمل"
+src/pages/archive-page.tsx:79:              data-testid="input-archive-search"
+src/pages/archive-page.tsx:84:        <main className="space-y-3" data-testid="archive-list">
+src/pages/archive-page.tsx:86:            <div className="operations-empty" data-testid="archive-empty">
+src/pages/archive-page.tsx:87:              <span className="operations-empty-icon"><Archive size={19} /></span>
+src/pages/archive-page.tsx:98:            <details key={record.id} className="archive-record" data-testid={`archive-record-${record.id}`}>
+src/pages/archive-page.tsx:99:              <summary className="archive-record-summary">
+src/pages/archive-page.tsx:103:                    <span>{formatArchiveDate(record.createdAt)}</span>
+src/pages/archive-page.tsx:106:                      {formatWesternNumber(formatArchiveTime(record.createdAt))}
+src/pages/archive-page.tsx:114:                  <ChevronDown size={16} className="archive-record-chevron text-[hsl(var(--muted-foreground))]" />
+src/pages/archive-page.tsx:118:              <div className="archive-record-details">
+src/pages/archive-page.tsx:121:                    نوع العمل: <span className="text-[hsl(var(--foreground))]">{record.workTypeName}</span>
+src/pages/archive-page.tsx:133:                      <div key={section.id} className="archive-section">
+src/pages/archive-page.tsx:160:                <div className="archive-shipping">
+src/pages/archive-page.tsx:167:                      مصاريف الشحن ({record.shipping.mode === 'manual' ? 'تعديل يدوي' : 'تلقائي'})
+src/pages/archive-page.tsx:170:                      {record.shipping.included ? formatWesternNumber(record.shipping.amount) : 'غير محتسب'}
+src/pages/archive-page.tsx:173:                  {record.shipping.mode === 'manual' && (
+src/pages/archive-page.tsx:175:                      التلقائي: <span className="font-mono" dir="ltr">{formatWesternNumber(record.shipping.automaticAmount)}</span>
+src/pages/archive-page.tsx:176:                      {' · '}اليدوي: <span className="font-mono" dir="ltr">{formatWesternNumber(record.shipping.manualAmount)}</span>
+src/pages/archive-page.tsx:188:                  data-testid={`button-edit-archive-${record.id}`}
+src/pages/settings-page.tsx:4:import { CalculationMode, createId, loadSettings, Material, saveSettings, Section, SettingsState, ShippingExpenseSetting, WorkType, SETTINGS_SCHEMA_VERSION } from '@/lib/settings-store';
+src/pages/settings-page.tsx:180:      <Field label="اسم نوع العمل"><input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder="مثال: تجهيز متجر" data-testid="input-work-name" className="field-input" /></Field>
+src/pages/settings-page.tsx:181:      <Field label="الأقسام المضمنة" hint="اختر الأقسام التي يستخدمها نوع العمل هذا.">
+src/pages/settings-page.tsx:184:      <div className="flex justify-start gap-2 border-t border-[hsl(var(--border))] pt-5"><Button type="submit" variant="primary" disabled={!valid} data-testid="button-save-work"><Check size={14} />{initial ? 'حفظ التعديلات' : 'إضافة نوع العمل'}</Button><Button type="button" variant="ghost" onClick={onClose} data-testid="button-cancel-work">إلغاء</Button></div>
+src/pages/settings-page.tsx:189:function ShippingExpensesSection({
+src/pages/settings-page.tsx:191:  shippingExpenses,
+src/pages/settings-page.tsx:195:  shippingExpenses: ShippingExpenseSetting[];
+src/pages/settings-page.tsx:196:  onChange: (next: ShippingExpenseSetting[]) => void;
+src/pages/settings-page.tsx:198:  const configuredBySectionId = new Map(shippingExpenses.map((item) => [item.sectionId, item]));
+src/pages/settings-page.tsx:203:      onChange([...shippingExpenses, { sectionId, referenceQuantity: 1, referenceCost: 0 }]);
+src/pages/settings-page.tsx:206:    onChange(shippingExpenses.filter((item) => item.sectionId !== sectionId));
+src/pages/settings-page.tsx:213:    onChange(shippingExpenses.map((item) => item.sectionId === sectionId ? { ...item, [field]: nextValue } : item));
+src/pages/settings-page.tsx:217:    <section className="section-card mt-5" data-testid="shipping-expenses-settings">
+src/pages/settings-page.tsx:221:          <h2>إعداد مصاريف الشحن</h2>
+src/pages/settings-page.tsx:222:          <p className="section-description">حدد الأقسام التي ترتبط بمصاريف شحن مرجعية. تُحسب تلقائيًا في صفحة العمليات حسب كمية القسم.</p>
+src/pages/settings-page.tsx:229:          أضف قسمًا أولًا حتى تتمكن من ربطه بإعدادات مصاريف الشحن.
+src/pages/settings-page.tsx:236:              <div key={section.id} className={cn('rounded-xl border p-3.5 transition-colors', setting ? 'border-[hsl(var(--accent)/.65)] bg-[hsl(var(--accent)/.06)]' : 'border-[hsl(var(--border))] bg-[hsl(var(--background)/.3)]')} data-testid={`shipping-section-${section.id}`}>
+src/pages/settings-page.tsx:243:                    data-testid={`checkbox-shipping-section-${section.id}`}
+src/pages/settings-page.tsx:258:                        data-testid={`input-shipping-quantity-${section.id}`}
+src/pages/settings-page.tsx:261:                    <Field label="مصاريف الشحن المرجعية">
+src/pages/settings-page.tsx:269:                        data-testid={`input-shipping-cost-${section.id}`}
+src/pages/settings-page.tsx:284:  const label = target === 'material' ? 'المادة' : target === 'section' ? 'القسم' : 'نوع العمل';
+src/pages/settings-page.tsx:315:  const updateShippingExpenses = (shippingExpenses: ShippingExpenseSetting[]) => update({ ...state, shippingExpenses });
+src/pages/settings-page.tsx:394:        shippingExpenses: state.shippingExpenses.filter((expense) => expense.sectionId !== item.id),
+src/pages/settings-page.tsx:470:              : <div className="overflow-hidden rounded-xl border border-[hsl(var(--border))]"><div className="list-header"><span>نوع العمل</span><span>الأقسام المضمنة</span><span className="text-left">الإجراءات</span></div>{state.workTypes.map((work, index) => <div key={work.id} className="list-row" data-testid={`row-work-${work.id}`}><div className="flex min-w-0 items-center gap-3"><span className="index-mark">{formatWesternNumber(String(index + 1).padStart(2, '0'))}</span><span className="truncate text-sm font-semibold">{work.name}</span></div><div className="flex flex-wrap gap-1">{work.sectionIds.length ? work.sectionIds.map((id) => <span key={id} className="rounded-lg bg-[hsl(var(--muted))] px-2 py-1 text-[10px] font-semibold">{state.sections.find((section) => section.id === id)?.name ?? 'قسم غير موجود'}</span>) : <span className="text-xs italic text-[hsl(var(--muted-foreground))]">لا توجد أقسام</span>}</div><div className="flex justify-end gap-1"><Button variant="ghost" className="size-10 p-0" onClick={() => setModal({ kind: 'work', item: work })} aria-label={`تعديل ${work.name}`} data-testid={`button-edit-work-${work.id}`}><Pencil size={14} /></Button><Button variant="ghost" className="size-10 p-0 hover:text-[hsl(var(--destructive))]" onClick={() => setModal({ kind: 'delete', target: 'work', item: work })} aria-label={`حذف ${work.name}`} data-testid={`button-delete-work-${work.id}`}><Trash2 size={14} /></Button></div></div>)}</div>)}
+src/pages/settings-page.tsx:472:          <ShippingExpensesSection sections={state.sections} shippingExpenses={state.shippingExpenses} onChange={updateShippingExpenses} />
+src/pages/operations-page.tsx:14:import { appendQuantityKey, calculateShippingExpense, formatAmount, formatWesternNumber, quantityValue, resolveShippingExpense } from '@/lib/operations-utils';
+src/pages/operations-page.tsx:15:import { getOperationFromArchive, saveOperationToArchive, updateOperationInArchive, type ArchivedOperation, type ArchivedOperationDraft } from '@/lib/operations-archive-store';
+src/pages/operations-page.tsx:198:            <h2 id="transfer-work-title" className="mt-2 text-lg font-extrabold">اختر نوع العمل الذي تريد نقل العملية إليه</h2>
+src/pages/operations-page.tsx:369:          <p className="eyebrow">اختر نوع العمل</p>
+src/pages/operations-page.tsx:750:  const archiveEditId = location.match(/^\/operations\/edit\/([^/]+)$/)?.[1] ?? null;
+src/pages/operations-page.tsx:751:  const isArchiveEditing = Boolean(archiveEditId);
+src/pages/operations-page.tsx:754:  const [archiveRecord, setArchiveRecord] = useState<ArchivedOperation | null>(null);
+src/pages/operations-page.tsx:755:  const initializedArchiveIdRef = useRef<string | null>(null);
+src/pages/operations-page.tsx:756:  const [archiveSaveError, setArchiveSaveError] = useState('');
+src/pages/operations-page.tsx:765:  const [includeShipping, setIncludeShipping] = useState(true);
+src/pages/operations-page.tsx:766:  const [manualShippingEnabled, setManualShippingEnabled] = useState(false);
+src/pages/operations-page.tsx:767:  const [manualShippingValue, setManualShippingValue] = useState('0');
+src/pages/operations-page.tsx:786:    if (!archiveEditId) {
+src/pages/operations-page.tsx:787:      if (initializedArchiveIdRef.current !== null) {
+src/pages/operations-page.tsx:788:        initializedArchiveIdRef.current = null;
+src/pages/operations-page.tsx:789:        setArchiveRecord(null);
+src/pages/operations-page.tsx:795:        setIncludeShipping(true);
+src/pages/operations-page.tsx:796:        setManualShippingEnabled(false);
+src/pages/operations-page.tsx:797:        setManualShippingValue('0');
+src/pages/operations-page.tsx:798:        setArchiveSaveError('');
+src/pages/operations-page.tsx:804:    if (initializedArchiveIdRef.current === archiveEditId) return;
+src/pages/operations-page.tsx:805:    initializedArchiveIdRef.current = archiveEditId;
+src/pages/operations-page.tsx:806:    const record = getOperationFromArchive(archiveEditId);
+src/pages/operations-page.tsx:808:      setLocation('/archive');
+src/pages/operations-page.tsx:811:    setArchiveRecord(record);
+src/pages/operations-page.tsx:824:    setIncludeShipping(record.shipping.included);
+src/pages/operations-page.tsx:825:    setManualShippingEnabled(record.shipping.mode === 'manual');
+src/pages/operations-page.tsx:826:    setManualShippingValue(String(record.shipping.manualAmount));
+src/pages/operations-page.tsx:827:    setArchiveSaveError('');
+src/pages/operations-page.tsx:829:  }, [archiveEditId, settings.workTypes, setLocation]);
+src/pages/operations-page.tsx:841:    if (archiveRecord) {
+src/pages/operations-page.tsx:842:      for (const section of archiveRecord.sections) {
+src/pages/operations-page.tsx:849:  }, [archiveRecord, settings.materials, settings.sections]);
+src/pages/operations-page.tsx:852:    if (archiveRecord) {
+src/pages/operations-page.tsx:853:      for (const saved of archiveRecord.sections) {
+src/pages/operations-page.tsx:869:  }, [archiveRecord, materialById, settings.sections]);
+src/pages/operations-page.tsx:877:  const availableSectionIds = isArchiveEditing && archiveRecord
+src/pages/operations-page.tsx:878:    ? archiveRecord.sections.map((section) => section.id)
+src/pages/operations-page.tsx:894:  const getShippingReference = (sectionId: string) => {
+src/pages/operations-page.tsx:895:    const archivedSection = isArchiveEditing ? archiveRecord?.sections.find((section) => section.id === sectionId) : undefined;
+src/pages/operations-page.tsx:896:    if (archivedSection && Object.prototype.hasOwnProperty.call(archivedSection, 'shippingReference')) {
+src/pages/operations-page.tsx:897:      return archivedSection.shippingReference ?? null;
+src/pages/operations-page.tsx:899:    return settings.shippingExpenses.find((item) => item.sectionId === sectionId) ?? null;
+src/pages/operations-page.tsx:915:  const calculatedShippingTotal = Math.round(entries.reduce((total, entry) => {
+src/pages/operations-page.tsx:916:    const reference = getShippingReference(entry.sectionId);
+src/pages/operations-page.tsx:918:    return total + calculateShippingExpense(reference.referenceCost, reference.referenceQuantity, quantityValue(entry.quantity));
+src/pages/operations-page.tsx:920:  const manualShippingAmount = Number(formatWesternNumber(manualShippingValue).replace(/,/g, ''));
+src/pages/operations-page.tsx:921:  const shippingTotal = resolveShippingExpense(
+src/pages/operations-page.tsx:922:    calculatedShippingTotal,
+src/pages/operations-page.tsx:923:    manualShippingEnabled,
+src/pages/operations-page.tsx:924:    manualShippingAmount,
+src/pages/operations-page.tsx:925:    includeShipping,
+src/pages/operations-page.tsx:927:  const finalTotal = sectionTotal + shippingTotal;
+src/pages/operations-page.tsx:931:    || !includeShipping
+src/pages/operations-page.tsx:932:    || manualShippingEnabled
+src/pages/operations-page.tsx:933:    || (Number.isFinite(manualShippingAmount) && manualShippingAmount !== 0);
+src/pages/operations-page.tsx:971:    setIncludeShipping(true);
+src/pages/operations-page.tsx:972:    setManualShippingEnabled(false);
+src/pages/operations-page.tsx:973:    setManualShippingValue('0');
+src/pages/operations-page.tsx:977:    if (isArchiveEditing || !selectedWork) return;
+src/pages/operations-page.tsx:981:      else setBackNavigationNotice('أكمل العملية أو انقلها قبل الرجوع إلى اختيار نوع العمل.');
+src/pages/operations-page.tsx:990:    setIncludeShipping(true);
+src/pages/operations-page.tsx:991:    setManualShippingEnabled(false);
+src/pages/operations-page.tsx:992:    setManualShippingValue('0');
+src/pages/operations-page.tsx:1011:    if (selectedWork && !activeSectionId && orderedAvailableSections.length > 0 && !isArchiveEditing) {
+src/pages/operations-page.tsx:1014:  }, [activeSectionId, isArchiveEditing, orderedAvailableSections, selectedWork]);
+src/pages/operations-page.tsx:1085:  const buildArchivedDraft = (): ArchivedOperationDraft => {
+src/pages/operations-page.tsx:1086:    const archivedSections = entries.flatMap((entry) => {
+src/pages/operations-page.tsx:1098:      const shippingReference = getShippingReference(section.id);
+src/pages/operations-page.tsx:1116:        shippingReference: shippingReference
+src/pages/operations-page.tsx:1117:          ? { referenceQuantity: shippingReference.referenceQuantity, referenceCost: shippingReference.referenceCost }
+src/pages/operations-page.tsx:1121:    const draft: ArchivedOperationDraft = {
+src/pages/operations-page.tsx:1123:      workTypeName: isArchiveEditing && archiveRecord
+src/pages/operations-page.tsx:1124:        ? archiveRecord.workTypeName
+src/pages/operations-page.tsx:1128:          ? (workById.get(selectedWork)?.name ?? (archiveRecord?.workTypeId === selectedWork ? archiveRecord.workTypeName : null))
+src/pages/operations-page.tsx:1130:      workTypeId: isArchiveEditing && archiveRecord
+src/pages/operations-page.tsx:1131:        ? archiveRecord.workTypeId ?? null
+src/pages/operations-page.tsx:1133:      sections: archivedSections,
+src/pages/operations-page.tsx:1135:      shipping: {
+src/pages/operations-page.tsx:1136:        amount: shippingTotal,
+src/pages/operations-page.tsx:1137:        automaticAmount: calculatedShippingTotal,
+src/pages/operations-page.tsx:1138:        manualAmount: manualShippingEnabled && Number.isFinite(manualShippingAmount) && manualShippingAmount >= 0
+src/pages/operations-page.tsx:1139:          ? Math.round(manualShippingAmount)
+src/pages/operations-page.tsx:1141:        mode: manualShippingEnabled ? 'manual' : 'automatic',
+src/pages/operations-page.tsx:1142:        included: includeShipping,
+src/pages/operations-page.tsx:1170:      const savedSource = isArchiveEditing ? archiveRecord : saveOperationToArchive(buildArchivedDraft());
+src/pages/operations-page.tsx:1188:      const targetName = orderedWorkChoices.find((choice) => choice.id === targetWork)?.name ?? 'نوع العمل المحدد';
+src/pages/operations-page.tsx:1223:    if (isArchiveEditing && !archiveRecord) return;
+src/pages/operations-page.tsx:1229:    const draft = buildArchivedDraft();
+src/pages/operations-page.tsx:1230:    if (isArchiveEditing && archiveRecord) {
+src/pages/operations-page.tsx:1231:      const updated = updateOperationInArchive(archiveRecord.id, draft);
+src/pages/operations-page.tsx:1233:        setArchiveSaveError('تعذر تحديث السجل؛ ربما انتهت مدة الاحتفاظ به. ارجع إلى الأرشيف للتحقق.');
+src/pages/operations-page.tsx:1237:      setLocation('/archive');
+src/pages/operations-page.tsx:1240:    saveOperationToArchive(draft);
+src/pages/operations-page.tsx:1246:    setIncludeShipping(true);
+src/pages/operations-page.tsx:1247:    setManualShippingEnabled(false);
+src/pages/operations-page.tsx:1248:    setManualShippingValue('0');
+src/pages/operations-page.tsx:1310:      {isArchiveEditing ? 'حفظ التعديلات' : 'إنهاء العملية'}
+src/pages/operations-page.tsx:1320:              {!isArchiveEditing && (
+src/pages/operations-page.tsx:1327:                  aria-label="العودة إلى اختيار نوع العمل"
+src/pages/operations-page.tsx:1335:                <p className="eyebrow">{isArchiveEditing ? 'تعديل عملية محفوظة' : 'العمل الحالي'}</p>
+src/pages/operations-page.tsx:1337:                  {selectedWork === FREE_WORK_ORDER_ID ? 'عمل حر' : selectedWorkRecord?.name ?? archiveRecord?.workTypeName ?? 'نوع العمل'}
+src/pages/operations-page.tsx:1361:                    {isArchiveEditing ? 'حفظ التعديلات' : 'إنهاء العملية'}
+src/pages/operations-page.tsx:1377:                <h1 className="text-2xl font-extrabold tracking-[-.06em] sm:text-3xl">{isArchiveEditing ? 'تعديل عملية محفوظة' : 'اختر نوع العمل'}</h1>
+src/pages/operations-page.tsx:1379:                  {isArchiveEditing ? 'عدّل مدخلات السجل، وستُعاد جميع النتائج تلقائيًا قبل حفظه في الأرشيف.' : 'اختر نوع العمل للبدء مباشرة.'}
+src/pages/operations-page.tsx:1382:              {!isArchiveEditing && (
+src/pages/operations-page.tsx:1394:            {noWorkTypes && !isArchiveEditing && (
+src/pages/operations-page.tsx:1403:            {(isArchiveEditing || customerNameVisible || workName.trim() || workNameValidationError) && (
+src/pages/operations-page.tsx:1438:            {!isArchiveEditing && !selectedWork && (
+src/pages/operations-page.tsx:1446:            {archiveSaveError && <div className="operations-notice" role="alert" data-testid="archive-edit-error">{archiveSaveError}</div>}
+src/pages/operations-page.tsx:1465:                <EmptyState title="لا توجد أقسام لهذا العمل" detail="اربط قسمًا بنوع العمل من الإعدادات، ثم عد إلى الحاسبة." />
+src/pages/operations-page.tsx:1501:                  <div className="shipping-total" data-testid="shipping-expenses-total">
+src/pages/operations-page.tsx:1502:                    <span>مصاريف الشحن</span>
+src/pages/operations-page.tsx:1503:                    <strong dir="ltr">{formatWesternNumber(Math.round(shippingTotal).toLocaleString('en-US'))}</strong>
+src/pages/operations-page.tsx:1505:                  <label className="shipping-option" data-testid="shipping-expenses-toggle">
+src/pages/operations-page.tsx:1508:                      checked={includeShipping}
+src/pages/operations-page.tsx:1511:                        setIncludeShipping(event.target.checked);
+src/pages/operations-page.tsx:1513:                      data-testid="checkbox-include-shipping"
+src/pages/operations-page.tsx:1515:                    <span>احتساب مصاريف الشحن</span>
+src/pages/operations-page.tsx:1517:                  <label className="shipping-option" data-testid="manual-shipping-toggle">
+src/pages/operations-page.tsx:1520:                      checked={manualShippingEnabled}
+src/pages/operations-page.tsx:1523:                        setManualShippingEnabled(event.target.checked);
+src/pages/operations-page.tsx:1525:                      data-testid="checkbox-manual-shipping"
+src/pages/operations-page.tsx:1527:                    <span>تعديل يدوي لمصاريف الشحن</span>
+src/pages/operations-page.tsx:1529:                  {manualShippingEnabled && (
+src/pages/operations-page.tsx:1530:                    <div className="mt-2 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card)/.55)] p-3" data-testid="manual-shipping-input-wrap">
+src/pages/operations-page.tsx:1531:                      <label htmlFor="input-manual-shipping" className="text-xs font-bold">قيمة مصاريف الشحن لهذه العملية</label>
+src/pages/operations-page.tsx:1533:                        id="input-manual-shipping"
+src/pages/operations-page.tsx:1540:                        value={manualShippingValue}
+src/pages/operations-page.tsx:1543:                          setManualShippingValue(event.target.value);
+src/pages/operations-page.tsx:1545:                        data-testid="input-manual-shipping"
+src/pages/operations-page.tsx:1548:                        الحساب التلقائي الحالي: <span className="font-mono" dir="ltr">{formatWesternNumber(calculatedShippingTotal.toLocaleString('en-US'))}</span>. هذا التعديل لهذه العملية فقط.
+src/pages/operations-page.tsx:1556:                        <p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">مجموع نتائج الأقسام الحالية + مصاريف الشحن</p>
+src/pages/operations-page.tsx:1573:          title={isArchiveEditing ? 'هل تريد حفظ تعديلات هذا السجل؟' : 'هل تريد إنهاء العملية الحالية؟'}
+src/pages/operations-page.tsx:1574:          description={isArchiveEditing
+src/pages/operations-page.tsx:1577:          confirmLabel={isArchiveEditing ? 'حفظ التعديلات' : 'إنهاء العملية'}
