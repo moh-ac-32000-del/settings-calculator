@@ -11,7 +11,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages-v5
+  group: pages-v2
   cancel-in-progress: true
 
 jobs:
@@ -195,11 +195,7 @@ jobs:
           PORT: 4173
           BASE_PATH: /settings-calculator/
         run: |
-          set +e
-          timeout 90s npm run build > build.log 2>&1
-          status=$?
-          cat build.log
-          if [ "$status" -ne 0 ]; then exit "$status"; fi
+          npm run build
           rm -rf "$GITHUB_WORKSPACE/pages"
           mkdir -p "$GITHUB_WORKSPACE/pages"
           cp -R dist/public/. "$GITHUB_WORKSPACE/pages"/
@@ -207,14 +203,6 @@ jobs:
           # Without this fallback, refreshing /settings-calculator/<route> shows GitHub's 404 page.
           cp "$GITHUB_WORKSPACE/pages/index.html" "$GITHUB_WORKSPACE/pages/404.html"
           test -s "$GITHUB_WORKSPACE/pages/404.html"
-
-      - name: Upload build log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: settings-calculator-build-log
-          path: build.log
-          if-no-files-found: ignore
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
