@@ -372,7 +372,7 @@ function WorkPicker({
         </div>
         <Button type="button" variant="outline" size="sm" className="order-operations-button" onClick={onOpenOrder} data-testid="button-open-operations-order">
           <ListOrdered size={15} />
-          ترتيب العمليات
+          {translateKey('orderOperations')}
         </Button>
       </div>
       <div className="work-choice-grid">
@@ -728,7 +728,7 @@ function SectionProgress({
         </Button>
         {countdown !== null && (
           <p className="auto-advance-countdown" role="status" data-testid="auto-advance-countdown">
-            الانتقال خلال {countdown}...
+            {translateKey('transitionInSeconds').replace('{count}', formatWesternNumber(countdown))}
           </p>
         )}
         <Button
@@ -1409,7 +1409,7 @@ export default function OperationsPage() {
                 <span>{translateKey('noSavedWorkTypesFreeWork')}</span>
                 <Link href="/settings" className="operation-link" data-testid="link-notice-settings">
                   <Settings2 size={14} />
-                  الإعدادات
+                  {translateKey('openSettings')}
                 </Link>
               </div>
             )}
