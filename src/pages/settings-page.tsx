@@ -5,7 +5,7 @@ import { CalculationMode, createId, loadSettings, Material, saveSettings, Sectio
 import { createSettingsCode, parseSettingsCode } from '@/lib/settings-transfer';
 import { reconcileOperationsOrderAfterSettingsChange } from '@/lib/operations-order-store';
 import { loadLanguage, saveLanguage, type AppLanguage } from '@/lib/language-store';
-import { translateKey } from '@/lib/i18n';
+import { translateKey, type TranslationKey } from '@/lib/i18n';
 import AppBottomNav from '@/components/app-bottom-nav';
 
 type Area = 'materials' | 'sections' | 'work';
@@ -18,30 +18,15 @@ type ModalState =
   | { kind: 'import-preview'; candidate: SettingsState }
   | null;
 
-const modeCopy: Record<CalculationMode, { label: string; description: string; short: string }> = {
-  SELECT_ONE_MULTIPLY: { label: translateKey('singleChoice'), description: translateKey('singleChoiceDescription'), short: translateKey('singleChoiceShort') },
-  SUM_SELECTED_MULTIPLY: { label: translateKey('sumSelected'), description: translateKey('sumSelectedDescription'), short: translateKey('sumSelectedShort') },
+const modeCopy: Record<CalculationMode, { label: TranslationKey; description: TranslationKey; short: TranslationKey }> = {
+  SELECT_ONE_MULTIPLY: { label: 'singleChoice', description: 'singleChoiceDescription', short: 'singleChoiceShort' },
+  SUM_SELECTED_MULTIPLY: { label: 'sumSelected', description: 'sumSelectedDescription', short: 'sumSelectedShort' },
 };
 
-const areaCopy: Record<Area, { label: string; title: string; description: string; eyebrow: string }> = {
-  materials: {
-    label: translateKey('materialsAndPrices'),
-    title: translateKey('materialsAndPrices'),
-    description: translateKey('aSingleRegisterForMaterialsYouBuyOrUseWithAPriceForEach'),
-    eyebrow: translateKey('priceRegisterEyebrow'),
-  },
-  sections: {
-    label: translateKey('sections'),
-    title: translateKey('sections'),
-    description: translateKey('reusableGroupsOfMaterialsWithAClearCalculationRule'),
-    eyebrow: translateKey('calculationUnitsEyebrow'),
-  },
-  work: {
-    label: translateKey('workTypes'),
-    title: translateKey('workTypes'),
-    description: translateKey('groupSectionsIntoWorkTypesYouUseRepeatedly'),
-    eyebrow: translateKey('workTemplatesEyebrow'),
-  },
+const areaCopy: Record<Area, { label: TranslationKey; title: TranslationKey; description: TranslationKey; eyebrow: TranslationKey }> = {
+  materials: { label: 'materialsAndPrices', title: 'materialsAndPrices', description: 'aSingleRegisterForMaterialsYouBuyOrUseWithAPriceForEach', eyebrow: 'priceRegisterEyebrow' },
+  sections: { label: 'sections', title: 'sections', description: 'reusableGroupsOfMaterialsWithAClearCalculationRule', eyebrow: 'calculationUnitsEyebrow' },
+  work: { label: 'workTypes', title: 'workTypes', description: 'groupSectionsIntoWorkTypesYouUseRepeatedly', eyebrow: 'workTemplatesEyebrow' },
 };
 
 function formatWesternNumber(value: number | string) {
@@ -150,12 +135,12 @@ function SectionForm({ initial, materials, onSave, onClose }: { initial?: Sectio
   return (
     <form onSubmit={(event) => { event.preventDefault(); if (valid) onSave(name, mode, materialIds); }} className="space-y-5">
       <Field label={translateKey('sectionName')}><input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder={translateKey('exampleSurfaceFinish')} data-testid="input-section-name" className="field-input" /></Field>
-      <Field label={translateKey('calculationMethod')} hint={modeCopy[mode].description}>
+      <Field label={translateKey('calculationMethod')} hint={translateKey(modeCopy[mode].description)}>
         <div className="grid gap-2 sm:grid-cols-2">
           {(Object.keys(modeCopy) as CalculationMode[]).map((key) => (
             <button type="button" key={key} onClick={() => setMode(key)} data-testid={`button-mode-${key}`} className={cn('rounded-xl border p-3 text-right transition-colors', mode === key ? 'border-[hsl(var(--accent))] bg-[hsl(var(--accent)/.13)]' : 'border-[hsl(var(--border))] hover:bg-[hsl(var(--muted))]')}>
-              <span className="flex items-center justify-between text-xs font-bold"><span>{modeCopy[key].label}</span><span className={cn('size-3 rounded-full border', mode === key ? 'border-[hsl(var(--primary))] bg-[hsl(var(--primary))]' : 'border-[hsl(var(--muted-foreground))]')} /></span>
-              <span className="mt-2 block text-[11px] leading-5 text-[hsl(var(--muted-foreground))]">{modeCopy[key].short}</span>
+              <span className="flex items-center justify-between text-xs font-bold"><span>{translateKey(modeCopy[key].label)}</span><span className={cn('size-3 rounded-full border', mode === key ? 'border-[hsl(var(--primary))] bg-[hsl(var(--primary))]' : 'border-[hsl(var(--muted-foreground))]')} /></span>
+              <span className="mt-2 block text-[11px] leading-5 text-[hsl(var(--muted-foreground))]">{translateKey(modeCopy[key].short)}</span>
             </button>
           ))}
         </div>
@@ -432,7 +417,7 @@ export default function SettingsPage() {
             {(['materials', 'sections', 'work'] as Area[]).map((key) => {
               const Icon = key === 'materials' ? PackageOpen : key === 'sections' ? Layers3 : Settings2;
               const count = key === 'materials' ? state.materials.length : key === 'sections' ? state.sections.length : state.workTypes.length;
-              return <button key={key} onClick={() => setActiveArea(key)} data-active={activeArea === key} data-testid={`nav-${key}`} className="nav-item flex items-center justify-center gap-1.5 px-2 text-[10px] font-bold sm:gap-2 sm:text-xs"><Icon size={15} strokeWidth={1.8} /><span>{areaCopy[key].label}</span><span className="font-mono text-[9px] opacity-60">{formatWesternNumber(count)}</span></button>;
+              return <button key={key} onClick={() => setActiveArea(key)} data-active={activeArea === key} data-testid={`nav-${key}`} className="nav-item flex items-center justify-center gap-1.5 px-2 text-[10px] font-bold sm:gap-2 sm:text-xs"><Icon size={15} strokeWidth={1.8} /><span>{translateKey(areaCopy[key].label)}</span><span className="font-mono text-[9px] opacity-60">{formatWesternNumber(count)}</span></button>;
             })}
           </nav>
         </header>
@@ -450,8 +435,8 @@ export default function SettingsPage() {
                 <p className="mt-1 text-xs leading-6 text-[hsl(var(--muted-foreground))]">{translateKey('chooseTheAppInterfaceLanguage')}</p>
                 <select value={language} onChange={(event) => setLanguage(event.target.value as AppLanguage)} className="field-input mt-3" data-testid="select-language">
                   <option value="ar">{translateKey('arabic')}</option>
-                  <option value="tr">Türkçe</option>
-                  <option value="en">English</option>
+                  <option value="tr">{translateKey('turkish')}</option>
+                  <option value="en">{translateKey('english')}</option>
                 </select>
               </div>
             </div>
@@ -472,7 +457,7 @@ export default function SettingsPage() {
           </section>
           <section className="section-card">
             <div className="section-heading">
-              <div><p className="eyebrow">{active.eyebrow}</p><h2>{active.title}</h2><p className="section-description">{active.description}</p></div>
+              <div><p className="eyebrow">{translateKey(active.eyebrow)}</p><h2>{translateKey(active.title)}</h2><p className="section-description">{translateKey(active.description)}</p></div>
               <Button variant="primary" onClick={() => openCreate(activeArea === 'materials' ? 'material' : activeArea === 'sections' ? 'section' : 'work')} data-testid={`button-add-${activeArea === 'work' ? 'work' : activeArea.slice(0, -1)}`}><Plus size={15} />{activeArea === 'materials' ? translateKey('addMaterial') : activeArea === 'sections' ? translateKey('addSection') : translateKey('addWorkType')}</Button>
             </div>
 
@@ -495,7 +480,7 @@ export default function SettingsPage() {
       {modal?.kind === 'work' && <Modal title={modal.item ? translateKey('editWorkType') : translateKey('addWorkType')} eyebrow={translateKey('workTemplate')} onClose={() => setModal(null)}><WorkForm initial={modal.item as WorkType | undefined} sections={state.sections} onClose={() => setModal(null)} onSave={(name, ids) => saveWork((modal.item as WorkType | undefined)?.id, name, ids)} /></Modal>}
       {modal?.kind === 'delete' && <DeleteModal target={modal.target} item={modal.item} detail={deleteDetail} onClose={() => setModal(null)} onConfirm={confirmDelete} />}
       {modal?.kind === 'share-settings' && <Modal title={translateKey('shareSettings')} eyebrow={translateKey('settingsCode')} onClose={() => setModal(null)}>
-        <p className="text-xs leading-6 text-[hsl(var(--muted-foreground))]">{translateKey(translateKey('shareCodeDescription'))}</p>
+        <p className="text-xs leading-6 text-[hsl(var(--muted-foreground))]">{translateKey('shareCodeDescription')}</p>
         <textarea value={modal.code} readOnly spellCheck={false} dir="ltr" className="field-input mt-4 min-h-28 resize-y font-mono text-[10px] leading-5" aria-label={translateKey('settingsCode')} />
         <div className="mt-4 flex justify-start gap-2"><Button variant="primary" onClick={() => copySettingsCode(modal.code)} data-testid="button-copy-settings-code"><Clipboard size={14} />{translateKey('copyCode')}</Button><Button variant="ghost" onClick={() => setModal(null)} data-testid="button-close-share-settings">{translateKey('close')}</Button></div>
         {transferMessage && <p role="status" className={cn('mt-3 rounded-lg border px-3 py-2 text-xs leading-5', transferMessage.type === 'error' ? 'border-[hsl(var(--destructive)/.3)] bg-[hsl(var(--destructive)/.08)] text-[hsl(var(--destructive))]' : 'border-[hsl(var(--accent)/.3)] bg-[hsl(var(--accent)/.08)] text-[hsl(var(--accent-foreground))]')}>{transferMessage.text}</p>}
