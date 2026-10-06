@@ -107,7 +107,7 @@ export default function ArchivePage() {
               className="field-input pr-10"
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder=translateKey('searchByCustomerOrWorkType')
+              placeholder={translateKey('searchByCustomerOrWorkType')}
               autoComplete="off"
               data-testid="input-archive-search"
             />
