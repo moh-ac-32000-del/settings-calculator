@@ -44,7 +44,7 @@ patch("src/pages/archive-page.tsx","function formatArchiveTime(timestamp: number
   if (record.shipping.included) lines.push("", "مصاريف الشحن: " + formatWesternNumber(record.shipping.amount));
   if ((record.additionalExpenses ?? 0) > 0) lines.push("مصاريف إضافية: " + formatWesternNumber(record.additionalExpenses ?? 0));
   lines.push("المجموع النهائي: " + formatAmount(record.finalTotal));
-  return lines.join("\n");
+  return lines.join(String.fromCharCode(10));
 }
 
 function formatArchiveTime(timestamp: number) {''')
@@ -65,6 +65,20 @@ patch("src/pages/archive-page.tsx",
                   </Link>
                   <button type="button" className="operation-link flex-1" onClick={() => window.open("https://wa.me/?text=" + encodeURIComponent(buildWhatsAppMessage(record)), "_blank", "noopener,noreferrer")} data-testid="button-share-whatsapp"><Share2 size={14} />مشاركة واتساب</button>
                 </div>''')
+
+p=Path("src/pages/archive-page.tsx")
+s=p.read_text(encoding="utf-8")
+if "button-share-whatsapp" not in s:
+    marker="                </Link>\n              </div>"
+    button='''                </Link>
+                <button type="button" className="operation-link flex-1" onClick={() => window.open("https://wa.me/?text=" + encodeURIComponent(buildWhatsAppMessage(record)), "_blank", "noopener,noreferrer")} data-testid="button-share-whatsapp">
+                  <Share2 size={14} />
+                  مشاركة واتساب
+                </button>
+              </div>'''
+    if marker in s:
+        s=s.replace(marker,button,1)
+        p.write_text(s,encoding="utf-8")
 
 Path("src/lib/language-store.ts").write_text("""export type AppLanguage = 'ar' | 'tr' | 'en';
 export const LANGUAGE_STORAGE_KEY = 'settings-calculator-language';
