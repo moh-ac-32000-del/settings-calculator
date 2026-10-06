@@ -1222,7 +1222,7 @@ export default function OperationsPage() {
       setActiveSectionId(transfer.entries[0]?.sectionId ?? null);
       setWorkNameValidationError('');
       setShowTransferPicker(false);
-      setTransferNotice(`نُقلت العملية إلى ${targetName}، وحُفظت نسخة ${savedSource.workTypeName ?? 'العمل {translateKey('previous')}'} في الأرشيف.${issueMessages.length ? ` ${issueMessages.join(' ')}` : ''}`);
+      setTransferNotice(`${translateKey('transferSuccess').replace('{target}', targetName).replace('{source}', savedSource.workTypeName ?? '')}${issueMessages.length ? ` ${issueMessages.join(' ')}` : ''}`);
     } catch {
       setShowTransferPicker(false);
       setTransferNotice(translateKey('failedToSaveBeforeMove'));
@@ -1341,7 +1341,7 @@ export default function OperationsPage() {
                   data-testid="button-back-work-choice"
                 >
                   <ChevronLeft size={15} />
-                  رجوع
+                  {translateKey('back')}
                 </Button>
               )}
               <div className="min-w-0 flex-1">
@@ -1367,7 +1367,7 @@ export default function OperationsPage() {
                 >
                   <DropdownMenuItem onSelect={openTransferPicker} data-testid="button-transfer-operation">
                     <MoveRight size={15} />
-                    نقل العملية
+                    {translateKey('moveOperation')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onSelect={() => requestFinishOperation(true)} data-testid="button-finish-operation-menu">
                     <Check size={15} />
@@ -1375,7 +1375,7 @@ export default function OperationsPage() {
                   </DropdownMenuItem>
                   <DropdownMenuItem onSelect={openOrderEditor} data-testid="button-open-operations-order">
                     <ListOrdered size={15} />
-                    ترتيب العمليات
+                    {translateKey('orderOperations')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -1406,7 +1406,7 @@ export default function OperationsPage() {
           <>
             {noWorkTypes && !isArchiveEditing && (
               <div className="operations-notice" data-testid="notice-no-work-types">
-                <span>{translateKey("لا توجد أنواع أعمال محفوظة. يمكنك استخدام «عمل حر» أو {translateKey('openSettings')} لإنشاء قالب.")}</span>
+                <span>{translateKey('noSavedWorkTypesFreeWork')}</span>
                 <Link href="/settings" className="operation-link" data-testid="link-notice-settings">
                   <Settings2 size={14} />
                   الإعدادات
@@ -1475,7 +1475,7 @@ export default function OperationsPage() {
               )}
 
               {selectedWork && (noSectionsForWork || orderedAvailableSections.length === 0) ? (
-                <EmptyState title="لا توجد أقسام لهذا العمل" detail=translateKey('linkASectionToThisWorkTypeInSettingsThenReturnToTheCalc') />
+                <EmptyState title={translateKey('noSectionsForThisWork')} detail={translateKey('linkASectionToThisWorkTypeInSettingsThenReturnToTheCalc')} />
               ) : selectedWork && entries.length === 0 ? (
                 <EmptyState title=translateKey('preparingTheFirstSection') detail=translateKey('currentSectionDataWillAppearHere') />
               ) : selectedWork ? (
@@ -1558,7 +1558,7 @@ export default function OperationsPage() {
                         data-testid="input-manual-shipping"
                       />
                       <p className="mt-2 text-[10px] text-[hsl(var(--muted-foreground))]">
-                        الحساب التلقائي الحالي: <span className="font-mono" dir="ltr">{formatWesternNumber(calculatedShippingTotal.toLocaleString('en-US'))}</span>. هذا التعديل لهذه العملية فقط.
+                        الحساب التلقائي الحالي: <span className="font-mono" dir="ltr">{formatWesternNumber(calculatedShippingTotal.toLocaleString('en-US'))}</span>. {translateKey('thisChangeAppliesToThisOperationOnly')}
                       </p>
                     </div>
                   )}
