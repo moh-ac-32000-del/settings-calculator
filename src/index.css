@@ -332,3 +332,46 @@ body { min-width: 320px; }
   .final-total strong { font-size: 1.25rem; }
   .finish-operation-fab { min-height: 3.1rem; gap: .3rem; padding-inline: .65rem; font-size: .62rem; }
 }
+
+/* Language-aware layout: Arabic stays RTL; Turkish/English use LTR with logical alignment. */
+html[data-language="tr"],
+html[data-language="en"] {
+  direction: ltr;
+}
+html[data-language="tr"] body,
+html[data-language="en"] body {
+  direction: ltr;
+}
+html[data-language="tr"] .text-right,
+html[data-language="en"] .text-right {
+  text-align: left !important;
+}
+html[data-language="tr"] .text-left,
+html[data-language="en"] .text-left {
+  text-align: right !important;
+}
+html[data-language="tr"] .field-input.pr-10,
+html[data-language="en"] .field-input.pr-10 {
+  padding-right: .75rem;
+  padding-left: 2.5rem;
+}
+html[data-language="tr"] .absolute.right-3,
+html[data-language="en"] .absolute.right-3 {
+  right: auto !important;
+  left: .75rem !important;
+}
+html[data-language="tr"] .absolute.left-3,
+html[data-language="en"] .absolute.left-3 {
+  left: auto !important;
+  right: .75rem !important;
+}
+html[data-language="tr"] .archive-record-summary,
+html[data-language="en"] .archive-record-summary {
+  text-align: left;
+}
+html[data-language="tr"] .material-choice,
+html[data-language="en"] .material-choice,
+html[data-language="tr"] .work-pill,
+html[data-language="en"] .work-pill {
+  text-align: left;
+}
