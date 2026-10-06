@@ -216,6 +216,7 @@ export default function ArchivePage() {
                     مشاركة واتساب
                   </button>
                 </div>
+              </div>
             </details>
           ))}
         </main>
