@@ -90,7 +90,7 @@ jobs:
           }\n'''
           Path("public/manifest.webmanifest").write_text(manifest, encoding="utf-8")
 
-          sw = '''const CACHE = "settings-calculator-v5";
+          sw = '''const CACHE = "settings-calculator-v6";
           const BASE = "/settings-calculator/";
           self.addEventListener("install", (event) => {
             event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll([BASE, BASE + "manifest.webmanifest"])).then(() => self.skipWaiting()));
