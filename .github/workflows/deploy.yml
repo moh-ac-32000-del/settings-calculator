@@ -172,10 +172,7 @@ jobs:
           index.write_text(text, encoding="utf-8")
           PY
 
-      - name: Restore Vite config if missing
-        run: |
-          if [ ! -f vite.config.ts ]; then
-            member="$(tar -tzf project-backup.tar.gz | grep 'vite.config.ts      - name: Make TypeScript config standalone
+      - name: Make TypeScript config standalone
         run: |
           python3 - <<'PY'
           import json
