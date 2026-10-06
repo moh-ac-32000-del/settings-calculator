@@ -43,7 +43,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src package.json package-lock.json vite.config.* tsconfig.json index.html public 2>/dev/null || true
+          git add -f src package.json package-lock.json vite.config.* tsconfig.json index.html public 2>/dev/null || true
+          git status --short | head -n 80
           git diff --cached --quiet || git commit -m "chore: persist calculator source"
           git push || true
 
