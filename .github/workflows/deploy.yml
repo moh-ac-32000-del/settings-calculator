@@ -39,6 +39,16 @@ jobs:
           echo "=== EXPENSE/SHIPPING/LANGUAGE MATCHES ==="
           grep -RniE "مصاريف|الشحن|shipping|language|اللغة|نوع العمل|archive|localStorage" src --include='*.tsx' --include='*.ts' | head -n 300 || true
 
+      - name: Inspect extracted calculator source
+        run: |
+          find src -type f \( -name "*.tsx" -o -name "*.ts" \) -print | sort > source-files.txt
+          { echo "=== FILES ==="; cat source-files.txt; echo "=== MATCHES ==="; grep -RniE "مصاريف|الشحن|shipping|language|اللغة|نوع العمل|archive|localStorage|saveOperationToArchive" src --include='*.tsx' --include='*.ts' || true; } > source-inspect.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add source-inspect.txt source-files.txt
+          git diff --cached --quiet || git commit -m "chore: inspect extracted calculator source"
+          git push
+
       - name: Add PWA files
         run: |
           python3 - <<'PY'
