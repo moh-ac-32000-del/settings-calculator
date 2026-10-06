@@ -411,3 +411,8 @@ export function formatLocalizedTime(date: Date, language: AppLanguage): string {
 export function translate(key: TranslationKey, language: AppLanguage = 'ar'): string {
   return dictionaries[language][key] ?? ar[key] ?? key;
 }
+
+export function translateText(value: string, language: AppLanguage = 'ar'): string {
+  const key = value as TranslationKey;
+  return dictionaries[language][key] ?? value;
+}
