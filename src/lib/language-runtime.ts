@@ -178,6 +178,30 @@ const dictionaries: Record<AppLanguage, Dictionary> = {
     'مثال: تجهيز متجر': 'Örnek: mağaza hazırlama',
     'مثال: معدن ساتان': 'Örnek: saten metal',
     'لوحة إدخال الكمية': 'Miktar giriş paneli',
+    'تكلفة إضافية': 'Ek maliyet',
+    '04 / تكلفة إضافية': '04 / Ek maliyet',
+    'لم تتم إضافة مواد بعد.': 'Henüz malzeme eklenmedi.',
+    'أنشئ قسمًا أولًا لربطه هنا.': 'Buraya bağlamak için önce bir bölüm oluşturun.',
+    'إضافة مادة إلى القسم': 'Bölüme malzeme ekle',
+    'تعديل مادة': 'Malzemeyi düzenle',
+    'تعديل قسم': 'Bölümü düzenle',
+    'تعديل نوع عمل': 'İş türünü düzenle',
+    'إضافة مادة': 'Malzeme ekle',
+    'إضافة قسم': 'Bölüm ekle',
+    'إضافة نوع عمل': 'İş türü ekle',
+    'كود الإعدادات': 'Ayar kodu',
+    'وحدة حساب': 'Hesap birimi',
+    'قالب عمل': 'İş şablonu',
+    'ملف الإعدادات': 'Ayar dosyası',
+    'معاينة الإعدادات': 'Ayar önizlemesi',
+    'استيراد هذه الإعدادات سيستبدل الإعدادات الحالية.': 'Bu ayarlar mevcut ayarların yerini alacak.',
+    'تعذر تحديث السجل؛ ربما انتهت مدة الاحتفاظ به. ارجع إلى الأرشيف للتحقق.': 'Kayıt güncellenemedi; saklama süresi dolmuş olabilir. Kontrol etmek için arşive dönün.',
+    'عدّل مدخلات السجل، وستُعاد جميع النتائج تلقائيًا قبل حفظه في الأرشيف.': 'Kayıt girişlerini düzenleyin; arşive kaydetmeden önce tüm sonuçlar otomatik olarak yeniden hesaplanır.',
+    'سيُحدّث السجل الحالي في الأرشيف ويبدأ احتساب مدة الاحتفاظ به لثلاثة أيام من جديد.': 'Mevcut kayıt arşivde güncellenecek ve üç günlük saklama süresi yeniden başlayacaktır.',
+    'إذا أضفت اسمًا للعمل فسيُحفظ ملخصه في الأرشيف. ستُصفّر الكميات والنتائج وتُزال الأقسام المؤقتة.': 'İş için bir ad eklerseniz özeti arşive kaydedilir. Miktarlar ve sonuçlar sıfırlanır ve geçici bölümler kaldırılır.',
+    'يشمل «عمل حر» كخيار مستقل. اضغط أي صف لترتيب أقسامه.': '“Serbest iş” bağımsız bir seçenek olarak dahildir. Bölümlerini sıralamak için bir satıra dokunun.',
+    'رتّب أنواع الأعمال أولًا، ثم افتح أي نوع لترتيب أقسامه.': 'Önce iş türlerini sıralayın, ardından bölümlerini sıralamak için bir tür açın.',
+    'التنقل الرئيسي': 'Ana gezinme',
   },
   en: {
     'إعدادات الحاسبة': 'Calculator settings',
@@ -348,6 +372,28 @@ const dictionaries: Record<AppLanguage, Dictionary> = {
     'مثال: تجهيز متجر': 'Example: store setup',
     'مثال: معدن ساتان': 'Example: satin metal',
     'لوحة إدخال الكمية': 'Quantity input panel',
+    'تكلفة إضافية': 'Additional cost',
+    '04 / تكلفة إضافية': '04 / Additional cost',
+    'لم تتم إضافة مواد بعد.': 'No materials have been added yet.',
+    'أنشئ قسمًا أولًا لربطه هنا.': 'Create a section first to link it here.',
+    'إضافة مادة إلى القسم': 'Add material to section',
+    'تعديل مادة': 'Edit material',
+    'تعديل قسم': 'Edit section',
+    'تعديل نوع عمل': 'Edit work type',
+    'إضافة مادة': 'Add material',
+    'إضافة قسم': 'Add section',
+    'إضافة نوع عمل': 'Add work type',
+    'كود الإعدادات': 'Settings code',
+    'وحدة حساب': 'Calculation unit',
+    'قالب عمل': 'Work template',
+    'ملف الإعدادات': 'Settings file',
+    'استيراد هذه الإعدادات سيستبدل الإعدادات الحالية.': 'Importing these settings will replace the current settings.',
+    'تعذر تحديث السجل؛ ربما انتهت مدة الاحتفاظ به. ارجع إلى الأرشيف للتحقق.': 'The record could not be updated; its retention period may have expired. Return to the archive to check.',
+    'عدّل مدخلات السجل، وستُعاد جميع النتائج تلقائيًا قبل حفظه في الأرشيف.': 'Edit the record inputs; all results will be recalculated automatically before it is saved to the archive.',
+    'سيُحدّث السجل الحالي في الأرشيف ويبدأ احتساب مدة الاحتفاظ به لثلاثة أيام من جديد.': 'The current record will be updated in the archive and its three-day retention period will restart.',
+    'إذا أضفت اسمًا للعمل فسيُحفظ ملخصه في الأرشيف. ستُصفّر الكميات والنتائج وتُزال الأقسام المؤقتة.': 'If you add a work name, its summary will be saved to the archive. Quantities and results will reset and temporary sections will be removed.',
+    'يشمل «عمل حر» كخيار مستقل. اضغط أي صف لترتيب أقسامه.': '“Free work” is included as an independent option. Tap any row to order its sections.',
+    'التنقل الرئيسي': 'Main navigation',
   },
 };
 
@@ -358,19 +404,26 @@ function translateValue(value: string, dictionary: Dictionary) {
   const exact = dictionary[value];
   if (exact) return exact;
 
-  // Source components contain both Arabic and English strings. Resolve either
-  // language through the Arabic canonical key so switching is complete.
+  // Source components may contain both Arabic and English. Resolve either
+  // source language through the Arabic canonical key.
   for (const canonical of Object.keys(dictionaries.tr)) {
-    if (dictionaries.tr[canonical] === value) return dictionary[canonical] ?? (Object.keys(dictionary).length === 0 ? canonical : value);
+    if (dictionaries.tr[canonical] === value) return dictionary[canonical] ?? value;
   }
   for (const canonical of Object.keys(dictionaries.en)) {
-    if (dictionaries.en[canonical] === value) return dictionary[canonical] ?? (Object.keys(dictionary).length === 0 ? canonical : value);
+    if (dictionaries.en[canonical] === value) return dictionary[canonical] ?? value;
   }
 
-  if (value.startsWith('تعديل كمية ')) return dictionary['تعديل كمية هذا القسم فقط']?.replace('هذا القسم', value.slice('تعديل كمية '.length)) ?? value;
-  if (value.startsWith('إزالة ')) return (dictionary['إزالة'] ?? 'إزالة') + ' ' + value.slice('إزالة '.length);
-  if (value.startsWith('حذف ')) return (languageLabel(dictionary, 'حذف') ?? 'حذف') + ' ' + value.slice('حذف '.length);
-  if (value.startsWith('تعديل ')) return (dictionary['تعديل العملية'] ?? 'تعديل') + ' ' + value.slice('تعديل '.length);
+  const dynamicPrefixes: Array<[string, string]> = [
+    ['تعديل ', 'تعديل العملية'],
+    ['حذف ', 'حذف'],
+    ['إزالة ', 'إزالة'],
+  ];
+  for (const [prefix, labelKey] of dynamicPrefixes) {
+    if (value.startsWith(prefix)) {
+      const translatedLabel = dictionary[labelKey];
+      if (translatedLabel) return translatedLabel + ' ' + value.slice(prefix.length);
+    }
+  }
   return value;
 }
 
