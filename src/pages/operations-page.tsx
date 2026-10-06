@@ -827,7 +827,7 @@ export default function OperationsPage() {
     setManualShippingEnabled(record.shipping.mode === 'manual');
     setManualShippingValue(String(record.shipping.manualAmount));
     setAdditionalExpensesEnabled((record.additionalExpenses ?? 0) > 0);
-      setAdditionalExpensesValue(String(record.additionalExpenses ?? 0));
+    setAdditionalExpensesValue(String(record.additionalExpenses ?? 0));
     setArchiveSaveError('');
     setWorkNameValidationError('');
   }, [archiveEditId, settings.workTypes, setLocation]);
@@ -936,6 +936,7 @@ export default function OperationsPage() {
     || !includeShipping
     || manualShippingEnabled
     || (Number.isFinite(manualShippingAmount) && manualShippingAmount !== 0)
+    || additionalExpensesEnabled
     || additionalExpensesAmount !== 0;
 
   const focusCustomerName = (afterMenuClose = false) => {
@@ -977,6 +978,8 @@ export default function OperationsPage() {
     setIncludeShipping(true);
     setManualShippingEnabled(false);
     setManualShippingValue('0');
+    setAdditionalExpensesEnabled(false);
+    setAdditionalExpensesValue('0');
   };
 
   const returnToWorkChoices = () => {
@@ -996,6 +999,8 @@ export default function OperationsPage() {
     setIncludeShipping(true);
     setManualShippingEnabled(false);
     setManualShippingValue('0');
+    setAdditionalExpensesEnabled(false);
+    setAdditionalExpensesValue('0');
   };
 
   const selectSection = (sectionId: string) => {
