@@ -168,7 +168,7 @@ export default function ArchivePage() {
                           <div className="min-w-0">
                             <p className="truncate text-xs font-bold">{section.name}</p>
                             <p className="mt-1 text-[10px] text-[hsl(var(--muted-foreground))]">
-                              {translateKey('archiveQuantity').replace('{quantity}', font-mono text-[hsl(var(--foreground))]" dir="ltr">{formatWesternNumber(section.quantity)}</span>
+                              {translateKey('archiveQuantity').replace('{quantity}', formatWesternNumber(section.quantity))}
                             </p>
                           </div>
                           <strong className="shrink-0 font-mono text-xs text-[hsl(var(--accent-foreground))]" dir="ltr">
