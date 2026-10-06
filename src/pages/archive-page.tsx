@@ -29,11 +29,11 @@ function buildWhatsAppMessage(record: ArchivedOperation) {
 
   for (const section of record.sections) {
     const primary = section.materials[0];
-    const unitPrice = primary?.price ?? 0;
+    const unitPrice = section.quantity ? section.result / section.quantity : 0;
     const quantity = formatWesternNumber(section.quantity);
     const total = formatAmount(section.result);
     lines.push('• *' + section.name + '* — ' + quantity + ' × ' + formatAmount(unitPrice) + ' = *' + total + '*');
-    const extras = section.materials.slice(1).map((material) => material.name + ' ' + formatAmount(material.price)).join(' · ');
+    const extras = section.materials.map((material) => material.name + ' ' + formatAmount(material.price)).join(' · ');
     if (extras) lines.push('  ' + extras);
     lines.push('---');
   }
