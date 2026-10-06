@@ -1,3 +1,5 @@
+import { loadLanguage } from './language-store';
+
 export type AppLanguage = 'ar' | 'tr' | 'en';
 
 const tr = {
@@ -412,7 +414,7 @@ export function translate(key: TranslationKey, language: AppLanguage = 'ar'): st
   return dictionaries[language][key] ?? ar[key] ?? key;
 }
 
-export function translateText(value: string, language: AppLanguage = 'ar'): string {
+export function translateText(value: string, language: AppLanguage = loadLanguage()): string {
   const key = value as TranslationKey;
   return dictionaries[language][key] ?? value;
 }
