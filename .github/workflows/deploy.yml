@@ -143,8 +143,7 @@ jobs:
           text = text.replace("</head>", head + "</head>")
           text = re.sub(r'<script>if\("serviceWorker" in navigator\).*?</script>', '', text, flags=re.S)
           reg = '<script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("/settings-calculator/sw.js",{scope:"/settings-calculator/"}))}</script>'
-          const shareScript = `
-<script>
+          shareScript = r'''<script>
 (function(){
   const SHARE_LABEL = "مشاركة واتساب";
   const clean = (s) => s.replace(/\\u00a0/g, " ").replace(/[ \\t]+/g, " ").trim();
@@ -173,15 +172,12 @@ jobs:
     const total = totalIndex >= 0 ? (ls[totalIndex].split(/[:：]/).slice(1).join(":").trim() || ls[totalIndex]) : "";
     const out = [];
     if (work) out.push("اسم العمل: " + work);
-    if (materialLines.length) {
-      out.push("", "المواد:", ...materialLines);
-    }
+    if (materialLines.length) out.push("", "المواد:", ...materialLines);
     if (shipping) out.push("", "مصاريف الشحن: " + shipping.replace(/^مصاريف الشحن\\s*/, ""));
     if (total) out.push("", "المجموع: " + total.replace(/^المجموع\\s*/, ""));
     return out.join("\\n").trim();
   }
   function addButtons(){
-    if (!location.pathname.includes("/settings-calculator")) return;
     const candidates = Array.from(document.querySelectorAll("button")).filter(b => clean(b.textContent || "") === "تعديل");
     for (const edit of candidates) {
       const card = edit.closest("article, [role='article'], .rounded-2xl, .rounded-xl, .border");
@@ -196,8 +192,7 @@ jobs:
         e.stopPropagation();
         const message = buildMessage(card);
         if (!message) return;
-        const url = "https://wa.me/?text=" + encodeURIComponent(message);
-        window.open(url, "_blank", "noopener,noreferrer");
+        window.open("https://wa.me/?text=" + encodeURIComponent(message), "_blank", "noopener,noreferrer");
       });
       edit.parentElement && edit.parentElement.appendChild(share);
     }
@@ -207,7 +202,7 @@ jobs:
   window.addEventListener("load", addButtons);
   addButtons();
 })();
-</script>`;
+</script>'''
           text = text.replace("</body>", shareScript + "</body>")
           index.write_text(text, encoding="utf-8")
           PY
