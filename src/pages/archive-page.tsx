@@ -25,35 +25,6 @@ function buildWhatsAppMessage(record: ArchivedOperation) {
   if (record.shipping.included) lines.push("", "مصاريف الشحن: " + formatWesternNumber(record.shipping.amount));
   if ((record.additionalExpenses ?? 0) > 0) lines.push("مصاريف إضافية: " + formatWesternNumber(record.additionalExpenses ?? 0));
   lines.push("المجموع النهائي: " + formatAmount(record.finalTotal));
-  return lines.join("\n");
-}
-
-function buildWhatsAppMessage(record: ArchivedOperation) {
-  const lines = ["اسم العمل: " + record.name];
-  if (record.workTypeName) lines.push("نوع العمل: " + record.workTypeName);
-  lines.push("", "المواد والأقسام:");
-  for (const section of record.sections) {
-    lines.push(section.name + " — الكمية: " + formatWesternNumber(section.quantity) + " — المجموع: " + formatAmount(section.result));
-    for (const material of section.materials) lines.push("  " + material.name + ": " + formatAmount(material.price));
-  }
-  if (record.shipping.included) lines.push("", "مصاريف الشحن: " + formatWesternNumber(record.shipping.amount));
-  if ((record.additionalExpenses ?? 0) > 0) lines.push("مصاريف إضافية: " + formatWesternNumber(record.additionalExpenses ?? 0));
-  lines.push("المجموع النهائي: " + formatAmount(record.finalTotal));
-  return lines.join("
-");
-}
-
-function buildWhatsAppMessage(record: ArchivedOperation) {
-  const lines = ["اسم العمل: " + record.name];
-  if (record.workTypeName) lines.push("نوع العمل: " + record.workTypeName);
-  lines.push("", "المواد والأقسام:");
-  for (const section of record.sections) {
-    lines.push(section.name + " — الكمية: " + formatWesternNumber(section.quantity) + " — المجموع: " + formatAmount(section.result));
-    for (const material of section.materials) lines.push("  " + material.name + ": " + formatAmount(material.price));
-  }
-  if (record.shipping.included) lines.push("", "مصاريف الشحن: " + formatWesternNumber(record.shipping.amount));
-  if ((record.additionalExpenses ?? 0) > 0) lines.push("مصاريف إضافية: " + formatWesternNumber(record.additionalExpenses ?? 0));
-  lines.push("المجموع النهائي: " + formatAmount(record.finalTotal));
   return lines.join(String.fromCharCode(10));
 }
 
