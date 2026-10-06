@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { CalculationMode, createId, loadSettings, Material, saveSettings, Section, SettingsState, ShippingExpenseSetting, WorkType, SETTINGS_SCHEMA_VERSION } from '@/lib/settings-store';
 import { createSettingsCode, parseSettingsCode } from '@/lib/settings-transfer';
 import { reconcileOperationsOrderAfterSettingsChange } from '@/lib/operations-order-store';
+import { loadLanguage, saveLanguage, type AppLanguage } from '@/lib/language-store';
 import AppBottomNav from '@/components/app-bottom-nav';
 
 type Area = 'materials' | 'sections' | 'work';
@@ -305,9 +306,10 @@ export default function SettingsPage() {
   const [activeArea, setActiveArea] = useState<Area>('materials');
   const [savedAt, setSavedAt] = useState<Date | null>(null);
   const [transferMessage, setTransferMessage] = useState<{ type: 'error' | 'success'; text: string } | null>(null);
+  const [language, setLanguage] = useState<AppLanguage>(() => loadLanguage());
 
   useEffect(() => { saveSettings(state); setSavedAt(new Date()); }, [state]);
-  useEffect(() => { document.documentElement.lang = 'ar'; document.documentElement.dir = 'rtl'; }, []);
+  useEffect(() => { saveLanguage(language); document.documentElement.lang = language; document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr'; }, [language]);
 
   const materialById = useMemo(() => new Map(state.materials.map((material) => [material.id, material])), [state.materials]);
   const counts = `${formatWesternNumber(state.materials.length)} مواد · ${formatWesternNumber(state.sections.length)} أقسام · ${formatWesternNumber(state.workTypes.length)} أنواع أعمال`;
@@ -439,6 +441,20 @@ export default function SettingsPage() {
             <div className="flex items-center gap-2"><CircleHelp size={15} className="shrink-0 text-[hsl(var(--accent-foreground))]" /><span>تُحفظ التغييرات تلقائيًا على هذا المتصفح.</span></div>
             {savedAt && <span className="hidden font-mono text-[10px] sm:inline">آخر حفظ {formatWesternNumber(savedAt.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }))}</span>}
           </div>
+          <section className="mb-5 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card)/.45)] p-4 sm:p-5" data-testid="language-settings">
+            <div className="flex items-start gap-3">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[hsl(var(--accent)/.13)] text-[hsl(var(--accent-foreground))]"><Settings2 size={17} /></div>
+              <div className="flex-1">
+                <h2 className="text-sm font-extrabold">اللغة / Language / Dil</h2>
+                <p className="mt-1 text-xs leading-6 text-[hsl(var(--muted-foreground))]">اختر لغة واجهة التطبيق.</p>
+                <select value={language} onChange={(event) => setLanguage(event.target.value as AppLanguage)} className="field-input mt-3" data-testid="select-language">
+                  <option value="ar">العربية</option>
+                  <option value="tr">Türkçe</option>
+                  <option value="en">English</option>
+                </select>
+              </div>
+            </div>
+          </section>
           <section className="mb-5 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card)/.45)] p-4 sm:p-5">
             <div className="flex items-start gap-3">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[hsl(var(--accent)/.13)] text-[hsl(var(--accent-foreground))]"><Share2 size={17} /></div>

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Archive, ChevronDown, Clock3, Layers3, Pencil, Search } from 'lucide-react';
+import { Archive, ChevronDown, Clock3, Layers3, Pencil, Search, Share2 } from 'lucide-react';
 import { Link } from 'wouter';
 import { cleanupOperationsArchive, type ArchivedOperation } from '@/lib/operations-archive-store';
 import { formatAmount, formatWesternNumber } from '@/lib/operations-utils';
@@ -12,6 +12,21 @@ function formatArchiveDate(timestamp: number) {
     year: 'numeric',
     numberingSystem: 'latn',
   }).format(new Date(timestamp));
+}
+
+function buildWhatsAppMessage(record: ArchivedOperation) {
+  const lines = ["اسم العمل: " + record.name];
+  if (record.workTypeName) lines.push("نوع العمل: " + record.workTypeName);
+  lines.push("", "المواد والأقسام:");
+  for (const section of record.sections) {
+    lines.push(section.name + " — الكمية: " + formatWesternNumber(section.quantity) + " — المجموع: " + formatAmount(section.result));
+    for (const material of section.materials) lines.push("  " + material.name + ": " + formatAmount(material.price));
+  }
+  if (record.shipping.included) lines.push("", "مصاريف الشحن: " + formatWesternNumber(record.shipping.amount));
+  if ((record.additionalExpenses ?? 0) > 0) lines.push("مصاريف إضافية: " + formatWesternNumber(record.additionalExpenses ?? 0));
+  lines.push("المجموع النهائي: " + formatAmount(record.finalTotal));
+  return lines.join("
+");
 }
 
 function formatArchiveTime(timestamp: number) {
@@ -176,12 +191,19 @@ export default function ArchivePage() {
                       {' · '}اليدوي: <span className="font-mono" dir="ltr">{formatWesternNumber(record.shipping.manualAmount)}</span>
                     </p>
                   )}
+                  {(record.additionalExpenses ?? 0) > 0 && (
+                    <div className="mt-2 flex items-center justify-between gap-3 text-[11px]">
+                      <span className="text-[hsl(var(--muted-foreground))]">مصاريف إضافية</span>
+                      <strong className="font-mono" dir="ltr">{formatWesternNumber(record.additionalExpenses ?? 0)}</strong>
+                    </div>
+                  )}
                   <div className="mt-3 flex items-center justify-between gap-3 border-t border-[hsl(var(--border))] pt-3 text-xs">
                     <span className="font-bold">المجموع النهائي</span>
                     <strong className="font-mono text-[hsl(var(--accent-foreground))]" dir="ltr">{formatAmount(record.finalTotal)}</strong>
                   </div>
                 </div>
-                <Link
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Link
                   href={`/operations/edit/${encodeURIComponent(record.id)}`}
                   className="operation-link mt-4"
                   aria-label={`تعديل العملية ${record.name}`}

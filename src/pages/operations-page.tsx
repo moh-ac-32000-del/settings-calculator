@@ -765,6 +765,7 @@ export default function OperationsPage() {
   const [includeShipping, setIncludeShipping] = useState(true);
   const [manualShippingEnabled, setManualShippingEnabled] = useState(false);
   const [manualShippingValue, setManualShippingValue] = useState('0');
+  const [additionalExpensesValue, setAdditionalExpensesValue] = useState('0');
   const [autoAdvanceEnabled, setAutoAdvanceEnabled] = useState(true);
   const [autoAdvanceCountdown, setAutoAdvanceCountdown] = useState<number | null>(null);
   const autoAdvanceTimerRef = useRef<number | null>(null);
@@ -795,6 +796,7 @@ export default function OperationsPage() {
         setIncludeShipping(true);
         setManualShippingEnabled(false);
         setManualShippingValue('0');
+        setAdditionalExpensesValue('0');
         setArchiveSaveError('');
         setWorkNameValidationError('');
         setBackNavigationNotice('');
@@ -824,6 +826,7 @@ export default function OperationsPage() {
     setIncludeShipping(record.shipping.included);
     setManualShippingEnabled(record.shipping.mode === 'manual');
     setManualShippingValue(String(record.shipping.manualAmount));
+    setAdditionalExpensesValue(String(record.additionalExpenses ?? 0));
     setArchiveSaveError('');
     setWorkNameValidationError('');
   }, [archiveEditId, settings.workTypes, setLocation]);
@@ -924,13 +927,15 @@ export default function OperationsPage() {
     manualShippingAmount,
     includeShipping,
   );
-  const finalTotal = sectionTotal + shippingTotal;
+  const additionalExpensesAmount = Math.max(0, Number(formatWesternNumber(additionalExpensesValue).replace(/,/g, '')) || 0);
+  const finalTotal = sectionTotal + shippingTotal + additionalExpensesAmount;
   const hasStartedOperation = entries.some((entry) => (
     quantityValue(entry.quantity) > 0 || (entry.materialSelectionTouched && entry.selectedMaterialIds.length > 0)
   ))
     || !includeShipping
     || manualShippingEnabled
-    || (Number.isFinite(manualShippingAmount) && manualShippingAmount !== 0);
+    || (Number.isFinite(manualShippingAmount) && manualShippingAmount !== 0)
+    || additionalExpensesAmount !== 0;
 
   const focusCustomerName = (afterMenuClose = false) => {
     focusCustomerNameAfterMenuCloseRef.current = afterMenuClose;
@@ -1141,6 +1146,7 @@ export default function OperationsPage() {
         mode: manualShippingEnabled ? 'manual' : 'automatic',
         included: includeShipping,
       },
+      additionalExpenses: additionalExpensesAmount,
       finalTotal,
     };
     return draft;
@@ -1549,6 +1555,21 @@ export default function OperationsPage() {
                       </p>
                     </div>
                   )}
+                  <div className="mt-3 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card)/.55)] p-3" data-testid="additional-expenses">
+                    <div className="flex items-center justify-between gap-3">
+                      <label className="shipping-option m-0 flex-1">
+                        <input type="checkbox" checked={additionalExpensesAmount > 0} onChange={(event) => { cancelAutoAdvance(); if (!event.target.checked) setAdditionalExpensesValue('0'); }} data-testid="checkbox-additional-expenses" />
+                        <span>مصاريف إضافية</span>
+                      </label>
+                      <strong className="font-mono text-xs" dir="ltr">{formatWesternNumber(additionalExpensesAmount.toLocaleString('en-US'))}</strong>
+                    </div>
+                    {(additionalExpensesAmount > 0 || additionalExpensesValue !== '0') && (
+                      <div className="mt-2">
+                        <label htmlFor="input-additional-expenses" className="text-xs font-bold">قيمة المصاريف الإضافية لهذه العملية</label>
+                        <input id="input-additional-expenses" type="text" inputMode="decimal" dir="ltr" className="field-input mt-2 text-left font-mono" value={additionalExpensesValue} onChange={(event) => { cancelAutoAdvance(); setAdditionalExpensesValue(event.target.value); }} data-testid="input-additional-expenses" />
+                      </div>
+                    )}
+                  </div>
                   <div className="final-total" data-testid="final-total">
                     <div className="final-total-summary">
                       <div>

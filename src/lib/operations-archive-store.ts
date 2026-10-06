@@ -33,6 +33,7 @@ export type ArchivedOperationDraft = {
     mode: 'automatic' | 'manual';
     included: boolean;
   };
+  additionalExpenses?: number;
   finalTotal: number;
 };
 
@@ -94,6 +95,7 @@ function isArchivedOperation(value: unknown): value is ArchivedOperation {
         ))
     ))
     && (record.workTypeId === undefined || record.workTypeId === null || typeof record.workTypeId === 'string')
+    && (record.additionalExpenses === undefined || (typeof record.additionalExpenses === 'number' && Number.isFinite(record.additionalExpenses) && record.additionalExpenses >= 0))
     && shipping !== undefined
     && typeof shipping.amount === 'number'
     && typeof shipping.automaticAmount === 'number'
