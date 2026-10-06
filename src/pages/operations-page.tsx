@@ -780,8 +780,6 @@ export default function OperationsPage() {
 
   useEffect(() => {
     setSettings(loadSettings());
-    document.documentElement.lang = 'ar';
-    document.documentElement.dir = 'rtl';
   }, []);
 
   useEffect(() => {
