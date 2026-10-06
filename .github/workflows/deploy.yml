@@ -17,6 +17,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 8
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -195,7 +196,7 @@ jobs:
           PORT: 4173
           BASE_PATH: /settings-calculator/
         run: |
-          npm run build
+          timeout 180s npm run build
           rm -rf "$GITHUB_WORKSPACE/pages"
           mkdir -p "$GITHUB_WORKSPACE/pages"
           cp -R dist/public/. "$GITHUB_WORKSPACE/pages"/
