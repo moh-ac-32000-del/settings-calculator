@@ -151,7 +151,7 @@ export default function ArchivePage() {
               <div className="archive-record-details">
                 {record.workTypeName && (
                   <p className="mb-3 text-[11px] text-[hsl(var(--muted-foreground))]">
-                    {translateKey('archiveCustomerType').replace('{name}', {record.workTypeName}</span>
+                    {translateKey('archiveCustomerType').replace('{name}', record.workTypeName)} <span className="text-[hsl(var(--foreground))]">{record.workTypeName}</span>
                   </p>
                 )}
                 <div className="flex items-center gap-2 text-xs font-bold">
