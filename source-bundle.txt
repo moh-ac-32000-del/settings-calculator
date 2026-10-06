@@ -2124,9 +2124,9 @@ function EmptyState({ icon: Icon, title, detail, action }: { icon: typeof Packag
 function Field({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-xs font-bold text-[hsl(var(--foreground))]">{label}</span>
+      <span className="mb-2 block text-xs font-bold text-[hsl(var(--foreground))]">{translateText(label)}</span>
       {children}
-      {hint && <span className="mt-2 block text-[11px] leading-5 text-[hsl(var(--muted-foreground))]">{hint}</span>}
+      {hint && <span className="mt-2 block text-[11px] leading-5 text-[hsl(var(--muted-foreground))]">{translateText(hint)}</span>}
     </label>
   );
 }
@@ -2144,7 +2144,7 @@ function Button({ children, variant = 'secondary', className, ...props }: React.
       )}
       {...props}
     >
-      {children}
+      {typeof children === "string" ? translateText(children) : children}
     </button>
   );
 }
@@ -2159,10 +2159,10 @@ function Modal({ children, onClose, title, eyebrow }: { children: ReactNode; onC
       <div className="dialog-panel w-full max-w-lg rounded-t-2xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-5 shadow-2xl sm:rounded-2xl sm:p-6" role="dialog" aria-modal="true" aria-label={title}>
         <div className="mb-6 flex items-start justify-between gap-4">
           <div>
-            <p className="font-mono text-[10px] font-medium tracking-[.08em] text-[hsl(var(--accent-foreground))]">{eyebrow}</p>
-            <h2 className="mt-2 text-xl font-extrabold tracking-[-.04em]">{title}</h2>
+            <p className="font-mono text-[10px] font-medium tracking-[.08em] text-[hsl(var(--accent-foreground))]">{translateText(eyebrow)}</p>
+            <h2 className="mt-2 text-xl font-extrabold tracking-[-.04em]">{translateText(title)}</h2>
           </div>
-          <Button variant="ghost" className="size-11 shrink-0 p-0" onClick={onClose} aria-label="إغلاق النافذة" data-testid="button-close-dialog"><X size={17} /></Button>
+          <Button variant="ghost" className="size-11 shrink-0 p-0" onClick={onClose} aria-label={translateText("إغلاق النافذة")} data-testid="button-close-dialog"><X size={17} /></Button>
         </div>
         {children}
       </div>
@@ -2176,7 +2176,7 @@ function MaterialForm({ initial, onSave, onClose }: { initial?: Material; onSave
   const valid = name.trim().length > 0 && Number(price) >= 0 && price !== '';
   return (
     <form onSubmit={(event) => { event.preventDefault(); if (valid) onSave(name, Number(normalizePriceInput(price))); }} className="space-y-5">
-      <Field label="اسم المادة"><input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder="مثال: معدن ساتان" data-testid="input-material-name" className="field-input" /></Field>
+      <Field label="اسم المادة"><input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder={translateText("مثال: معدن ساتان")} data-testid="input-material-name" className="field-input" /></Field>
       <Field label="سعر الوحدة" hint="تُحفظ الأسعار محليًا على هذا الجهاز.">
         <div className="relative"><Coins size={15} className="pointer-events-none absolute right-3 top-3.5 text-[hsl(var(--muted-foreground))]" /><input type="text" inputMode="decimal" value={price} onChange={(e) => setPrice(normalizePriceInput(e.target.value))} placeholder="0.00" data-testid="input-material-price" className="field-input pr-10" dir="ltr" /></div>
       </Field>
@@ -2196,7 +2196,7 @@ function SectionForm({ initial, materials, onSave, onClose }: { initial?: Sectio
   const valid = name.trim().length > 0;
   return (
     <form onSubmit={(event) => { event.preventDefault(); if (valid) onSave(name, mode, materialIds); }} className="space-y-5">
-      <Field label="اسم القسم"><input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder="مثال: تشطيب السطح" data-testid="input-section-name" className="field-input" /></Field>
+      <Field label="اسم القسم"><input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder={translateText("مثال: تشطيب السطح")} data-testid="input-section-name" className="field-input" /></Field>
       <Field label="طريقة الحساب" hint={modeCopy[mode].description}>
         <div className="grid gap-2 sm:grid-cols-2">
           {(Object.keys(modeCopy) as CalculationMode[]).map((key) => (
@@ -2213,7 +2213,7 @@ function SectionForm({ initial, materials, onSave, onClose }: { initial?: Sectio
             const material = materials.find((item) => item.id === id);
             return material ? <div className="flex items-center justify-between rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--background)/.5)] px-3 py-2.5" key={id}><div><p className="text-xs font-semibold">{material.name}</p><p className="font-mono text-[10px] text-[hsl(var(--muted-foreground))]">{money(material.price)}</p></div><button type="button" onClick={() => setMaterialIds((current) => current.filter((value) => value !== id))} className="flex size-9 items-center justify-center rounded-lg text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--muted))] hover:text-[hsl(var(--destructive))]" aria-label={`إزالة ${material.name}`} data-testid={`button-remove-material-${id}`}><Minus size={14} /></button></div> : null;
           })}</div>
-        <div className="relative mt-2"><select value="" onChange={(e) => { if (e.target.value) setMaterialIds((current) => [...current, e.target.value]); }} disabled={!available.length} aria-label="إضافة مادة إلى القسم" data-testid="select-section-material" className="field-input appearance-none pl-8"><option value="">{available.length ? 'إضافة مادة موجودة' : 'تمت إضافة كل المواد'}</option>{available.map((material) => <option key={material.id} value={material.id}>{material.name} · {money(material.price)}</option>)}</select><ChevronDown size={14} className="pointer-events-none absolute left-3 top-3.5 text-[hsl(var(--muted-foreground))]" /></div>
+        <div className="relative mt-2"><select value="" onChange={(e) => { if (e.target.value) setMaterialIds((current) => [...current, e.target.value]); }} disabled={!available.length} aria-label={translateText("إضافة مادة إلى القسم")} data-testid="select-section-material" className="field-input appearance-none pl-8"><option value="">{available.length ? 'إضافة مادة موجودة' : 'تمت إضافة كل المواد'}</option>{available.map((material) => <option key={material.id} value={material.id}>{material.name} · {money(material.price)}</option>)}</select><ChevronDown size={14} className="pointer-events-none absolute left-3 top-3.5 text-[hsl(var(--muted-foreground))]" /></div>
       </Field>
       <div className="flex justify-start gap-2 border-t border-[hsl(var(--border))] pt-5"><Button type="submit" variant="primary" disabled={!valid} data-testid="button-save-section"><Check size={14} />{initial ? 'حفظ التعديلات' : 'إضافة القسم'}</Button><Button type="button" variant="ghost" onClick={onClose} data-testid="button-cancel-section">{translateText("إلغاء")}</Button></div>
     </form>
@@ -2226,7 +2226,7 @@ function WorkForm({ initial, sections, onSave, onClose }: { initial?: WorkType; 
   const valid = name.trim().length > 0;
   return (
     <form onSubmit={(event) => { event.preventDefault(); if (valid) onSave(name, sectionIds); }} className="space-y-5">
-      <Field label="اسم نوع العمل"><input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder="مثال: تجهيز متجر" data-testid="input-work-name" className="field-input" /></Field>
+      <Field label="اسم نوع العمل"><input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder={translateText("مثال: تجهيز متجر")} data-testid="input-work-name" className="field-input" /></Field>
       <Field label="الأقسام المضمنة" hint="اختر الأقسام التي يستخدمها نوع العمل هذا.">
         <div className="space-y-2">{sections.length === 0 ? <div className="rounded-xl border border-dashed border-[hsl(var(--border))] px-3 py-3 text-xs text-[hsl(var(--muted-foreground))]">{translateText("أنشئ قسمًا أولًا لربطه هنا.")}</div> : sections.map((section) => <label key={section.id} className={cn('flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors', sectionIds.includes(section.id) ? 'border-[hsl(var(--accent))] bg-[hsl(var(--accent)/.13)]' : 'border-[hsl(var(--border))] hover:bg-[hsl(var(--muted))]')}><input type="checkbox" checked={sectionIds.includes(section.id)} onChange={(e) => setSectionIds((current) => e.target.checked ? [...current, section.id] : current.filter((id) => id !== section.id))} data-testid={`checkbox-work-section-${section.id}`} className="size-4 accent-[hsl(var(--primary))]" /><span className="text-xs font-semibold">{section.name}</span><span className="mr-auto font-mono text-[10px] text-[hsl(var(--muted-foreground))]">{formatWesternNumber(section.materialIds.length)} مواد</span></label>)}</div>
       </Field>
@@ -2475,7 +2475,7 @@ export default function SettingsPage() {
               <p className="mt-1 text-xs font-bold text-[hsl(var(--accent-foreground))]">{counts}</p>
             </div>
           </div>
-          <nav className="top-nav mt-6 grid grid-cols-3 gap-1 rounded-xl p-1" aria-label="أقسام الإعدادات">
+          <nav className="top-nav mt-6 grid grid-cols-3 gap-1 rounded-xl p-1" aria-label={translateText("أقسام الإعدادات")}>
             {(['materials', 'sections', 'work'] as Area[]).map((key) => {
               const Icon = key === 'materials' ? PackageOpen : key === 'sections' ? Layers3 : Settings2;
               const count = key === 'materials' ? state.materials.length : key === 'sections' ? state.sections.length : state.workTypes.length;
@@ -2543,12 +2543,12 @@ export default function SettingsPage() {
       {modal?.kind === 'delete' && <DeleteModal target={modal.target} item={modal.item} detail={deleteDetail} onClose={() => setModal(null)} onConfirm={confirmDelete} />}
       {modal?.kind === 'share-settings' && <Modal title="مشاركة الإعدادات" eyebrow="كود الإعدادات" onClose={() => setModal(null)}>
         <p className="text-xs leading-6 text-[hsl(var(--muted-foreground))]">{translateText("انسخ الكود وأرسله للشخص الذي تريد مشاركة إعداداتك معه.")}</p>
-        <textarea value={modal.code} readOnly spellCheck={false} dir="ltr" className="field-input mt-4 min-h-28 resize-y font-mono text-[10px] leading-5" aria-label="كود الإعدادات" />
+        <textarea value={modal.code} readOnly spellCheck={false} dir="ltr" className="field-input mt-4 min-h-28 resize-y font-mono text-[10px] leading-5" aria-label={translateText("كود الإعدادات")} />
         <div className="mt-4 flex justify-start gap-2"><Button variant="primary" onClick={() => copySettingsCode(modal.code)} data-testid="button-copy-settings-code"><Clipboard size={14} />{translateText("نسخ الكود")}</Button><Button variant="ghost" onClick={() => setModal(null)} data-testid="button-close-share-settings">{translateText("إغلاق")}</Button></div>
         {transferMessage && <p role="status" className={cn('mt-3 rounded-lg border px-3 py-2 text-xs leading-5', transferMessage.type === 'error' ? 'border-[hsl(var(--destructive)/.3)] bg-[hsl(var(--destructive)/.08)] text-[hsl(var(--destructive))]' : 'border-[hsl(var(--accent)/.3)] bg-[hsl(var(--accent)/.08)] text-[hsl(var(--accent-foreground))]')}>{transferMessage.text}</p>}
       </Modal>}
       {modal?.kind === 'import-settings' && <Modal title="استيراد الإعدادات" eyebrow="لصق كود الإعدادات" onClose={() => setModal(null)}>
-        <label className="block"><span className="mb-2 block text-xs font-bold">{translateText("الصق كود الإعدادات هنا")}</span><textarea autoFocus value={modal.code} onChange={(event) => updateTransferCode(event.target.value)} spellCheck={false} dir="ltr" className="field-input min-h-36 resize-y font-mono text-[10px] leading-5" aria-label="الصق كود الإعدادات هنا" placeholder="SC1...." /></label>
+        <label className="block"><span className="mb-2 block text-xs font-bold">{translateText("الصق كود الإعدادات هنا")}</span><textarea autoFocus value={modal.code} onChange={(event) => updateTransferCode(event.target.value)} spellCheck={false} dir="ltr" className="field-input min-h-36 resize-y font-mono text-[10px] leading-5" aria-label={translateText("الصق كود الإعدادات هنا")} placeholder="SC1...." /></label>
         <div className="mt-4 flex flex-wrap justify-start gap-2"><Button variant="secondary" onClick={pasteSettingsCode} data-testid="button-paste-settings-code"><ClipboardPaste size={14} />{translateText("لصق من الحافظة")}</Button><Button variant="primary" onClick={() => submitImportCode(modal.code)} disabled={!modal.code.trim()} data-testid="button-submit-settings-code"><Check size={14} />{translateText("استيراد الإعدادات")}</Button><Button variant="ghost" onClick={() => setModal(null)} data-testid="button-cancel-settings-code">{translateText("إلغاء")}</Button></div>
         {transferMessage && <p role="status" className={cn('mt-3 rounded-lg border px-3 py-2 text-xs leading-5', transferMessage.type === 'error' ? 'border-[hsl(var(--destructive)/.3)] bg-[hsl(var(--destructive)/.08)] text-[hsl(var(--destructive))]' : 'border-[hsl(var(--accent)/.3)] bg-[hsl(var(--accent)/.08)] text-[hsl(var(--accent-foreground))]')}>{transferMessage.text}</p>}
       </Modal>}
