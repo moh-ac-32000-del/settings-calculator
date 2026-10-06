@@ -55,7 +55,7 @@ jobs:
           git add -f source-bundle.txt
           git status --short | head -n 80
           git diff --cached --quiet || git commit -m "chore: persist calculator source"
-          git push || true
+          git push origin HEAD:main
 
       - name: Add PWA files
         run: |
