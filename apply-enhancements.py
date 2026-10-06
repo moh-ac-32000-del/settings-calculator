@@ -89,6 +89,7 @@ export function loadLanguage(): AppLanguage {
 }
 export function saveLanguage(language: AppLanguage) {
   window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+  window.dispatchEvent(new Event('settings-calculator-language-change'));
 }
 """,encoding="utf-8")
 patch("src/pages/settings-page.tsx","import { reconcileOperationsOrderAfterSettingsChange } from '@/lib/operations-order-store';","import { reconcileOperationsOrderAfterSettingsChange } from '@/lib/operations-order-store';\nimport { loadLanguage, saveLanguage, type AppLanguage } from '@/lib/language-store';")
