@@ -1,4 +1,4 @@
-import { translateText } from '@/lib/i18n';
+import { translateKey } from '@/lib/i18n';
 import { Card, CardContent } from '@/components/ui/card';
 import { AlertCircle } from 'lucide-react';
 
