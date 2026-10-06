@@ -765,6 +765,7 @@ export default function OperationsPage() {
   const [includeShipping, setIncludeShipping] = useState(true);
   const [manualShippingEnabled, setManualShippingEnabled] = useState(false);
   const [manualShippingValue, setManualShippingValue] = useState('0');
+  const [additionalExpensesEnabled, setAdditionalExpensesEnabled] = useState(false);
   const [additionalExpensesValue, setAdditionalExpensesValue] = useState('0');
   const [autoAdvanceEnabled, setAutoAdvanceEnabled] = useState(true);
   const [autoAdvanceCountdown, setAutoAdvanceCountdown] = useState<number | null>(null);
@@ -796,6 +797,7 @@ export default function OperationsPage() {
         setIncludeShipping(true);
         setManualShippingEnabled(false);
         setManualShippingValue('0');
+        setAdditionalExpensesEnabled(false);
         setAdditionalExpensesValue('0');
         setArchiveSaveError('');
         setWorkNameValidationError('');
@@ -826,7 +828,8 @@ export default function OperationsPage() {
     setIncludeShipping(record.shipping.included);
     setManualShippingEnabled(record.shipping.mode === 'manual');
     setManualShippingValue(String(record.shipping.manualAmount));
-    setAdditionalExpensesValue(String(record.additionalExpenses ?? 0));
+    setAdditionalExpensesEnabled((record.additionalExpenses ?? 0) > 0);
+      setAdditionalExpensesValue(String(record.additionalExpenses ?? 0));
     setArchiveSaveError('');
     setWorkNameValidationError('');
   }, [archiveEditId, settings.workTypes, setLocation]);
@@ -927,7 +930,7 @@ export default function OperationsPage() {
     manualShippingAmount,
     includeShipping,
   );
-  const additionalExpensesAmount = Math.max(0, Number(formatWesternNumber(additionalExpensesValue).replace(/,/g, '')) || 0);
+  const additionalExpensesAmount = additionalExpensesEnabled ? Math.max(0, Number(formatWesternNumber(additionalExpensesValue).replace(/,/g, '')) || 0) : 0;
   const finalTotal = sectionTotal + shippingTotal + additionalExpensesAmount;
   const hasStartedOperation = entries.some((entry) => (
     quantityValue(entry.quantity) > 0 || (entry.materialSelectionTouched && entry.selectedMaterialIds.length > 0)
@@ -1558,12 +1561,12 @@ export default function OperationsPage() {
                   <div className="mt-3 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card)/.55)] p-3" data-testid="additional-expenses">
                     <div className="flex items-center justify-between gap-3">
                       <label className="shipping-option m-0 flex-1">
-                        <input type="checkbox" checked={additionalExpensesAmount > 0} onChange={(event) => { cancelAutoAdvance(); if (!event.target.checked) setAdditionalExpensesValue('0'); }} data-testid="checkbox-additional-expenses" />
+                        <input type="checkbox" checked={additionalExpensesEnabled} onChange={(event) => { cancelAutoAdvance(); const enabled = event.target.checked; setAdditionalExpensesEnabled(enabled); if (!enabled) setAdditionalExpensesValue('0'); }} data-testid="checkbox-additional-expenses" />
                         <span>مصاريف إضافية</span>
                       </label>
                       <strong className="font-mono text-xs" dir="ltr">{formatWesternNumber(additionalExpensesAmount.toLocaleString('en-US'))}</strong>
                     </div>
-                    {(additionalExpensesAmount > 0 || additionalExpensesValue !== '0') && (
+                    {additionalExpensesEnabled && (
                       <div className="mt-2">
                         <label htmlFor="input-additional-expenses" className="text-xs font-bold">قيمة المصاريف الإضافية لهذه العملية</label>
                         <input id="input-additional-expenses" type="text" inputMode="decimal" dir="ltr" className="field-input mt-2 text-left font-mono" value={additionalExpensesValue} onChange={(event) => { cancelAutoAdvance(); setAdditionalExpensesValue(event.target.value); }} data-testid="input-additional-expenses" />
