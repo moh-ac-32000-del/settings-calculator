@@ -2,6 +2,18 @@ import { loadLanguage } from './language-store';
 export type AppLanguage = 'ar' | 'tr' | 'en';
 
 const ar = {
+  singleChoiceDescription: 'اختيار مادة واحدة ثم ضربها في الكمية.',
+  singleChoiceShort: 'مرجع واحد',
+  sumSelectedDescription: 'جمع المواد المختارة ثم ضرب مجموعها.',
+  sumSelectedShort: 'مراجع متعددة',
+  priceRegisterEyebrow: '01 / سجل الأسعار',
+  calculationUnitsEyebrow: '02 / وحدات الحساب',
+  workTemplatesEyebrow: '03 / قوالب العمل',
+  exampleSurfaceFinish: 'مثال: تشطيب السطح',
+  referencesStayLinkedToCurrentMaterialPrice: 'تبقى المراجع مرتبطة بسعر المادة الحالي.',
+  material: 'المادة',
+  section: 'القسم',
+
   hesapMakinesiAyarlar: 'الإعدادات الحاسبة',
   calculatorSettings: 'إعدادات الحاسبة',
   yourLocalSettings: 'إعداداتك المحلية',
@@ -195,6 +207,18 @@ const ar = {
 export type TranslationKey = keyof typeof ar;
 
 const en: Record<TranslationKey, string> = {
+  singleChoiceDescription: 'اختيار مادة واحدة ثم ضربها في الكمية.',
+  singleChoiceShort: 'مرجع واحد',
+  sumSelectedDescription: 'جمع المواد المختارة ثم ضرب مجموعها.',
+  sumSelectedShort: 'مراجع متعددة',
+  priceRegisterEyebrow: '01 / سجل الأسعار',
+  calculationUnitsEyebrow: '02 / وحدات الحساب',
+  workTemplatesEyebrow: '03 / قوالب العمل',
+  exampleSurfaceFinish: 'مثال: تشطيب السطح',
+  referencesStayLinkedToCurrentMaterialPrice: 'تبقى المراجع مرتبطة بسعر المادة الحالي.',
+  material: 'المادة',
+  section: 'القسم',
+
   hesapMakinesiAyarlar: 'Calculator settings',
   calculatorSettings: 'Calculator settings',
   yourLocalSettings: 'Your local settings',
@@ -386,6 +410,18 @@ const en: Record<TranslationKey, string> = {
 };
 
 const tr: Record<TranslationKey, string> = {
+  singleChoiceDescription: 'اختيار مادة واحدة ثم ضربها في الكمية.',
+  singleChoiceShort: 'مرجع واحد',
+  sumSelectedDescription: 'جمع المواد المختارة ثم ضرب مجموعها.',
+  sumSelectedShort: 'مراجع متعددة',
+  priceRegisterEyebrow: '01 / سجل الأسعار',
+  calculationUnitsEyebrow: '02 / وحدات الحساب',
+  workTemplatesEyebrow: '03 / قوالب العمل',
+  exampleSurfaceFinish: 'مثال: تشطيب السطح',
+  referencesStayLinkedToCurrentMaterialPrice: 'تبقى المراجع مرتبطة بسعر المادة الحالي.',
+  material: 'المادة',
+  section: 'القسم',
+
   hesapMakinesiAyarlar: 'Hesap makinesi ayarları',
   calculatorSettings: 'Hesap makinesi ayarları',
   yourLocalSettings: 'Yerel ayarlarınız',
