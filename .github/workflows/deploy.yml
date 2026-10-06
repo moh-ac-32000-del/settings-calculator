@@ -90,7 +90,7 @@ jobs:
           }\n'''
           Path("public/manifest.webmanifest").write_text(manifest, encoding="utf-8")
 
-          sw = '''const CACHE = "settings-calculator-v4";
+          sw = '''const CACHE = "settings-calculator-v5";
           const BASE = "/settings-calculator/";
           self.addEventListener("install", (event) => {
             event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll([BASE, BASE + "manifest.webmanifest"])).then(() => self.skipWaiting()));
@@ -159,7 +159,7 @@ jobs:
           text = re.sub(r'<script>if\("serviceWorker" in navigator\).*?</script>', '', text, flags=re.S)
           reg = '<script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("/settings-calculator/sw.js",{scope:"/settings-calculator/"}))}</script>'
           Path("public/archive-share.js").write_text(Path("archive-share.js").read_text(encoding="utf-8"), encoding="utf-8")
-          text = text.replace("</body>", reg + '<script src="/settings-calculator/archive-share.js?v=4"></script></body>')
+          text = text.replace("</body>", reg + "</body>")
           index.write_text(text, encoding="utf-8")
           PY
 
