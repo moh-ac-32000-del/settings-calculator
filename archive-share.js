@@ -18,16 +18,22 @@
 
   function getRecordCard(button) {
     let node = button;
-    for (let i = 0; i < 10 && node; i += 1) {
+    for (let i = 0; i < 40 && node; i += 1) {
       const text = node.innerText || "";
       if (
         text.includes("نوع العمل") &&
-        text.includes("الأقسام المستخدمة") &&
-        text.includes("المجموع النهائي")
+        (text.includes("المجموع النهائي") || text.includes("الأقسام المستخدمة"))
       ) {
         return node;
       }
       node = node.parentElement;
+    }
+
+    // Fallback: choose the nearest ancestor that looks like an archive record.
+    let best = button.parentElement;
+    for (let i = 0; i < 40 && best; i += 1) {
+      if ((best.innerText || "").includes("نوع العمل")) return best;
+      best = best.parentElement;
     }
     return null;
   }
@@ -41,6 +47,7 @@
   }
 
   function buildMessage(card) {
+    if (!card) return "";
     const lines = getLines(card);
     const workType = valueAfterLabel(lines, "نوع العمل");
     const customer = valueAfterLabel(lines, "اسم العميل");
@@ -50,20 +57,28 @@
     const shippingIndex = lines.findIndex((line) => line.includes("مصاريف الشحن"));
     const finalTotalIndex = findLine(lines, "المجموع النهائي");
 
+    const endOfSections = sectionsTotalIndex > sectionsIndex
+      ? sectionsTotalIndex
+      : shippingIndex > sectionsIndex
+        ? shippingIndex
+        : finalTotalIndex > sectionsIndex
+          ? finalTotalIndex
+          : lines.length;
+
     const sectionLines =
       sectionsIndex >= 0
-        ? lines.slice(
-            sectionsIndex + 1,
-            sectionsTotalIndex > sectionsIndex ? sectionsTotalIndex : (shippingIndex > sectionsIndex ? shippingIndex : lines.length)
-          )
+        ? lines.slice(sectionsIndex + 1, endOfSections)
         : [];
 
     const shippingLabel = shippingIndex >= 0 ? lines[shippingIndex] : "";
     const shippingValue =
       shippingIndex >= 0
-        ? normalize(shippingLabel.replace(/^مصاريف الشحن(?:\s*\([^)]*\))?\s*[:：-]?\s*/i, "")) ||
-          lines[shippingIndex + 1] ||
-          ""
+        ? normalize(
+            shippingLabel.replace(
+              /^مصاريف الشحن(?:\s*\([^)]*\))?\s*[:：-]?\s*/i,
+              ""
+            )
+          ) || lines[shippingIndex + 1] || ""
         : "";
 
     const finalTotalLabel = finalTotalIndex >= 0 ? lines[finalTotalIndex] : "";
@@ -80,13 +95,8 @@
       message.push(...sectionLines);
     }
 
-    if (shippingValue) {
-      message.push("", "مصاريف الشحن: " + shippingValue);
-    }
-
-    if (finalTotal) {
-      message.push("المجموع النهائي: " + finalTotal);
-    }
+    if (shippingValue) message.push("", "مصاريف الشحن: " + shippingValue);
+    if (finalTotal) message.push("المجموع النهائي: " + finalTotal);
 
     return message.join("\n").trim();
   }
@@ -94,11 +104,8 @@
   function addShareButtons() {
     const buttons = Array.from(document.querySelectorAll("button"));
     for (const editButton of buttons) {
-      const label = normalize(editButton.textContent);
-      if (!label.includes("تعديل العملية")) continue;
-
-      const card = getRecordCard(editButton);
-      if (!card || card.querySelector("[data-whatsapp-share]")) continue;
+      if (!normalize(editButton.textContent).includes("تعديل العملية")) continue;
+      if (editButton.parentElement?.querySelector("[data-whatsapp-share]")) continue;
 
       const shareButton = document.createElement("button");
       shareButton.type = "button";
@@ -111,8 +118,15 @@
       shareButton.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
+
+        const card = getRecordCard(editButton);
         const message = buildMessage(card);
-        if (!message) return;
+
+        if (!message) {
+          window.alert("تعذر قراءة بيانات العملية للمشاركة.");
+          return;
+        }
+
         const url = "https://wa.me/?text=" + encodeURIComponent(message);
         window.open(url, "_blank", "noopener,noreferrer");
       });
@@ -121,7 +135,8 @@
     }
   }
 
+  // Archive cards are rendered dynamically, so keep the button synchronized.
   const observer = new MutationObserver(addShareButtons);
-  observer.observe(document.body, { childList: true, subtree: true });
+  if (document.body) observer.observe(document.body, { childList: true, subtree: true });
   addShareButtons();
 })();
