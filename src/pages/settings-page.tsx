@@ -287,8 +287,8 @@ function DeleteModal({ target, item, onClose, onConfirm, detail }: { target: Ent
   return (
     <Modal title={`حذف ${label}؟`} eyebrow=translateKey('confirmationRequired') onClose={onClose}>
       <div className="flex gap-3 rounded-xl border border-[hsl(var(--destructive)/.28)] bg-[hsl(var(--destructive)/.07)] p-3"><AlertTriangle size={18} className="mt-0.5 shrink-0 text-[hsl(var(--destructive))]" /><p className="text-xs leading-6 text-[hsl(var(--foreground))]">{detail}</p></div>
-      <p className="mt-5 text-sm leading-7">{translateKey("سيتم حذف")} <strong>{item.name}</strong>. لا يمكن التراجع عن هذا الإجراء.</p>
-      <div className="mt-6 flex justify-start gap-2"><Button variant="danger" onClick={onConfirm} data-testid={`button-confirm-delete-${target}`}><Trash2 size={14} />حذف {label}</Button><Button variant="ghost" onClick={onClose} data-testid="button-cancel-delete">{translateKey('keepIt')}</Button></div>
+      <p className="mt-5 text-sm leading-7">{translateKey("{translateKey('deleteWillRemove').replace('{name}', label)}")} <strong>{item.name}</strong>. لا يمكن التراجع عن هذا الإجراء.</p>
+      <div className="mt-6 flex justify-start gap-2"><Button variant="danger" onClick={onConfirm} data-testid={`button-confirm-delete-${target}`}><Trash2 size={14} />{translateKey('deleteButton').replace('{name}', label)}</Button><Button variant="ghost" onClick={onClose} data-testid="button-cancel-delete">{translateKey('keepIt')}</Button></div>
     </Modal>
   );
 }
@@ -440,7 +440,7 @@ export default function SettingsPage() {
         <main>
           <div className="mb-5 flex items-center justify-between gap-3 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card)/.45)] px-3.5 py-3 text-xs text-[hsl(var(--muted-foreground))]">
             <div className="flex items-center gap-2"><CircleHelp size={15} className="shrink-0 text-[hsl(var(--accent-foreground))]" /><span>{translateKey('changesAreSavedAutomaticallyInThisBrowser')}</span></div>
-            {savedAt && <span className="hidden font-mono text-[10px] sm:inline">آخر حفظ {formatWesternNumber(savedAt.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }))}</span>}
+            {savedAt && <span className="hidden font-mono text-[10px] sm:inline">{translateKey('lastSaved').replace('{time}', formatWesternNumber(savedAt.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })))}</span>}
           </div>
           <section className="mb-5 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card)/.45)] p-4 sm:p-5" data-testid="language-settings">
             <div className="flex items-start gap-3">
@@ -473,7 +473,7 @@ export default function SettingsPage() {
           <section className="section-card">
             <div className="section-heading">
               <div><p className="eyebrow">{active.eyebrow}</p><h2>{active.title}</h2><p className="section-description">{active.description}</p></div>
-              <Button variant="primary" onClick={() => openCreate(activeArea === 'materials' ? 'material' : activeArea === 'sections' ? 'section' : 'work')} data-testid={`button-add-${activeArea === 'work' ? 'work' : activeArea.slice(0, -1)}`}><Plus size={15} />{activeArea === 'materials' ? 'إضافة مادة' : activeArea === 'sections' ? 'إضافة قسم' : 'إضافة نوع عمل'}</Button>
+              <Button variant="primary" onClick={() => openCreate(activeArea === 'materials' ? 'material' : activeArea === 'sections' ? 'section' : 'work')} data-testid={`button-add-${activeArea === 'work' ? 'work' : activeArea.slice(0, -1)}`}><Plus size={15} />{activeArea === 'materials' ? translateKey('addMaterial') : activeArea === 'sections' ? translateKey('addSection') : translateKey('addWorkType')}</Button>
             </div>
 
             {activeArea === 'materials' && (state.materials.length === 0
@@ -490,9 +490,9 @@ export default function SettingsPage() {
         </main>
       </div>
 
-      {modal?.kind === 'material' && <Modal title={modal.item ? translateKey('editMaterial') : 'إضافة مادة'} eyebrow="سجل الأسعار" onClose={() => setModal(null)}><MaterialForm initial={modal.item as Material | undefined} onClose={() => setModal(null)} onSave={(name, price) => saveMaterial((modal.item as Material | undefined)?.id, name, price)} /></Modal>}
-      {modal?.kind === 'section' && <Modal title={modal.item ? translateKey('editSection') : 'إضافة قسم'} eyebrow="وحدة حساب" onClose={() => setModal(null)}><SectionForm initial={modal.item as Section | undefined} materials={state.materials} onClose={() => setModal(null)} onSave={(name, mode, ids) => saveSection((modal.item as Section | undefined)?.id, name, mode, ids)} /></Modal>}
-      {modal?.kind === 'work' && <Modal title={modal.item ? translateKey('editWorkType') : 'إضافة نوع عمل'} eyebrow="قالب عمل" onClose={() => setModal(null)}><WorkForm initial={modal.item as WorkType | undefined} sections={state.sections} onClose={() => setModal(null)} onSave={(name, ids) => saveWork((modal.item as WorkType | undefined)?.id, name, ids)} /></Modal>}
+      {modal?.kind === 'material' && <Modal title={modal.item ? translateKey('editMaterial') : translateKey('addMaterial')} eyebrow="سجل الأسعار" onClose={() => setModal(null)}><MaterialForm initial={modal.item as Material | undefined} onClose={() => setModal(null)} onSave={(name, price) => saveMaterial((modal.item as Material | undefined)?.id, name, price)} /></Modal>}
+      {modal?.kind === 'section' && <Modal title={modal.item ? translateKey('editSection') : translateKey('addSection')} eyebrow="وحدة حساب" onClose={() => setModal(null)}><SectionForm initial={modal.item as Section | undefined} materials={state.materials} onClose={() => setModal(null)} onSave={(name, mode, ids) => saveSection((modal.item as Section | undefined)?.id, name, mode, ids)} /></Modal>}
+      {modal?.kind === 'work' && <Modal title={modal.item ? translateKey('editWorkType') : translateKey('addWorkType')} eyebrow="قالب عمل" onClose={() => setModal(null)}><WorkForm initial={modal.item as WorkType | undefined} sections={state.sections} onClose={() => setModal(null)} onSave={(name, ids) => saveWork((modal.item as WorkType | undefined)?.id, name, ids)} /></Modal>}
       {modal?.kind === 'delete' && <DeleteModal target={modal.target} item={modal.item} detail={deleteDetail} onClose={() => setModal(null)} onConfirm={confirmDelete} />}
       {modal?.kind === 'share-settings' && <Modal title=translateKey('shareSettings') eyebrow=translateKey('settingsCode') onClose={() => setModal(null)}>
         <p className="text-xs leading-6 text-[hsl(var(--muted-foreground))]">{translateKey(translateKey('shareCodeDescription'))}</p>
