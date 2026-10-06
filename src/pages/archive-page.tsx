@@ -15,21 +15,38 @@ function formatArchiveDate(timestamp: number) {
 function buildWhatsAppMessage(record: ArchivedOperation) {
   const language = loadLanguage();
   const labels = language === 'tr'
-    ? { work: 'İş adı', type: 'İş türü', sections: 'Malzemeler ve bölümler:', qty: 'Miktar', total: 'Toplam', shipping: 'Nakliye masrafı', extra: 'Ek masraf', final: 'Genel toplam' }
+    ? { title: '🧾 İşlem detayları', work: '👤', type: '🔧', materials: '📦 Malzemeler', shipping: '🚚 Nakliye', extra: '➕ Ek masraf', final: '💰 Genel toplam' }
     : language === 'en'
-      ? { work: 'Work name', type: 'Work type', sections: 'Materials and sections:', qty: 'Quantity', total: 'Total', shipping: 'Shipping expense', extra: 'Additional expense', final: 'Final total' }
-      : { work: 'اسم العمل', type: 'نوع العمل', sections: 'المواد والأقسام:', qty: 'الكمية', total: 'المجموع', shipping: 'مصاريف الشحن', extra: 'مصاريف إضافية', final: 'المجموع النهائي' };
-  const lines = [labels.work + ': ' + record.name];
-  if (record.workTypeName) lines.push(labels.type + ': ' + record.workTypeName);
-  lines.push('', labels.sections);
+      ? { title: '🧾 Operation details', work: '👤', type: '🔧', materials: '📦 Materials', shipping: '🚚 Shipping', extra: '➕ Additional expense', final: '💰 Final total' }
+      : { title: '🧾 تفاصيل العملية', work: '👤', type: '🔧', materials: '📦 المواد', shipping: '🚚 الشحن', extra: '➕ مصاريف إضافية', final: '💰 المجموع النهائي' };
+
+  const lines = [
+    titleLine(labels.title),
+    labels.work + ' ' + record.name,
+  ];
+  if (record.workTypeName) lines.push(labels.type + ' ' + record.workTypeName);
+  lines.push('', labels.materials);
+
   for (const section of record.sections) {
-    lines.push(section.name + ' — ' + labels.qty + ': ' + formatWesternNumber(section.quantity) + ' — ' + labels.total + ': ' + formatAmount(section.result));
-    for (const material of section.materials) lines.push('  ' + material.name + ': ' + formatAmount(material.price));
+    const primary = section.materials[0];
+    const unitPrice = primary?.price ?? 0;
+    const quantity = formatWesternNumber(section.quantity);
+    const total = formatAmount(section.result);
+    lines.push('• *' + section.name + '* — ' + quantity + ' × ' + formatAmount(unitPrice) + ' = *' + total + '*');
+    const extras = section.materials.slice(1).map((material) => material.name + ' ' + formatAmount(material.price)).join(' · ');
+    if (extras) lines.push('  ' + extras);
+    lines.push('---');
   }
-  if (record.shipping.included) lines.push('', labels.shipping + ': ' + formatWesternNumber(record.shipping.amount));
-  if ((record.additionalExpenses ?? 0) > 0) lines.push(labels.extra + ': ' + formatWesternNumber(record.additionalExpenses ?? 0));
-  lines.push(labels.final + ': ' + formatAmount(record.finalTotal));
-  return lines.join(String.fromCharCode(10));
+
+  if (record.sections.length > 0) lines.pop();
+  if (record.shipping.included) lines.push(labels.shipping + ': *' + formatWesternNumber(record.shipping.amount) + '*');
+  if ((record.additionalExpenses ?? 0) > 0) lines.push(labels.extra + ': *' + formatWesternNumber(record.additionalExpenses ?? 0) + '*');
+  lines.push(labels.final + ': *' + formatAmount(record.finalTotal) + '*');
+  return lines.join('\n');
+}
+
+function titleLine(value: string) {
+  return '*' + value + '*';
 }
 
 function formatArchiveTime(timestamp: number) {
