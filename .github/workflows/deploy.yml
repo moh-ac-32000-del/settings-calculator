@@ -32,19 +32,6 @@ jobs:
           echo "Application package:"
           find . -maxdepth 4 -path "*/package.json" -print
 
-      - name: Apply calculator archive updates
-        run: python3 apply-archive-update.py
-
-      - name: Persist source archive update
-        if: github.actor != 'github-actions[bot]'
-        run: |
-          tar -czf project-backup.tar.gz --exclude='node_modules' --exclude='.git' .
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add project-backup.tar.gz
-          git diff --cached --quiet || git commit -m "fix: update archive controls [skip ci]"
-          git push
-
       - name: Add PWA files
         run: |
           python3 - <<'PY'
