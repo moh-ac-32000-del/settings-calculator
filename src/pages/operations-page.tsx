@@ -26,7 +26,7 @@ type OperationEntry = {
   materialSelectionTouched?: boolean;
 };
 
-const CUSTOMER_NAME_REQUIRED_MESSAGE = translateKey('enterCustomerFirst')';
+const CUSTOMER_NAME_REQUIRED_MESSAGE = translateKey('enterCustomerFirst');
 
 function hexToHslChannels(hex: string) {
   const value = hex.replace('#', '');
