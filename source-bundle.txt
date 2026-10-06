@@ -2582,8 +2582,7 @@ function buildWhatsAppMessage(record: ArchivedOperation) {
   if (record.shipping.included) lines.push("", "مصاريف الشحن: " + formatWesternNumber(record.shipping.amount));
   if ((record.additionalExpenses ?? 0) > 0) lines.push("مصاريف إضافية: " + formatWesternNumber(record.additionalExpenses ?? 0));
   lines.push("المجموع النهائي: " + formatAmount(record.finalTotal));
-  return lines.join("
-");
+  return lines.join("\n");
 }
 
 function formatArchiveTime(timestamp: number) {
@@ -2761,15 +2760,19 @@ export default function ArchivePage() {
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <Link
-                  href={`/operations/edit/${encodeURIComponent(record.id)}`}
-                  className="operation-link mt-4"
-                  aria-label={`تعديل العملية ${record.name}`}
-                  data-testid={`button-edit-archive-${record.id}`}
-                >
-                  <Pencil size={14} />
-                  تعديل العملية
-                </Link>
-              </div>
+                    href={`/operations/edit/${encodeURIComponent(record.id)}`}
+                    className="operation-link flex-1"
+                    aria-label={`تعديل العملية ${record.name}`}
+                    data-testid={`button-edit-archive-${record.id}`}
+                  >
+                    <Pencil size={14} />
+                    تعديل العملية
+                  </Link>
+                  <button type="button" className="operation-link flex-1" onClick={() => window.open("https://wa.me/?text=" + encodeURIComponent(buildWhatsAppMessage(record)), "_blank", "noopener,noreferrer")} data-testid="button-share-whatsapp">
+                    <Share2 size={14} />
+                    مشاركة واتساب
+                  </button>
+                </div>
             </details>
           ))}
         </main>
