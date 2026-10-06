@@ -52,7 +52,7 @@ jobs:
               out.append(p.read_text(encoding="utf-8"))
           Path("source-bundle.txt").write_text("".join(out),encoding="utf-8")
           PY
-          for path in src package.json tsconfig.json index.html public; do
+          for path in src package.json tsconfig.json index.html public vite.config.ts postcss.config.js tailwind.config.ts tailwind.config.js; do
             [ -e "$path" ] && git add -f "$path"
           done
           git add -f source-bundle.txt
