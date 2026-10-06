@@ -181,7 +181,7 @@ function WorkForm({ initial, sections, onSave, onClose }: { initial?: WorkType; 
     <form onSubmit={(event) => { event.preventDefault(); if (valid) onSave(name, sectionIds); }} className="space-y-5">
       <Field label=translateKey('workTypeName')><input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder={translateKey('exampleStoreSetup')} data-testid="input-work-name" className="field-input" /></Field>
       <Field label=translateKey('includedSections') hint=translateKey('chooseTheSectionsUsedByThisWorkType')>
-        <div className="space-y-2">{sections.length === 0 ? <div className="rounded-xl border border-dashed border-[hsl(var(--border))] px-3 py-3 text-xs text-[hsl(var(--muted-foreground))]">{translateKey('createASectionFirstToLinkItHere')}</div> : sections.map((section) => <label key={section.id} className={cn('flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors', sectionIds.includes(section.id) ? 'border-[hsl(var(--accent))] bg-[hsl(var(--accent)/.13)]' : 'border-[hsl(var(--border))] hover:bg-[hsl(var(--muted))]')}><input type="checkbox" checked={sectionIds.includes(section.id)} onChange={(e) => setSectionIds((current) => e.target.checked ? [...current, section.id] : current.filter((id) => id !== section.id))} data-testid={`checkbox-work-section-${section.id}`} className="size-4 accent-[hsl(var(--primary))]" /><span className="text-xs font-semibold">{section.name}</span><span className="mr-auto font-mono text-[10px] text-[hsl(var(--muted-foreground))]">{formatWesternNumber(section.materialIds.length)} مواد</span></label>)}</div>
+        <div className="space-y-2">{sections.length === 0 ? <div className="rounded-xl border border-dashed border-[hsl(var(--border))] px-3 py-3 text-xs text-[hsl(var(--muted-foreground))]">{translateKey('createASectionFirstToLinkItHere')}</div> : sections.map((section) => <label key={section.id} className={cn('flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors', sectionIds.includes(section.id) ? 'border-[hsl(var(--accent))] bg-[hsl(var(--accent)/.13)]' : 'border-[hsl(var(--border))] hover:bg-[hsl(var(--muted))]')}><input type="checkbox" checked={sectionIds.includes(section.id)} onChange={(e) => setSectionIds((current) => e.target.checked ? [...current, section.id] : current.filter((id) => id !== section.id))} data-testid={`checkbox-work-section-${section.id}`} className="size-4 accent-[hsl(var(--primary))]" /><span className="text-xs font-semibold">{section.name}</span><span className="mr-auto font-mono text-[10px] text-[hsl(var(--muted-foreground))]">{translateKey('materialCount').replace('{count}', formatWesternNumber(section.materialIds.length))}</span></label>)}</div>
       </Field>
       <div className="flex justify-start gap-2 border-t border-[hsl(var(--border))] pt-5"><Button type="submit" variant="primary" disabled={!valid} data-testid="button-save-work"><Check size={14} />{initial ? translateKey('saveChanges') : translateKey('addWorkType')}</Button><Button type="button" variant="ghost" onClick={onClose} data-testid="button-cancel-work">{translateKey('cancel')}</Button></div>
     </form>
@@ -219,16 +219,16 @@ function ShippingExpensesSection({
     <section className="section-card mt-5" data-testid="shipping-expenses-settings">
       <div className="section-heading">
         <div>
-          <p className="eyebrow">04 / تكلفة إضافية</p>
+          <p className="eyebrow">{translateKey('text04AdditionalCost')}</p>
           <h2>{translateKey('shippingExpenseSettings')}</h2>
-          <p className="section-description">{translateKey(translateKey('shippingSettingsDescription'))}</p>
+          <p className="section-description">{translateKey('shippingSettingsDescription')}</p>
         </div>
         <Truck size={21} className="text-[hsl(var(--accent-foreground))]" />
       </div>
 
       {sections.length === 0 ? (
         <div className="rounded-xl border border-dashed border-[hsl(var(--border))] px-4 py-4 text-xs leading-6 text-[hsl(var(--muted-foreground))]">
-          أضف قسمًا أولًا حتى تتمكن من ربطه بإعدادات مصاريف الشحن.
+          {translateKey('shippingNoSections')}
         </div>
       ) : (
         <div className="grid gap-3 lg:grid-cols-2">
@@ -287,7 +287,7 @@ function DeleteModal({ target, item, onClose, onConfirm, detail }: { target: Ent
   return (
     <Modal title={translateKey('deleteNamed').replace('{name}', label)} eyebrow={translateKey('confirmationRequired')} onClose={onClose}>
       <div className="flex gap-3 rounded-xl border border-[hsl(var(--destructive)/.28)] bg-[hsl(var(--destructive)/.07)] p-3"><AlertTriangle size={18} className="mt-0.5 shrink-0 text-[hsl(var(--destructive))]" /><p className="text-xs leading-6 text-[hsl(var(--foreground))]">{detail}</p></div>
-      <p className="mt-5 text-sm leading-7">{translateKey("{translateKey('deleteWillRemove').replace('{name}', label)}")} <strong>{item.name}</strong>. لا يمكن التراجع عن هذا الإجراء.</p>
+      <p className="mt-5 text-sm leading-7">{translateKey('deleteWillRemove').replace('{name}', label)} <strong>{item.name}</strong>. {translateKey('cannotUndoDelete')}</p>
       <div className="mt-6 flex justify-start gap-2"><Button variant="danger" onClick={onConfirm} data-testid={`button-confirm-delete-${target}`}><Trash2 size={14} />{translateKey('deleteButton').replace('{name}', label)}</Button><Button variant="ghost" onClick={onClose} data-testid="button-cancel-delete">{translateKey('keepIt')}</Button></div>
     </Modal>
   );
