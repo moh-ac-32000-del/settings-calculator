@@ -578,6 +578,9 @@ const en: Record<TranslationKey, string> = {
   whatsappFinal: '💰 Genel toplam',
   keypadEnter: '{key} girişi',
   editSectionQuantity: '{name} miktarını düzenle',
+  cannotUndoDelete: 'لا يمكن التراجع عن هذا الإجراء.',
+  cannotUndoDelete: 'This action cannot be undone.',
+  cannotUndoDelete: 'Bu işlem geri alınamaz.',
 };
 
 const tr: Record<TranslationKey, string> = {
