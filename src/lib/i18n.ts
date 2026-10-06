@@ -207,7 +207,7 @@ const ar = {
 export type TranslationKey = keyof typeof ar;
 
 const en: Record<TranslationKey, string> = {
-  singleChoiceDescription: 'اختيار مادة واحدة ثم ضربها في الكمية.',
+  singleChoiceDescription: 'Choose one material, then multiply it by quantity.',
   singleChoiceShort: 'مرجع واحد',
   sumSelectedDescription: 'جمع المواد المختارة ثم ضرب مجموعها.',
   sumSelectedShort: 'مراجع متعددة',
