@@ -4,7 +4,7 @@ import { Link } from 'wouter';
 import { cleanupOperationsArchive, type ArchivedOperation } from '@/lib/operations-archive-store';
 import { formatAmount, formatWesternNumber } from '@/lib/operations-utils';
 import { loadLanguage } from '@/lib/language-store';
-import { translateText } from '@/lib/i18n';
+import { translateKey } from '@/lib/i18n';
 import AppBottomNav from '@/components/app-bottom-nav';
 
 function formatArchiveDate(timestamp: number) {
@@ -79,16 +79,16 @@ export default function ArchivePage() {
         <header className="operations-header">
           <div className="mb-3 flex items-center gap-2 text-[10px] font-medium text-[hsl(var(--accent-foreground))]">
             <span className="flex size-7 items-center justify-center rounded-lg bg-[hsl(var(--accent)/.13)]"><Archive size={14} /></span>
-            <span>{translateText("سجل العمليات")}</span>
+            <span>{translateKey('operationLog')}</span>
           </div>
           <div className="flex items-center justify-between gap-3">
-            <h1 className="text-2xl font-extrabold tracking-[-.06em] sm:text-3xl">{translateText("الأرشيف")}</h1>
+            <h1 className="text-2xl font-extrabold tracking-[-.06em] sm:text-3xl">{translateKey('archive')}</h1>
             <span
               className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[hsl(var(--border))] bg-[hsl(var(--card)/.55)] px-3 py-1.5 text-xs font-bold"
               data-testid="archive-count"
               aria-label={`عدد الأعمال في الأرشيف: ${records.length}`}
             >
-              <span className="text-[hsl(var(--muted-foreground))]">{translateText("الأعمال")}</span>
+              <span className="text-[hsl(var(--muted-foreground))]">{translateKey('records')}</span>
               <span className="font-mono text-[hsl(var(--accent-foreground))]" dir="ltr">{formatWesternNumber(records.length)}</span>
             </span>
           </div>
@@ -97,8 +97,8 @@ export default function ArchivePage() {
           </p>
         </header>
 
-        <section className="work-picker mb-4" aria-label={translateText("البحث في الأرشيف")}>
-          <label htmlFor="input-archive-search" className="eyebrow">{translateText("البحث في الأرشيف")}</label>
+        <section className="work-picker mb-4" aria-label={translateKey('searchArchive')}>
+          <label htmlFor="input-archive-search" className="eyebrow">{translateKey('searchArchive')}</label>
           <div className="relative mt-3">
             <Search size={16} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[hsl(var(--muted-foreground))]" aria-hidden="true" />
             <input
@@ -156,10 +156,10 @@ export default function ArchivePage() {
                 )}
                 <div className="flex items-center gap-2 text-xs font-bold">
                   <Layers3 size={15} className="text-[hsl(var(--accent-foreground))]" />
-                  <span>{translateText("الأقسام المستخدمة")}</span>
+                  <span>{translateKey('usedSections')}</span>
                 </div>
                 {record.sections.length === 0 ? (
-                  <p className="mt-3 text-[11px] text-[hsl(var(--muted-foreground))]">{translateText("لا توجد أقسام مسجلة في هذه العملية.")}</p>
+                  <p className="mt-3 text-[11px] text-[hsl(var(--muted-foreground))]">{translateKey('noSectionsAreRecordedInThisOperation')}</p>
                 ) : (
                   <div className="mt-3 space-y-2">
                     {record.sections.map((section) => (
@@ -192,7 +192,7 @@ export default function ArchivePage() {
 
                 <div className="archive-shipping">
                   <div className="flex items-center justify-between gap-3 text-[11px]">
-                    <span className="text-[hsl(var(--muted-foreground))]">{translateText("مجموع الأقسام")}</span>
+                    <span className="text-[hsl(var(--muted-foreground))]">{translateKey('sectionsTotal')}</span>
                     <strong className="font-mono" dir="ltr">{formatAmount(record.sectionTotal)}</strong>
                   </div>
                   <div className="mt-2 flex items-center justify-between gap-3 text-[11px]">
@@ -211,12 +211,12 @@ export default function ArchivePage() {
                   )}
                   {(record.additionalExpenses ?? 0) > 0 && (
                     <div className="mt-2 flex items-center justify-between gap-3 text-[11px]">
-                      <span className="text-[hsl(var(--muted-foreground))]">{translateText("مصاريف إضافية")}</span>
+                      <span className="text-[hsl(var(--muted-foreground))]">{translateKey('additionalExpenses')}</span>
                       <strong className="font-mono" dir="ltr">{formatWesternNumber(record.additionalExpenses ?? 0)}</strong>
                     </div>
                   )}
                   <div className="mt-3 flex items-center justify-between gap-3 border-t border-[hsl(var(--border))] pt-3 text-xs">
-                    <span className="font-bold">{translateText("المجموع النهائي")}</span>
+                    <span className="font-bold">{translateKey('finalTotal')}</span>
                     <strong className="font-mono text-[hsl(var(--accent-foreground))]" dir="ltr">{formatAmount(record.finalTotal)}</strong>
                   </div>
                 </div>
