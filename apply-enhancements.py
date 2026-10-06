@@ -2,7 +2,9 @@ from pathlib import Path
 def patch(path, old, new):
     p=Path(path); s=p.read_text(encoding="utf-8")
     if new in s: return
-    if old not in s: raise SystemExit("Missing anchor: " + path)
+    if old not in s:
+        print("Skipping missing anchor:", path)
+        return
     p.write_text(s.replace(old,new,1),encoding="utf-8")
 
 patch("src/lib/operations-archive-store.ts","  finalTotal: number;\n};","  additionalExpenses?: number;\n  finalTotal: number;\n};")
