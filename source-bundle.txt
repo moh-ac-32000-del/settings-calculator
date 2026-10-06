@@ -790,7 +790,7 @@ function WorkPicker({
         </div>
         <Button type="button" variant="outline" size="sm" className="order-operations-button" onClick={onOpenOrder} data-testid="button-open-operations-order">
           <ListOrdered size={15} />
-          ترتيب العمليات
+          {translateKey('orderOperations')}
         </Button>
       </div>
       <div className="work-choice-grid">
@@ -1146,7 +1146,7 @@ function SectionProgress({
         </Button>
         {countdown !== null && (
           <p className="auto-advance-countdown" role="status" data-testid="auto-advance-countdown">
-            الانتقال خلال {countdown}...
+            {translateKey('transitionInSeconds').replace('{count}', formatWesternNumber(countdown))}
           </p>
         )}
         <Button
@@ -1629,7 +1629,7 @@ export default function OperationsPage() {
           : translateKey('transferEmptyMaterial').replace('{target}', issue.targetName).replace('{position}', formatWesternNumber(issue.position));
       });
       if (transfer.unfilledTargetPositions.length > 0) {
-        issueMessages.push(translateKey('transferUnfilledPositions').replace('{positions}', transfer.unfilledTargetPositions.join('، ')));
+        issueMessages.push(translateKey('transferUnfilledPositions').replace('{positions}', transfer.unfilledTargetPositions.join(', ')));
       }
 
       setSelectedWork(targetWork);
@@ -1640,7 +1640,7 @@ export default function OperationsPage() {
       setActiveSectionId(transfer.entries[0]?.sectionId ?? null);
       setWorkNameValidationError('');
       setShowTransferPicker(false);
-      setTransferNotice(`نُقلت العملية إلى ${targetName}، وحُفظت نسخة ${savedSource.workTypeName ?? 'العمل {translateKey('previous')}'} في الأرشيف.${issueMessages.length ? ` ${issueMessages.join(' ')}` : ''}`);
+      setTransferNotice(`${translateKey('transferSuccess').replace('{target}', targetName).replace('{source}', savedSource.workTypeName ?? '')}${issueMessages.length ? ` ${issueMessages.join(' ')}` : ''}`);
     } catch {
       setShowTransferPicker(false);
       setTransferNotice(translateKey('failedToSaveBeforeMove'));
@@ -1759,7 +1759,7 @@ export default function OperationsPage() {
                   data-testid="button-back-work-choice"
                 >
                   <ChevronLeft size={15} />
-                  رجوع
+                  {translateKey('back')}
                 </Button>
               )}
               <div className="min-w-0 flex-1">
@@ -1785,7 +1785,7 @@ export default function OperationsPage() {
                 >
                   <DropdownMenuItem onSelect={openTransferPicker} data-testid="button-transfer-operation">
                     <MoveRight size={15} />
-                    نقل العملية
+                    {translateKey('moveOperation')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onSelect={() => requestFinishOperation(true)} data-testid="button-finish-operation-menu">
                     <Check size={15} />
@@ -1793,7 +1793,7 @@ export default function OperationsPage() {
                   </DropdownMenuItem>
                   <DropdownMenuItem onSelect={openOrderEditor} data-testid="button-open-operations-order">
                     <ListOrdered size={15} />
-                    ترتيب العمليات
+                    {translateKey('orderOperations')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -1824,10 +1824,10 @@ export default function OperationsPage() {
           <>
             {noWorkTypes && !isArchiveEditing && (
               <div className="operations-notice" data-testid="notice-no-work-types">
-                <span>{translateKey("لا توجد أنواع أعمال محفوظة. يمكنك استخدام «عمل حر» أو {translateKey('openSettings')} لإنشاء قالب.")}</span>
+                <span>{translateKey('noSavedWorkTypesFreeWork')}</span>
                 <Link href="/settings" className="operation-link" data-testid="link-notice-settings">
                   <Settings2 size={14} />
-                  الإعدادات
+                  {translateKey('openSettings')}
                 </Link>
               </div>
             )}
@@ -1893,7 +1893,7 @@ export default function OperationsPage() {
               )}
 
               {selectedWork && (noSectionsForWork || orderedAvailableSections.length === 0) ? (
-                <EmptyState title="لا توجد أقسام لهذا العمل" detail=translateKey('linkASectionToThisWorkTypeInSettingsThenReturnToTheCalc') />
+                <EmptyState title={translateKey('noSectionsForThisWork')} detail={translateKey('linkASectionToThisWorkTypeInSettingsThenReturnToTheCalc')} />
               ) : selectedWork && entries.length === 0 ? (
                 <EmptyState title=translateKey('preparingTheFirstSection') detail=translateKey('currentSectionDataWillAppearHere') />
               ) : selectedWork ? (
@@ -1976,7 +1976,7 @@ export default function OperationsPage() {
                         data-testid="input-manual-shipping"
                       />
                       <p className="mt-2 text-[10px] text-[hsl(var(--muted-foreground))]">
-                        الحساب التلقائي الحالي: <span className="font-mono" dir="ltr">{formatWesternNumber(calculatedShippingTotal.toLocaleString('en-US'))}</span>. هذا التعديل لهذه العملية فقط.
+                         {translateKey('currentAutomaticCalculationLabel').replace('{amount}', formatWesternNumber(calculatedShippingTotal.toLocaleString('en-US')))}
                       </p>
                     </div>
                   )}
@@ -2228,7 +2228,7 @@ function WorkForm({ initial, sections, onSave, onClose }: { initial?: WorkType; 
     <form onSubmit={(event) => { event.preventDefault(); if (valid) onSave(name, sectionIds); }} className="space-y-5">
       <Field label=translateKey('workTypeName')><input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder={translateKey('exampleStoreSetup')} data-testid="input-work-name" className="field-input" /></Field>
       <Field label=translateKey('includedSections') hint=translateKey('chooseTheSectionsUsedByThisWorkType')>
-        <div className="space-y-2">{sections.length === 0 ? <div className="rounded-xl border border-dashed border-[hsl(var(--border))] px-3 py-3 text-xs text-[hsl(var(--muted-foreground))]">{translateKey('createASectionFirstToLinkItHere')}</div> : sections.map((section) => <label key={section.id} className={cn('flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors', sectionIds.includes(section.id) ? 'border-[hsl(var(--accent))] bg-[hsl(var(--accent)/.13)]' : 'border-[hsl(var(--border))] hover:bg-[hsl(var(--muted))]')}><input type="checkbox" checked={sectionIds.includes(section.id)} onChange={(e) => setSectionIds((current) => e.target.checked ? [...current, section.id] : current.filter((id) => id !== section.id))} data-testid={`checkbox-work-section-${section.id}`} className="size-4 accent-[hsl(var(--primary))]" /><span className="text-xs font-semibold">{section.name}</span><span className="mr-auto font-mono text-[10px] text-[hsl(var(--muted-foreground))]">{formatWesternNumber(section.materialIds.length)} مواد</span></label>)}</div>
+        <div className="space-y-2">{sections.length === 0 ? <div className="rounded-xl border border-dashed border-[hsl(var(--border))] px-3 py-3 text-xs text-[hsl(var(--muted-foreground))]">{translateKey('createASectionFirstToLinkItHere')}</div> : sections.map((section) => <label key={section.id} className={cn('flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors', sectionIds.includes(section.id) ? 'border-[hsl(var(--accent))] bg-[hsl(var(--accent)/.13)]' : 'border-[hsl(var(--border))] hover:bg-[hsl(var(--muted))]')}><input type="checkbox" checked={sectionIds.includes(section.id)} onChange={(e) => setSectionIds((current) => e.target.checked ? [...current, section.id] : current.filter((id) => id !== section.id))} data-testid={`checkbox-work-section-${section.id}`} className="size-4 accent-[hsl(var(--primary))]" /><span className="text-xs font-semibold">{section.name}</span><span className="mr-auto font-mono text-[10px] text-[hsl(var(--muted-foreground))]">{translateKey('materialCount').replace('{count}', formatWesternNumber(section.materialIds.length))}</span></label>)}</div>
       </Field>
       <div className="flex justify-start gap-2 border-t border-[hsl(var(--border))] pt-5"><Button type="submit" variant="primary" disabled={!valid} data-testid="button-save-work"><Check size={14} />{initial ? translateKey('saveChanges') : translateKey('addWorkType')}</Button><Button type="button" variant="ghost" onClick={onClose} data-testid="button-cancel-work">{translateKey('cancel')}</Button></div>
     </form>
@@ -2266,16 +2266,16 @@ function ShippingExpensesSection({
     <section className="section-card mt-5" data-testid="shipping-expenses-settings">
       <div className="section-heading">
         <div>
-          <p className="eyebrow">04 / تكلفة إضافية</p>
+          <p className="eyebrow">{translateKey('text04AdditionalCost')}</p>
           <h2>{translateKey('shippingExpenseSettings')}</h2>
-          <p className="section-description">{translateKey(translateKey('shippingSettingsDescription'))}</p>
+          <p className="section-description">{translateKey('shippingSettingsDescription')}</p>
         </div>
         <Truck size={21} className="text-[hsl(var(--accent-foreground))]" />
       </div>
 
       {sections.length === 0 ? (
         <div className="rounded-xl border border-dashed border-[hsl(var(--border))] px-4 py-4 text-xs leading-6 text-[hsl(var(--muted-foreground))]">
-          أضف قسمًا أولًا حتى تتمكن من ربطه بإعدادات مصاريف الشحن.
+          {translateKey('shippingNoSections')}
         </div>
       ) : (
         <div className="grid gap-3 lg:grid-cols-2">
@@ -2332,9 +2332,9 @@ function ShippingExpensesSection({
 function DeleteModal({ target, item, onClose, onConfirm, detail }: { target: EntityKind; item: Material | Section | WorkType; onClose: () => void; onConfirm: () => void; detail: string }) {
   const label = target === 'material' ? translateKey('material') : target === 'section' ? translateKey('section') : translateKey('workType');
   return (
-    <Modal title={`حذف ${label}؟`} eyebrow=translateKey('confirmationRequired') onClose={onClose}>
+    <Modal title={translateKey('deleteNamed').replace('{name}', label)} eyebrow={translateKey('confirmationRequired')} onClose={onClose}>
       <div className="flex gap-3 rounded-xl border border-[hsl(var(--destructive)/.28)] bg-[hsl(var(--destructive)/.07)] p-3"><AlertTriangle size={18} className="mt-0.5 shrink-0 text-[hsl(var(--destructive))]" /><p className="text-xs leading-6 text-[hsl(var(--foreground))]">{detail}</p></div>
-      <p className="mt-5 text-sm leading-7">{translateKey("{translateKey('deleteWillRemove').replace('{name}', label)}")} <strong>{item.name}</strong>. لا يمكن التراجع عن هذا الإجراء.</p>
+      <p className="mt-5 text-sm leading-7">{translateKey('deleteWillRemove').replace('{name}', label)} <strong>{item.name}</strong>. {translateKey('cannotUndoDelete')}</p>
       <div className="mt-6 flex justify-start gap-2"><Button variant="danger" onClick={onConfirm} data-testid={`button-confirm-delete-${target}`}><Trash2 size={14} />{translateKey('deleteButton').replace('{name}', label)}</Button><Button variant="ghost" onClick={onClose} data-testid="button-cancel-delete">{translateKey('keepIt')}</Button></div>
     </Modal>
   );
@@ -2524,22 +2524,22 @@ export default function SettingsPage() {
             </div>
 
             {activeArea === 'materials' && (state.materials.length === 0
-              ? <EmptyState icon={PackageOpen} title="سجل الأسعار فارغ" detail="أضف مادة للبدء في بناء أقسام حساب قابلة لإعادة الاستخدام." action={<Button variant="primary" onClick={() => openCreate('material')} data-testid="button-empty-add-material"><Plus size={14} />{translateKey('addFirstMaterial')}</Button>} />
-              : <div className="overflow-hidden rounded-xl border border-[hsl(var(--border))]"><div className="list-header"><span>{translateKey("المادة")}</span><span>{translateKey('unitPrice')}</span><span className="text-left">{translateKey('actions')}</span></div>{state.materials.map((material, index) => <div key={material.id} className="list-row" data-testid={`row-material-${material.id}`}><div className="flex min-w-0 items-center gap-3"><span className="index-mark">{formatWesternNumber(String(index + 1).padStart(2, '0'))}</span><span className="truncate text-sm font-semibold">{material.name}</span></div><span className="font-mono text-xs">{money(material.price)}</span><div className="flex justify-end gap-1"><Button variant="ghost" className="size-10 p-0" onClick={() => setModal({ kind: 'material', item: material })} aria-label={translateKey('editNamedOperation').replace('{name}', material.name)} data-testid={`button-edit-material-${material.id}`}><Pencil size={14} /></Button><Button variant="ghost" className="size-10 p-0 hover:text-[hsl(var(--destructive))]" onClick={() => setModal({ kind: 'delete', target: 'material', item: material })} aria-label={translateKey('deleteNamed').replace('{name}', material.name)} data-testid={`button-delete-material-${material.id}`}><Trash2 size={14} /></Button></div></div>)}</div>)}
+              ? <EmptyState icon={PackageOpen} title={translateKey('priceRegisterIsEmpty')} detail={translateKey('addAMaterialToStartBuildingReusableCalculationSections')} action={<Button variant="primary" onClick={() => openCreate('material')} data-testid="button-empty-add-material"><Plus size={14} />{translateKey('addFirstMaterial')}</Button>} />
+              : <div className="overflow-hidden rounded-xl border border-[hsl(var(--border))]"><div className="list-header"><span>{translateKey('material')}</span><span>{translateKey('unitPrice')}</span><span className="text-left">{translateKey('actions')}</span></div>{state.materials.map((material, index) => <div key={material.id} className="list-row" data-testid={`row-material-${material.id}`}><div className="flex min-w-0 items-center gap-3"><span className="index-mark">{formatWesternNumber(String(index + 1).padStart(2, '0'))}</span><span className="truncate text-sm font-semibold">{material.name}</span></div><span className="font-mono text-xs">{money(material.price)}</span><div className="flex justify-end gap-1"><Button variant="ghost" className="size-10 p-0" onClick={() => setModal({ kind: 'material', item: material })} aria-label={translateKey('editNamedOperation').replace('{name}', material.name)} data-testid={`button-edit-material-${material.id}`}><Pencil size={14} /></Button><Button variant="ghost" className="size-10 p-0 hover:text-[hsl(var(--destructive))]" onClick={() => setModal({ kind: 'delete', target: 'material', item: material })} aria-label={translateKey('deleteNamed').replace('{name}', material.name)} data-testid={`button-delete-material-${material.id}`}><Trash2 size={14} /></Button></div></div>)}</div>)}
             {activeArea === 'sections' && (state.sections.length === 0
-              ? <EmptyState icon={Layers3} title="لا توجد أقسام بعد" detail="حوّل مجموعة من المواد إلى جزء قابل لإعادة الاستخدام." action={<Button variant="primary" onClick={() => openCreate('section')} data-testid="button-empty-add-section"><Plus size={14} />{translateKey('addFirstSection')}</Button>} />
+              ? <EmptyState icon={Layers3} title={translateKey('noSectionsYet')} detail={translateKey('turnAGroupOfMaterialsIntoAReusableSection')} action={<Button variant="primary" onClick={() => openCreate('section')} data-testid="button-empty-add-section"><Plus size={14} />{translateKey('addFirstSection')}</Button>} />
               : <div className="grid gap-3 lg:grid-cols-2">{state.sections.map((section, index) => <div className="section-tile" key={section.id} data-testid={`card-section-${section.id}`}><div className="flex items-start justify-between gap-3"><div className="flex items-start gap-3"><span className="index-mark mt-0.5">{formatWesternNumber(String(index + 1).padStart(2, '0'))}</span><div><h3 className="text-sm font-extrabold">{section.name}</h3><span className="mt-2 inline-flex rounded-full bg-[hsl(var(--accent)/.14)] px-2 py-1 text-[9px] font-bold text-[hsl(var(--accent-foreground))]">{modeCopy[section.calculationMode].label}</span></div></div><div className="flex gap-1"><Button variant="ghost" className="size-10 p-0" onClick={() => setModal({ kind: 'section', item: section })} aria-label={translateKey('editNamedOperation').replace('{name}', section.name)} data-testid={`button-edit-section-${section.id}`}><Pencil size={14} /></Button><Button variant="ghost" className="size-10 p-0 hover:text-[hsl(var(--destructive))]" onClick={() => setModal({ kind: 'delete', target: 'section', item: section })} aria-label={translateKey('deleteNamed').replace('{name}', section.name)} data-testid={`button-delete-section-${section.id}`}><Trash2 size={14} /></Button></div></div><div className="mt-5 border-t border-[hsl(var(--border))] pt-3">{section.materialIds.length ? <div className="flex flex-wrap gap-1.5">{section.materialIds.map((id) => { const material = materialById.get(id); return material ? <span key={id} className="inline-flex items-center gap-1.5 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--background)/.55)] px-2 py-1.5 text-[11px] font-semibold"><span className="size-1.5 rounded-full bg-[hsl(var(--accent))]" />{material.name}<span className="font-mono text-[10px] font-normal text-[hsl(var(--muted-foreground))]">{money(material.price)}</span></span> : null; })}</div> : <p className="text-xs italic leading-6 text-[hsl(var(--muted-foreground))]">{translateKey('noLinkedMaterialsEditTheSectionToAddReferences')}</p>}</div></div>)}</div>)}
             {activeArea === 'work' && (state.workTypes.length === 0
-              ? <EmptyState icon={Settings2} title="لا توجد أنواع أعمال بعد" detail="أنشئ نوع عمل عندما تتكرر مجموعة من الأقسام." action={<Button variant="primary" onClick={() => openCreate('work')} data-testid="button-empty-add-work"><Plus size={14} />{translateKey('addFirstWorkType')}</Button>} />
+              ? <EmptyState icon={Settings2} title={translateKey('noWorkTypesYet')} detail={translateKey('createAWorkTypeWhenAGroupOfSectionsRepeats')} action={<Button variant="primary" onClick={() => openCreate('work')} data-testid="button-empty-add-work"><Plus size={14} />{translateKey('addFirstWorkType')}</Button>} />
               : <div className="overflow-hidden rounded-xl border border-[hsl(var(--border))]"><div className="list-header"><span>{translateKey('workType')}</span><span>{translateKey('includedSections')}</span><span className="text-left">{translateKey('actions')}</span></div>{state.workTypes.map((work, index) => <div key={work.id} className="list-row" data-testid={`row-work-${work.id}`}><div className="flex min-w-0 items-center gap-3"><span className="index-mark">{formatWesternNumber(String(index + 1).padStart(2, '0'))}</span><span className="truncate text-sm font-semibold">{work.name}</span></div><div className="flex flex-wrap gap-1">{work.sectionIds.length ? work.sectionIds.map((id) => <span key={id} className="rounded-lg bg-[hsl(var(--muted))] px-2 py-1 text-[10px] font-semibold">{state.sections.find((section) => section.id === id)?.name ?? translateKey('sectionNotFound')}</span>) : <span className="text-xs italic text-[hsl(var(--muted-foreground))]">{translateKey('noSections')}</span>}</div><div className="flex justify-end gap-1"><Button variant="ghost" className="size-10 p-0" onClick={() => setModal({ kind: 'work', item: work })} aria-label={translateKey('editNamedOperation').replace('{name}', work.name)} data-testid={`button-edit-work-${work.id}`}><Pencil size={14} /></Button><Button variant="ghost" className="size-10 p-0 hover:text-[hsl(var(--destructive))]" onClick={() => setModal({ kind: 'delete', target: 'work', item: work })} aria-label={translateKey('deleteNamed').replace('{name}', work.name)} data-testid={`button-delete-work-${work.id}`}><Trash2 size={14} /></Button></div></div>)}</div>)}
           </section>
           <ShippingExpensesSection sections={state.sections} shippingExpenses={state.shippingExpenses} onChange={updateShippingExpenses} />
         </main>
       </div>
 
-      {modal?.kind === 'material' && <Modal title={modal.item ? translateKey('editMaterial') : translateKey('addMaterial')} eyebrow="سجل الأسعار" onClose={() => setModal(null)}><MaterialForm initial={modal.item as Material | undefined} onClose={() => setModal(null)} onSave={(name, price) => saveMaterial((modal.item as Material | undefined)?.id, name, price)} /></Modal>}
-      {modal?.kind === 'section' && <Modal title={modal.item ? translateKey('editSection') : translateKey('addSection')} eyebrow="وحدة حساب" onClose={() => setModal(null)}><SectionForm initial={modal.item as Section | undefined} materials={state.materials} onClose={() => setModal(null)} onSave={(name, mode, ids) => saveSection((modal.item as Section | undefined)?.id, name, mode, ids)} /></Modal>}
-      {modal?.kind === 'work' && <Modal title={modal.item ? translateKey('editWorkType') : translateKey('addWorkType')} eyebrow="قالب عمل" onClose={() => setModal(null)}><WorkForm initial={modal.item as WorkType | undefined} sections={state.sections} onClose={() => setModal(null)} onSave={(name, ids) => saveWork((modal.item as WorkType | undefined)?.id, name, ids)} /></Modal>}
+      {modal?.kind === 'material' && <Modal title={modal.item ? translateKey('editMaterial') : translateKey('addMaterial')} eyebrow={translateKey('priceRegister')} onClose={() => setModal(null)}><MaterialForm initial={modal.item as Material | undefined} onClose={() => setModal(null)} onSave={(name, price) => saveMaterial((modal.item as Material | undefined)?.id, name, price)} /></Modal>}
+      {modal?.kind === 'section' && <Modal title={modal.item ? translateKey('editSection') : translateKey('addSection')} eyebrow={translateKey('calculationUnit')} onClose={() => setModal(null)}><SectionForm initial={modal.item as Section | undefined} materials={state.materials} onClose={() => setModal(null)} onSave={(name, mode, ids) => saveSection((modal.item as Section | undefined)?.id, name, mode, ids)} /></Modal>}
+      {modal?.kind === 'work' && <Modal title={modal.item ? translateKey('editWorkType') : translateKey('addWorkType')} eyebrow={translateKey('workTemplate')} onClose={() => setModal(null)}><WorkForm initial={modal.item as WorkType | undefined} sections={state.sections} onClose={() => setModal(null)} onSave={(name, ids) => saveWork((modal.item as WorkType | undefined)?.id, name, ids)} /></Modal>}
       {modal?.kind === 'delete' && <DeleteModal target={modal.target} item={modal.item} detail={deleteDetail} onClose={() => setModal(null)} onConfirm={confirmDelete} />}
       {modal?.kind === 'share-settings' && <Modal title=translateKey('shareSettings') eyebrow=translateKey('settingsCode') onClose={() => setModal(null)}>
         <p className="text-xs leading-6 text-[hsl(var(--muted-foreground))]">{translateKey(translateKey('shareCodeDescription'))}</p>
@@ -2762,7 +2762,7 @@ export default function ArchivePage() {
                   </div>
                   <div className="mt-2 flex items-center justify-between gap-3 text-[11px]">
                     <span className="text-[hsl(var(--muted-foreground))]">
-                      مصاريف الشحن ({record.shipping.mode === 'manual' ? translateKey('manual') : translateKey('automatic')})
+                      {translateKey('archiveShipping').replace('{mode}', record.shipping.mode === 'manual' ? translateKey('manual') : translateKey('automatic'))}
                     </span>
                     <strong className="font-mono" dir="ltr">
                       {record.shipping.included ? formatWesternNumber(record.shipping.amount) : translateKey('notIncluded')}
@@ -2771,7 +2771,7 @@ export default function ArchivePage() {
                   {record.shipping.mode === 'manual' && (
                     <p className="mt-1 text-[10px] text-[hsl(var(--muted-foreground))]">
                       {translateKey('automatic2')}<span className="font-mono" dir="ltr">{formatWesternNumber(record.shipping.automaticAmount)}</span>
-                      {' · {translateKey('manual2')}<span className="font-mono" dir="ltr">{formatWesternNumber(record.shipping.manualAmount)}</span>
+                      {' · '}{translateKey('manual2')}<span className="font-mono" dir="ltr">{formatWesternNumber(record.shipping.manualAmount)}</span>
                     </p>
                   )}
                   {(record.additionalExpenses ?? 0) > 0 && (
@@ -2793,11 +2793,11 @@ export default function ArchivePage() {
                     data-testid={`button-edit-archive-${record.id}`}
                   >
                     <Pencil size={14} />
-                    تعديل العملية
+                    {translateKey('editOperation')}
                   </Link>
                   <button type="button" className="operation-link flex-1" onClick={() => window.open("https://wa.me/?text=" + encodeURIComponent(buildWhatsAppMessage(record)), "_blank", "noopener,noreferrer")} data-testid="button-share-whatsapp">
                     <Share2 size={14} />
-                    مشاركة واتساب
+                    {translateKey('shareOnWhatsapp')}
                   </button>
                 </div>
               </div>
