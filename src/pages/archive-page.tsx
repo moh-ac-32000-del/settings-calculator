@@ -7,12 +7,9 @@ import { loadLanguage } from '@/lib/language-store';
 import AppBottomNav from '@/components/app-bottom-nav';
 
 function formatArchiveDate(timestamp: number) {
-  return new Intl.DateTimeFormat('ar', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-    numberingSystem: 'latn',
-  }).format(new Date(timestamp));
+  const language = loadLanguage();
+  const locale = language === 'tr' ? 'tr-TR' : language === 'en' ? 'en-US' : 'ar-SA';
+  return new Intl.DateTimeFormat(locale, { day: '2-digit', month: 'long', year: 'numeric', numberingSystem: 'latn' }).format(new Date(timestamp));
 }
 
 function buildWhatsAppMessage(record: ArchivedOperation) {
@@ -36,12 +33,9 @@ function buildWhatsAppMessage(record: ArchivedOperation) {
 }
 
 function formatArchiveTime(timestamp: number) {
-  return new Intl.DateTimeFormat('ar', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-    numberingSystem: 'latn',
-  }).format(new Date(timestamp));
+  const language = loadLanguage();
+  const locale = language === 'tr' ? 'tr-TR' : language === 'en' ? 'en-US' : 'ar-SA';
+  return new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit', hour12: false, numberingSystem: 'latn' }).format(new Date(timestamp));
 }
 
 export default function ArchivePage() {
