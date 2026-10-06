@@ -14,16 +14,20 @@ new = """<div className="flex items-center justify-between gap-3">
               <span className="font-mono text-[hsl(var(--accent-foreground))]" dir="ltr">{formatWesternNumber(records.length)}</span>
             </span>
           </div>"""
-if old not in text:
+if old in text:
+    text = text.replace(old, new, 1)
+elif new not in text:
     raise SystemExit("Archive count insertion point not found")
-archive_page.write_text(text.replace(old, new, 1), encoding="utf-8")
+archive_page.write_text(text, encoding="utf-8")
 
 operations_page = Path("src/pages/operations-page.tsx")
 text = operations_page.read_text(encoding="utf-8")
 old_guard = "if (transferInProgressRef.current || !selectedWork || targetWork === selectedWork || isArchiveEditing) return;"
-if old_guard not in text:
+new_guard = "if (transferInProgressRef.current || !selectedWork || targetWork === selectedWork) return;"
+if old_guard in text:
+    text = text.replace(old_guard, new_guard, 1)
+elif new_guard not in text:
     raise SystemExit("Transfer guard not found")
-text = text.replace(old_guard, "if (transferInProgressRef.current || !selectedWork || targetWork === selectedWork) return;", 1)
 
 old_save = """    try {
       const savedSource = saveOperationToArchive(buildArchivedDraft());
@@ -43,9 +47,10 @@ new_save = """    try {
       }
 
       const targetWorkRecord"""
-if old_save not in text:
+if old_save in text:
+    text = text.replace(old_save, new_save, 1)
+elif new_save not in text:
     raise SystemExit("Transfer save block not found")
-text = text.replace(old_save, new_save, 1)
 
 old_menu = """                  {!isArchiveEditing && (
                     <DropdownMenuItem onSelect={openTransferPicker} data-testid="button-transfer-operation">
@@ -57,6 +62,8 @@ new_menu = """                  <DropdownMenuItem onSelect={openTransferPicker} 
                     <MoveRight size={15} />
                     نقل العملية
                   </DropdownMenuItem>"""
-if old_menu not in text:
+if old_menu in text:
+    text = text.replace(old_menu, new_menu, 1)
+elif new_menu not in text:
     raise SystemExit("Transfer menu block not found")
-operations_page.write_text(text.replace(old_menu, new_menu, 1), encoding="utf-8")
+operations_page.write_text(text, encoding="utf-8")
