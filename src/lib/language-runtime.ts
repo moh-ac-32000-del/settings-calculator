@@ -75,7 +75,7 @@ const dictionaries: Record<AppLanguage, Dictionary> = {
     'غير محتسب': 'Hesaplanmadı',
     'قيمة مصاريف الشحن لهذه العملية': 'Bu işlem için nakliye masrafı',
     'قيمة المصاريف الإضافية لهذه العملية': 'Bu işlem için ek masraf',
-    'إجمالي العملية': 'İşlem toplamı',
+
     'إنهاء العملية': 'İşlemi bitir',
     'حفظ التعديلات': 'Değişiklikleri kaydet',
     'إلغاء': 'İptal',
@@ -142,7 +142,7 @@ const dictionaries: Record<AppLanguage, Dictionary> = {
     'إضافة أول مادة': 'İlk malzemeyi ekle',
     'إضافة أول قسم': 'İlk bölümü ekle',
     'إضافة أول نوع عمل': 'İlk iş türünü ekle',
-    'مشاركة الإعدادات': 'Ayarları paylaş',
+
     'نسخ الكود': 'Kodu kopyala',
     'لصق كود الإعدادات': 'Ayar kodunu yapıştır',
     'الصق كود الإعدادات هنا': 'Ayar kodunu buraya yapıştırın',
@@ -155,7 +155,7 @@ const dictionaries: Record<AppLanguage, Dictionary> = {
     'حذف': 'Sil',
     'إغلاق النافذة': 'Pencereyi kapat',
     'إغلاق نافذة نقل العملية': 'İş taşıma penceresini kapat',
-    'البحث في الأرشيف': 'Arşivde ara',
+
     'لا توجد أقسام مسجلة في هذه العملية.': 'Bu işlemde kayıtlı bölüm yok.',
     'التلقائي: ': 'Otomatik: ',
     'اليدوي: ': 'Manuel: ',
