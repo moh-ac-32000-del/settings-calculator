@@ -196,7 +196,7 @@ const tr = {
     'التنقل الرئيسي': 'Ana gezinme',
   };
 export type TranslationKey = keyof typeof tr;
-const en: Record<TranslationKey, string> = {
+const en: Record<string, string> = {
     'إعدادات الحاسبة': 'Calculator settings',
     'إعداداتك المحلية': 'Your local settings',
     'محفوظ على الجهاز': 'Saved on this device',
@@ -384,10 +384,10 @@ const en: Record<TranslationKey, string> = {
     'يشمل «عمل حر» كخيار مستقل. اضغط أي صف لترتيب أقسامه.': '“Free work” is included as an independent option. Tap any row to order its sections.',
     'التنقل الرئيسي': 'Main navigation',
   };
-const ar: Record<TranslationKey, string> = Object.fromEntries(
+const ar: Record<string, string> = Object.fromEntries(
   Object.keys(tr).map((key) => [key, key]),
-) as Record<TranslationKey, string>;
-const dictionaries: Record<AppLanguage, Record<TranslationKey, string>> = { ar, tr, en };
+) as Record<string, string>;
+const dictionaries: Record<AppLanguage, Record<string, string>> = { ar, tr, en };
 
 export const languageOptions = [
   { code: 'ar' as const, labelKey: 'العربية' as TranslationKey },
