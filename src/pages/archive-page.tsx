@@ -19,7 +19,7 @@ function buildWhatsAppMessage(record: ArchivedOperation) {
     ? { title: '🧾 İşlem detayları', work: '👤', type: '🔧', materials: '📦 Malzemeler', shipping: '🚚 Nakliye', extra: '➕ Ek masraf', final: '💰 Genel toplam' }
     : language === 'en'
       ? { title: '🧾 Operation details', work: '👤', type: '🔧', materials: '📦 Materials', shipping: '🚚 Shipping', extra: '➕ Additional expense', final: '💰 Final total' }
-      : { title: '🧾 تفاصيل العملية', work: '👤', type: '🔧', materials: '📦 المواد', shipping: '🚚 الشحن', extra: '➕ مصاريف إضافية', final: '💰 المجموع النهائي' };
+      : { title: translateKey('whatsappTitle'), work: '👤', type: '🔧', materials: translateKey('whatsappMaterials'), shipping: translateKey('whatsappShipping'), extra: translateKey('whatsappAdditional'), final: translateKey('whatsappFinal') };
 
   const lines = [
     titleLine(labels.title),
@@ -86,14 +86,14 @@ export default function ArchivePage() {
             <span
               className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[hsl(var(--border))] bg-[hsl(var(--card)/.55)] px-3 py-1.5 text-xs font-bold"
               data-testid="archive-count"
-              aria-label={`عدد الأعمال في الأرشيف: ${records.length}`}
+              aria-label={translateKey('archiveCountLabel').replace('{count}', formatWesternNumber(records.length))}
             >
               <span className="text-[hsl(var(--muted-foreground))]">{translateKey('records')}</span>
               <span className="font-mono text-[hsl(var(--accent-foreground))]" dir="ltr">{formatWesternNumber(records.length)}</span>
             </span>
           </div>
           <p className="mt-2 max-w-md text-xs leading-6 text-[hsl(var(--muted-foreground))]">
-            العمليات المسماة محفوظة هنا لمدة 3 أيام، ثم تُحذف تلقائيًا من هذا الجهاز.
+            {translateKey('namedArchiveDescription')}
           </p>
         </header>
 
@@ -107,7 +107,7 @@ export default function ArchivePage() {
               className="field-input pr-10"
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="ابحث باسم العميل أو نوع العمل"
+              placeholder=translateKey('searchByCustomerOrWorkType')
               autoComplete="off"
               data-testid="input-archive-search"
             />
@@ -119,12 +119,12 @@ export default function ArchivePage() {
             <div className="operations-empty" data-testid="archive-empty">
               <span className="operations-empty-icon"><Archive size={19} /></span>
               <p className="text-sm font-bold">
-                {records.length === 0 ? 'لا توجد عمليات محفوظة' : 'لا توجد نتائج مطابقة'}
+                {records.length === 0 ? translateKey('noSavedOperations') : translateKey('noMatchingResults')}
               </p>
               <p className="mt-2 max-w-sm text-xs leading-6 text-[hsl(var(--muted-foreground))]">
                 {records.length === 0
-                  ? 'أضف اسمًا للعمل قبل إنهاء العملية ليظهر ملخصها هنا.'
-                  : 'جرّب البحث باسم عميل أو نوع عمل آخر.'}
+                  ? translateKey('noArchiveHint')
+                  : translateKey('noArchiveSearchHint')}
               </p>
             </div>
           ) : filteredRecords.map((record) => (
@@ -151,7 +151,7 @@ export default function ArchivePage() {
               <div className="archive-record-details">
                 {record.workTypeName && (
                   <p className="mb-3 text-[11px] text-[hsl(var(--muted-foreground))]">
-                    نوع العمل: <span className="text-[hsl(var(--foreground))]">{record.workTypeName}</span>
+                    {translateKey('archiveCustomerType').replace('{name}', text-[hsl(var(--foreground))]">{record.workTypeName}</span>
                   </p>
                 )}
                 <div className="flex items-center gap-2 text-xs font-bold">
@@ -168,7 +168,7 @@ export default function ArchivePage() {
                           <div className="min-w-0">
                             <p className="truncate text-xs font-bold">{section.name}</p>
                             <p className="mt-1 text-[10px] text-[hsl(var(--muted-foreground))]">
-                              الكمية: <span className="font-mono text-[hsl(var(--foreground))]" dir="ltr">{formatWesternNumber(section.quantity)}</span>
+                              {translateKey('archiveQuantity').replace('{quantity}', font-mono text-[hsl(var(--foreground))]" dir="ltr">{formatWesternNumber(section.quantity)}</span>
                             </p>
                           </div>
                           <strong className="shrink-0 font-mono text-xs text-[hsl(var(--accent-foreground))]" dir="ltr">
@@ -197,16 +197,16 @@ export default function ArchivePage() {
                   </div>
                   <div className="mt-2 flex items-center justify-between gap-3 text-[11px]">
                     <span className="text-[hsl(var(--muted-foreground))]">
-                      مصاريف الشحن ({record.shipping.mode === 'manual' ? 'تعديل يدوي' : 'تلقائي'})
+                      مصاريف الشحن ({record.shipping.mode === 'manual' ? translateKey('manual') : translateKey('automatic')})
                     </span>
                     <strong className="font-mono" dir="ltr">
-                      {record.shipping.included ? formatWesternNumber(record.shipping.amount) : 'غير محتسب'}
+                      {record.shipping.included ? formatWesternNumber(record.shipping.amount) : translateKey('notIncluded')}
                     </strong>
                   </div>
                   {record.shipping.mode === 'manual' && (
                     <p className="mt-1 text-[10px] text-[hsl(var(--muted-foreground))]">
-                      التلقائي: <span className="font-mono" dir="ltr">{formatWesternNumber(record.shipping.automaticAmount)}</span>
-                      {' · '}اليدوي: <span className="font-mono" dir="ltr">{formatWesternNumber(record.shipping.manualAmount)}</span>
+                      {translateKey('automatic2')}<span className="font-mono" dir="ltr">{formatWesternNumber(record.shipping.automaticAmount)}</span>
+                      {' · {translateKey('manual2')}<span className="font-mono" dir="ltr">{formatWesternNumber(record.shipping.manualAmount)}</span>
                     </p>
                   )}
                   {(record.additionalExpenses ?? 0) > 0 && (
@@ -224,7 +224,7 @@ export default function ArchivePage() {
                   <Link
                     href={`/operations/edit/${encodeURIComponent(record.id)}`}
                     className="operation-link flex-1"
-                    aria-label={`تعديل العملية ${record.name}`}
+                    aria-label={translateKey('editNamedOperation').replace('{name}', record.name)}
                     data-testid={`button-edit-archive-${record.id}`}
                   >
                     <Pencil size={14} />
