@@ -11,13 +11,12 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages-v3
+  group: pages-v2
   cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -196,7 +195,7 @@ jobs:
           PORT: 4173
           BASE_PATH: /settings-calculator/
         run: |
-          timeout 180s npm run build
+          npm run build
           rm -rf "$GITHUB_WORKSPACE/pages"
           mkdir -p "$GITHUB_WORKSPACE/pages"
           cp -R dist/public/. "$GITHUB_WORKSPACE/pages"/
