@@ -2352,7 +2352,7 @@ export default function SettingsPage() {
   const [language, setLanguage] = useState<AppLanguage>(() => loadLanguage());
 
   useEffect(() => { saveSettings(state); setSavedAt(new Date()); }, [state]);
-  useEffect(() => { saveLanguage(language); document.documentElement.lang = language; document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr'; }, [language]);
+  useEffect(() => { saveLanguage(language); document.documentElement.lang = language; document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr'; window.dispatchEvent(new Event('settings-calculator-language-change')); }, [language]);
 
   const materialById = useMemo(() => new Map(state.materials.map((material) => [material.id, material])), [state.materials]);
   const counts = `${formatWesternNumber(state.materials.length)} مواد · ${formatWesternNumber(state.sections.length)} أقسام · ${formatWesternNumber(state.workTypes.length)} أنواع أعمال`;
