@@ -43,7 +43,16 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -f src package.json package-lock.json vite.config.* tsconfig.json index.html public 2>/dev/null || true
+          python3 - <<'PY'
+          from pathlib import Path
+          files=[Path("src/lib/operations-archive-store.ts"),Path("src/lib/settings-store.ts"),Path("src/lib/settings-transfer.ts"),Path("src/pages/operations-page.tsx"),Path("src/pages/settings-page.tsx"),Path("src/pages/archive-page.tsx"),Path("src/lib/operations-utils.ts")]
+          out=[]
+          for p in files:
+              out.append(f"\\n===== {p} =====\\n")
+              out.append(p.read_text(encoding="utf-8"))
+          Path("source-bundle.txt").write_text("".join(out),encoding="utf-8")
+          PY
+          git add -f source-bundle.txt
           git status --short | head -n 80
           git diff --cached --quiet || git commit -m "chore: persist calculator source"
           git push || true
