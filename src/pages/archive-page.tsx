@@ -3,6 +3,7 @@ import { Archive, ChevronDown, Clock3, Layers3, Pencil, Search, Share2 } from 'l
 import { Link } from 'wouter';
 import { cleanupOperationsArchive, type ArchivedOperation } from '@/lib/operations-archive-store';
 import { formatAmount, formatWesternNumber } from '@/lib/operations-utils';
+import { loadLanguage } from '@/lib/language-store';
 import AppBottomNav from '@/components/app-bottom-nav';
 
 function formatArchiveDate(timestamp: number) {
@@ -15,16 +16,22 @@ function formatArchiveDate(timestamp: number) {
 }
 
 function buildWhatsAppMessage(record: ArchivedOperation) {
-  const lines = ["اسم العمل: " + record.name];
-  if (record.workTypeName) lines.push("نوع العمل: " + record.workTypeName);
-  lines.push("", "المواد والأقسام:");
+  const language = loadLanguage();
+  const labels = language === 'tr'
+    ? { work: 'İş adı', type: 'İş türü', sections: 'Malzemeler ve bölümler:', qty: 'Miktar', total: 'Toplam', shipping: 'Nakliye masrafı', extra: 'Ek masraf', final: 'Genel toplam' }
+    : language === 'en'
+      ? { work: 'Work name', type: 'Work type', sections: 'Materials and sections:', qty: 'Quantity', total: 'Total', shipping: 'Shipping expense', extra: 'Additional expense', final: 'Final total' }
+      : { work: 'اسم العمل', type: 'نوع العمل', sections: 'المواد والأقسام:', qty: 'الكمية', total: 'المجموع', shipping: 'مصاريف الشحن', extra: 'مصاريف إضافية', final: 'المجموع النهائي' };
+  const lines = [labels.work + ': ' + record.name];
+  if (record.workTypeName) lines.push(labels.type + ': ' + record.workTypeName);
+  lines.push('', labels.sections);
   for (const section of record.sections) {
-    lines.push(section.name + " — الكمية: " + formatWesternNumber(section.quantity) + " — المجموع: " + formatAmount(section.result));
-    for (const material of section.materials) lines.push("  " + material.name + ": " + formatAmount(material.price));
+    lines.push(section.name + ' — ' + labels.qty + ': ' + formatWesternNumber(section.quantity) + ' — ' + labels.total + ': ' + formatAmount(section.result));
+    for (const material of section.materials) lines.push('  ' + material.name + ': ' + formatAmount(material.price));
   }
-  if (record.shipping.included) lines.push("", "مصاريف الشحن: " + formatWesternNumber(record.shipping.amount));
-  if ((record.additionalExpenses ?? 0) > 0) lines.push("مصاريف إضافية: " + formatWesternNumber(record.additionalExpenses ?? 0));
-  lines.push("المجموع النهائي: " + formatAmount(record.finalTotal));
+  if (record.shipping.included) lines.push('', labels.shipping + ': ' + formatWesternNumber(record.shipping.amount));
+  if ((record.additionalExpenses ?? 0) > 0) lines.push(labels.extra + ': ' + formatWesternNumber(record.additionalExpenses ?? 0));
+  lines.push(labels.final + ': ' + formatAmount(record.finalTotal));
   return lines.join(String.fromCharCode(10));
 }
 
