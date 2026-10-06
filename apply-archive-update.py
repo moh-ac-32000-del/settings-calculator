@@ -1,6 +1,6 @@
 from pathlib import Path
 
-archive_page = Path("artifacts/settings-calculator/src/pages/archive-page.tsx")
+archive_page = Path("src/pages/archive-page.tsx")
 text = archive_page.read_text(encoding="utf-8")
 old = '<h1 className="text-2xl font-extrabold tracking-[-.06em] sm:text-3xl">الأرشيف</h1>'
 new = """<div className="flex items-center justify-between gap-3">
@@ -18,7 +18,7 @@ if old not in text:
     raise SystemExit("Archive count insertion point not found")
 archive_page.write_text(text.replace(old, new, 1), encoding="utf-8")
 
-operations_page = Path("artifacts/settings-calculator/src/pages/operations-page.tsx")
+operations_page = Path("src/pages/operations-page.tsx")
 text = operations_page.read_text(encoding="utf-8")
 old_guard = "if (transferInProgressRef.current || !selectedWork || targetWork === selectedWork || isArchiveEditing) return;"
 if old_guard not in text:
