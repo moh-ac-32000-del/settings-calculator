@@ -1245,7 +1245,7 @@ export default function OperationsPage() {
     setManualShippingEnabled(record.shipping.mode === 'manual');
     setManualShippingValue(String(record.shipping.manualAmount));
     setAdditionalExpensesEnabled((record.additionalExpenses ?? 0) > 0);
-      setAdditionalExpensesValue(String(record.additionalExpenses ?? 0));
+    setAdditionalExpensesValue(String(record.additionalExpenses ?? 0));
     setArchiveSaveError('');
     setWorkNameValidationError('');
   }, [archiveEditId, settings.workTypes, setLocation]);
@@ -1354,6 +1354,7 @@ export default function OperationsPage() {
     || !includeShipping
     || manualShippingEnabled
     || (Number.isFinite(manualShippingAmount) && manualShippingAmount !== 0)
+    || additionalExpensesEnabled
     || additionalExpensesAmount !== 0;
 
   const focusCustomerName = (afterMenuClose = false) => {
@@ -1395,6 +1396,8 @@ export default function OperationsPage() {
     setIncludeShipping(true);
     setManualShippingEnabled(false);
     setManualShippingValue('0');
+    setAdditionalExpensesEnabled(false);
+    setAdditionalExpensesValue('0');
   };
 
   const returnToWorkChoices = () => {
@@ -1414,6 +1417,8 @@ export default function OperationsPage() {
     setIncludeShipping(true);
     setManualShippingEnabled(false);
     setManualShippingValue('0');
+    setAdditionalExpensesEnabled(false);
+    setAdditionalExpensesValue('0');
   };
 
   const selectSection = (sectionId: string) => {
@@ -2565,12 +2570,9 @@ import { loadLanguage } from '@/lib/language-store';
 import AppBottomNav from '@/components/app-bottom-nav';
 
 function formatArchiveDate(timestamp: number) {
-  return new Intl.DateTimeFormat('ar', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-    numberingSystem: 'latn',
-  }).format(new Date(timestamp));
+  const language = loadLanguage();
+  const locale = language === 'tr' ? 'tr-TR' : language === 'en' ? 'en-US' : 'ar-SA';
+  return new Intl.DateTimeFormat(locale, { day: '2-digit', month: 'long', year: 'numeric', numberingSystem: 'latn' }).format(new Date(timestamp));
 }
 
 function buildWhatsAppMessage(record: ArchivedOperation) {
@@ -2594,12 +2596,9 @@ function buildWhatsAppMessage(record: ArchivedOperation) {
 }
 
 function formatArchiveTime(timestamp: number) {
-  return new Intl.DateTimeFormat('ar', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-    numberingSystem: 'latn',
-  }).format(new Date(timestamp));
+  const language = loadLanguage();
+  const locale = language === 'tr' ? 'tr-TR' : language === 'en' ? 'en-US' : 'ar-SA';
+  return new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit', hour12: false, numberingSystem: 'latn' }).format(new Date(timestamp));
 }
 
 export default function ArchivePage() {
