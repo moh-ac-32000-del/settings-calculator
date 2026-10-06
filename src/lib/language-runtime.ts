@@ -32,7 +32,7 @@ const dictionaries: Record<AppLanguage, Dictionary> = {
     'العربية': 'Arapça',
     'Türkçe': 'Türkçe',
     'English': 'İngilizce',
-    'اللغة / Language / Dil': 'Dil / Language / Dil',
+    'اللغة / Language / Dil': 'Dil',
     'حفظ': 'Kaydet',
     'إلغاء': 'İptal',
     'مسح': 'Temizle',
@@ -40,7 +40,6 @@ const dictionaries: Record<AppLanguage, Dictionary> = {
     'اختيار واحد': 'Tek seçim',
     'جمع المختار': 'Seçilenleri topla',
     'اختر مادة واحدة': 'Bir malzeme seçin',
-    'مصاريف إضافية لهذه العملية': 'Bu işlem için ek masraflar',
     'قيمة المصاريف الإضافية لهذه العملية': 'Bu işlem için ek masraf tutarı',
     'مصاريف الشحن (تلقائي)': 'Nakliye masrafı (otomatik)',
     'مصاريف الشحن (تعديل يدوي)': 'Nakliye masrafı (manuel)',
@@ -93,11 +92,13 @@ const dictionaries: Record<AppLanguage, Dictionary> = {
   },
 };
 
-const ATTRIBUTES = ['placeholder', 'aria-label', 'title'];
+const ATTRIBUTES = ['placeholder', 'aria-label', 'title'] as const;
 
 function translateTree(language: AppLanguage) {
   const dictionary = dictionaries[language];
   const root = document.body;
+  if (!root) return;
+
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   const textNodes: Text[] = [];
   let node: Node | null;
@@ -106,27 +107,30 @@ function translateTree(language: AppLanguage) {
   for (const textNode of textNodes) {
     const parent = textNode.parentElement;
     if (!parent || ['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(parent.tagName)) continue;
+
     const original = textNode.dataset.originalText ?? textNode.nodeValue ?? '';
     if (!textNode.dataset.originalText) textNode.dataset.originalText = original;
+
     const trimmed = original.trim();
     if (!trimmed) continue;
+
     const translated = dictionary[trimmed];
-    if (translated) textNode.nodeValue = original.replace(trimmed, translated);
-    else if (language === 'ar') textNode.nodeValue = original;
+    const nextValue = translated ? original.replace(trimmed, translated) : original;
+    if (textNode.nodeValue !== nextValue) textNode.nodeValue = nextValue;
   }
 
   root.querySelectorAll<HTMLElement>('*').forEach((element) => {
-    ATTRIBUTES.forEach((attribute) => {
-      const original = element.dataset['original' + attribute.replace(/-([a-z])/g, (_, c) => c.toUpperCase())];
+    for (const attribute of ATTRIBUTES) {
       const key = 'original' + attribute.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
-      const value = element.getAttribute(attribute);
-      if (!value) return;
-      const saved = original ?? value;
-      if (!original) element.dataset[key] = saved;
-      const translated = dictionary[saved];
-      if (translated) element.setAttribute(attribute, translated);
-      else if (language === 'ar') element.setAttribute(attribute, saved);
-    });
+      const saved = element.dataset[key] ?? element.getAttribute(attribute);
+      if (!saved) continue;
+      if (!element.dataset[key]) element.dataset[key] = saved;
+
+      const translated = dictionary[saved] ?? saved;
+      if (element.getAttribute(attribute) !== translated) {
+        element.setAttribute(attribute, translated);
+      }
+    }
   });
 }
 
@@ -138,8 +142,17 @@ export function applyLanguage(language: AppLanguage = loadLanguage()) {
 
 export function startLanguageRuntime() {
   applyLanguage();
+
+  // Observe only newly rendered elements. Observing characterData creates a
+  // feedback loop because translation itself changes text nodes.
   const observer = new MutationObserver(() => applyLanguage());
-  observer.observe(document.body, { childList: true, subtree: true, characterData: true });
-  window.addEventListener('settings-calculator-language-change', () => applyLanguage(loadLanguage()));
-  return () => observer.disconnect();
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  const onLanguageChange = () => applyLanguage(loadLanguage());
+  window.addEventListener('settings-calculator-language-change', onLanguageChange);
+
+  return () => {
+    observer.disconnect();
+    window.removeEventListener('settings-calculator-language-change', onLanguageChange);
+  };
 }
