@@ -157,3 +157,5 @@ export function startLanguageRuntime() {
     window.removeEventListener('settings-calculator-language-change', onLanguageChange);
   };
 }
+
+// Runtime language translation is intentionally DOM-safe for text nodes.
