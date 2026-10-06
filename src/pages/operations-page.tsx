@@ -26,8 +26,6 @@ type OperationEntry = {
   materialSelectionTouched?: boolean;
 };
 
-const CUSTOMER_NAME_REQUIRED_MESSAGE = translateKey('enterCustomerFirst');
-
 function hexToHslChannels(hex: string) {
   const value = hex.replace('#', '');
   const red = Number.parseInt(value.slice(0, 2), 16) / 255;
@@ -603,12 +601,12 @@ function OrderEditorModal({
                 <div>
                   <p className="eyebrow">{translateKey('orderSections2')}</p>
                   <h3 className="mt-2 text-base font-extrabold">{translateKey('orderSectionsForWork').replace('{workType}', activeWork.workLabel)}</h3>
-                  <p className="mt-1 text-[10px] leading-5 text-[hsl(var(--muted-foreground))]">{translateKey(translateKey('dragToOrderSections'))}</p>
+                  <p className="mt-1 text-[10px] leading-5 text-[hsl(var(--muted-foreground))]">{translateKey('dragToOrderSections')}</p>
                 </div>
                 <Layers3 size={18} className="text-[hsl(var(--accent-foreground))]" />
               </div>
               {activeWork.items.length === 0 ? (
-                <p className="order-empty-note">{translateKey(translateKey('noLinkedSectionsForWorkType'))}</p>
+                <p className="order-empty-note">{translateKey('noLinkedSectionsForWorkType')}</p>
               ) : (
                 <SortableOrderList
                   items={activeWork.items}
@@ -647,7 +645,7 @@ function OrderEditorModal({
             <div className="order-editor-heading">
               <div>
                 <p className="text-xs font-bold">{translateKey('orderSections')}</p>
-                <p className="mt-1 text-[10px] text-[hsl(var(--muted-foreground))]">{translateKey(translateKey('fallbackOrderDescription'))}</p>
+                <p className="mt-1 text-[10px] text-[hsl(var(--muted-foreground))]">{translateKey('fallbackOrderDescription')}</p>
               </div>
               <Layers3 size={17} className="text-[hsl(var(--accent-foreground))]" />
             </div>
@@ -709,7 +707,7 @@ function SectionProgress({
           <Switch
             checked={autoAdvanceEnabled}
             onCheckedChange={onAutoAdvanceChange}
-            aria-label={translateKey(translateKey('autoAdvanceBetweenSections'))}
+            aria-label={translateKey('autoAdvanceBetweenSections')}
             aria-labelledby="auto-advance-label"
             data-testid="switch-auto-advance"
           />
@@ -943,7 +941,7 @@ export default function OperationsPage() {
   const focusCustomerName = (afterMenuClose = false) => {
     focusCustomerNameAfterMenuCloseRef.current = afterMenuClose;
     setCustomerNameVisible(true);
-    setWorkNameValidationError(CUSTOMER_NAME_REQUIRED_MESSAGE);
+    setWorkNameValidationError(translateKey('enterCustomerFirst'));
     customerNameInputRef.current?.focus();
   };
 
