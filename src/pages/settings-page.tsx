@@ -5,7 +5,7 @@ import { CalculationMode, createId, loadSettings, Material, saveSettings, Sectio
 import { createSettingsCode, parseSettingsCode } from '@/lib/settings-transfer';
 import { reconcileOperationsOrderAfterSettingsChange } from '@/lib/operations-order-store';
 import { loadLanguage, saveLanguage, type AppLanguage } from '@/lib/language-store';
-import { translateKey, type TranslationKey } from '@/lib/i18n';
+import { getLanguageLocale, translateKey, type TranslationKey } from '@/lib/i18n';
 import AppBottomNav from '@/components/app-bottom-nav';
 
 type Area = 'materials' | 'sections' | 'work';
@@ -43,7 +43,7 @@ function normalizePriceInput(value: number | string) {
 }
 
 function money(value: number) {
-  return formatWesternNumber(new Intl.NumberFormat('ar-SA', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(value));
+  return formatWesternNumber(new Intl.NumberFormat(getLanguageLocale(loadLanguage()), { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(value));
 }
 
 function EmptyState({ icon: Icon, title, detail, action }: { icon: typeof PackageOpen; title: string; detail: string; action?: ReactNode }) {
