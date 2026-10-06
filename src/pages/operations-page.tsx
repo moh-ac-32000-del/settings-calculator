@@ -612,12 +612,7 @@ function OrderEditorModal({
                   items={activeWork.items}
                   showPositionNumbers
                   onChange={(sectionOrder) => onChange(
-                    activeWork.workId === FREE_WORK_ORDER_ID
-                      ? { ...order, sectionOrder }
-                      : {
-                        ...order,
-                        workSectionOrders: { ...order.workSectionOrders, [activeWork.workId]: sectionOrder },
-                      },
+                    { ...order, workSectionOrders: { ...order.workSectionOrders, [activeWork.workId]: sectionOrder } },
                   )}
                 />
               )}
@@ -1333,7 +1328,7 @@ export default function OperationsPage() {
               <div className="min-w-0 flex-1">
                 <p className="eyebrow">{isArchiveEditing ? translateKey('editSavedOperation') : translateKey('currentWork')}</p>
                 <h1 className="operation-toolbar-title" data-testid="current-work-title">
-                  {selectedWork === FREE_WORK_ORDER_ID ? translateKey('freeWork') : selectedWorkRecord?.name ?? archiveRecord?.workTypeName ?? translateKey('workType')}
+                  {selectedWorkRecord?.name ?? archiveRecord?.workTypeName ?? translateKey('workType')}
                 </h1>
               </div>
               <DropdownMenu>
