@@ -4,7 +4,7 @@ import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { cleanupOperationsArchive } from '@/lib/operations-archive-store';
-import { startLanguageRuntime } from '@/lib/language-runtime';
+import { LanguageProvider } from '@/lib/language-context';
 import NotFound from '@/pages/not-found';
 import ArchivePage from '@/pages/archive-page';
 import OperationsPage from '@/pages/operations-page';
@@ -43,17 +43,18 @@ function RoutedErrorBoundary({ children }: { children: ReactNode }) {
 function App() {
   useEffect(() => {
     cleanupOperationsArchive();
-    return startLanguageRuntime();
   }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
+      <LanguageProvider>
       <TooltipProvider>
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
           <Router />
         </WouterRouter>
         <Toaster />
       </TooltipProvider>
+      </LanguageProvider>
     </QueryClientProvider>
   );
 }
