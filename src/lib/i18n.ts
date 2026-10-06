@@ -593,7 +593,7 @@ export function getLanguageLocale(language: AppLanguage): string { return langua
 export function formatLocalizedDate(date: Date, language: AppLanguage): string { return new Intl.DateTimeFormat(getLanguageLocale(language), { day: '2-digit', month: 'long', year: 'numeric', numberingSystem: 'latn' }).format(date); }
 export function formatLocalizedTime(date: Date, language: AppLanguage): string { return new Intl.DateTimeFormat(getLanguageLocale(language), { hour: '2-digit', minute: '2-digit', numberingSystem: 'latn' }).format(date); }
 export function translate(key: TranslationKey, language: AppLanguage = loadLanguage()): string { return dictionaries[language][key] ?? ar[key] ?? key; }
-export function translateKey(key: TranslationKey, language: AppLanguage = loadLanguage()): string { return translate(key, language); }
+export function translateKey(key: TranslationKey | string, language: AppLanguage = loadLanguage()): string { const semanticKey = typeof key === 'string' ? (translationKeyForLegacyText[key] ?? key as TranslationKey) : key; return translate(semanticKey, language); }
 export function translateText(value: string, language: AppLanguage = loadLanguage()): string { const key = translationKeyForLegacyText[value]; return key ? translate(key, language) : value; }
 
 export const translationKeyForLegacyText: Record<string, TranslationKey> = Object.fromEntries(Object.entries(ar).map(([key, value]) => [value, key as TranslationKey])) as Record<string, TranslationKey>;
