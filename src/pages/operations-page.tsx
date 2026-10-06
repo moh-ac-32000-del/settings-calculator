@@ -26,7 +26,7 @@ type OperationEntry = {
   materialSelectionTouched?: boolean;
 };
 
-const CUSTOMER_NAME_REQUIRED_MESSAGE = 'يرجى إدخال اسم العميل أولًا';
+const CUSTOMER_NAME_REQUIRED_MESSAGE = translateKey('enterCustomerFirst')';
 
 function hexToHslChannels(hex: string) {
   const value = hex.replace('#', '');
@@ -93,7 +93,7 @@ function EmptyState({ title, detail }: { title: string; detail: string }) {
       <p className="mt-2 max-w-sm text-xs leading-6 text-[hsl(var(--muted-foreground))]">{detail}</p>
       <Link href="/settings" className="operation-link mt-5" data-testid="link-empty-settings">
         <Settings2 size={14} />
-        فتح الإعدادات
+        {translateKey('openSettings')}
       </Link>
     </div>
   );
@@ -129,10 +129,10 @@ function QuantityKeypad({
             type="button"
             onClick={() => onKey(key)}
             className={cn('keypad-key', key === 'backspace' && 'keypad-key-muted', key === 'clear' && 'keypad-key-clear')}
-            aria-label={key === 'backspace' ? 'حذف آخر رقم' : key === 'clear' ? 'مسح الكمية' : `إدخال ${key}`}
+            aria-label={key === 'backspace' ? translateKey('deleteLastDigit') : key === 'clear' ? translateKey('clearQuantity') : translateKey('keypadEnter').replace('{key}', key)}
             data-testid={`keypad-${key}`}
           >
-            {key === 'backspace' ? <Delete size={17} /> : key === 'clear' ? 'مسح' : key}
+            {key === 'backspace' ? <Delete size={17} /> : key === 'clear' ? translateKey('clear') : key}
           </button>
         ))}
       </div>
@@ -285,7 +285,7 @@ function SectionOperation({
           <p className="eyebrow">{translateKey('calculationSection')}</p>
           <h2 className="mt-1 truncate text-base font-extrabold tracking-[-.035em]">{section.name}</h2>
         </div>
-        <span className="mode-tag">{isSingle ? 'اختيار واحد' : 'جمع المختار'}</span>
+        <span className="mode-tag">{isSingle ? translateKey('singleChoice') : translateKey('sumSelected')}</span>
       </div>
 
       {sectionMaterials.length === 0 ? (
@@ -336,7 +336,7 @@ function SectionOperation({
           type="button"
           onClick={onQuantityOpen}
           className={cn('quantity-display', active && 'quantity-display-active')}
-          aria-label={`تعديل كمية ${section.name}`}
+          aria-label={translateKey('editSectionQuantity').replace('{name}', section.name)}
           data-testid={`button-quantity-${section.id}`}
           dir="ltr"
         >
@@ -508,7 +508,7 @@ function SortableOrderList({
           {showPositionNumbers && (
             <span
               className="inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-[hsl(var(--primary)/.55)] bg-[hsl(var(--primary)/.16)] text-sm font-black text-[hsl(var(--primary))]"
-              aria-label={`الترتيب ${displayItems.length - index}`}
+              aria-label={translateKey('orderPosition').replace('{position}', formatWesternNumber(displayItems.length - index))}
               data-testid={`order-position-${item.id}`}
             >
               {displayItems.length - index <= 20
@@ -528,7 +528,7 @@ function SortableOrderList({
               className="order-move-button"
               onClick={() => saveDisplayOrder(moveItem(ids, item.id, -1))}
               disabled={index === 0}
-              aria-label={`تحريك ${item.label} إلى الأعلى`}
+              aria-label={translateKey('moveUp').replace('{label}', item.label)}
               data-testid={`button-order-up-${item.id}`}
             >
               <ArrowUp size={14} />
@@ -538,7 +538,7 @@ function SortableOrderList({
               className="order-move-button"
               onClick={() => saveDisplayOrder(moveItem(ids, item.id, 1))}
               disabled={index === displayItems.length - 1}
-              aria-label={`تحريك ${item.label} إلى الأسفل`}
+              aria-label={translateKey('moveDown').replace('{label}', item.label)}
               data-testid={`button-order-down-${item.id}`}
             >
               <ArrowDown size={14} />
@@ -597,18 +597,18 @@ function OrderEditorModal({
                 data-testid="button-back-work-order"
               >
                 <ArrowRight size={16} />
-                العودة إلى أنواع الأعمال
+                {translateKey('backToWorkTypes')}
               </button>
               <div className="order-subview-heading">
                 <div>
                   <p className="eyebrow">{translateKey('orderSections2')}</p>
-                  <h3 className="mt-2 text-base font-extrabold">ترتيب أقسام {activeWork.workLabel}</h3>
-                  <p className="mt-1 text-[10px] leading-5 text-[hsl(var(--muted-foreground))]">{translateKey("اسحب الصف كاملًا لترتيب الأقسام، أو استخدم الأسهم.")}</p>
+                  <h3 className="mt-2 text-base font-extrabold">{translateKey('orderSectionsForWork').replace('{workType}', activeWork.workLabel)}</h3>
+                  <p className="mt-1 text-[10px] leading-5 text-[hsl(var(--muted-foreground))]">{translateKey(translateKey('dragToOrderSections'))}</p>
                 </div>
                 <Layers3 size={18} className="text-[hsl(var(--accent-foreground))]" />
               </div>
               {activeWork.items.length === 0 ? (
-                <p className="order-empty-note">{translateKey("لا توجد أقسام مرتبطة بهذا النوع بعد.")}</p>
+                <p className="order-empty-note">{translateKey(translateKey('noLinkedSectionsForWorkType'))}</p>
               ) : (
                 <SortableOrderList
                   items={activeWork.items}
@@ -647,7 +647,7 @@ function OrderEditorModal({
             <div className="order-editor-heading">
               <div>
                 <p className="text-xs font-bold">{translateKey('orderSections')}</p>
-                <p className="mt-1 text-[10px] text-[hsl(var(--muted-foreground))]">{translateKey("هذا الترتيب هو fallback لأي نوع عمل لا يملك تخصيصًا مستقلًا.")}</p>
+                <p className="mt-1 text-[10px] text-[hsl(var(--muted-foreground))]">{translateKey(translateKey('fallbackOrderDescription'))}</p>
               </div>
               <Layers3 size={17} className="text-[hsl(var(--accent-foreground))]" />
             </div>
@@ -662,10 +662,10 @@ function OrderEditorModal({
         <div className="order-dialog-actions">
           <button type="button" className="order-save-button" onClick={onSave} data-testid="button-save-operations-order">
             <Check size={15} />
-            حفظ الترتيب
+            {translateKey('saveOrder')}
           </button>
           <button type="button" className="order-cancel-button" onClick={onClose} data-testid="button-cancel-operations-order">
-            إلغاء
+            {translateKey('cancel')}
           </button>
         </div>
       </div>
@@ -709,7 +709,7 @@ function SectionProgress({
           <Switch
             checked={autoAdvanceEnabled}
             onCheckedChange={onAutoAdvanceChange}
-            aria-label={translateKey("الانتقال التلقائي بين الأقسام")}
+            aria-label={translateKey(translateKey('autoAdvanceBetweenSections'))}
             aria-labelledby="auto-advance-label"
             data-testid="switch-auto-advance"
           />
@@ -724,7 +724,7 @@ function SectionProgress({
           disabled={activeIndex <= 0}
           data-testid="button-previous-section"
         >
-          السابق
+          {translateKey('previous')}
         </Button>
         {countdown !== null && (
           <p className="auto-advance-countdown" role="status" data-testid="auto-advance-countdown">
@@ -739,7 +739,7 @@ function SectionProgress({
           disabled={activeIndex >= sections.length - 1}
           data-testid="button-next-section"
         >
-          التالي
+          {translateKey('next')}
         </Button>
       </div>
     </section>
@@ -874,7 +874,7 @@ export default function OperationsPage() {
   }, [archiveRecord, materialById, settings.sections]);
   const workById = useMemo(() => new Map(settings.workTypes.map((work) => [work.id, work])), [settings.workTypes]);
   const orderedWorkChoices = operationOrder.workOrder
-    .map((id) => id === FREE_WORK_ORDER_ID ? { id: FREE_WORK_ORDER_ID, name: 'عمل حر' } : workById.get(id))
+    .map((id) => id === FREE_WORK_ORDER_ID ? { id: FREE_WORK_ORDER_ID, name: translateKey('freeWork') } : workById.get(id))
     .filter((work): work is { id: string; name: string } => Boolean(work));
   const selectedWorkRecord = selectedWork && selectedWork !== 'free'
     ? settings.workTypes.find((work) => work.id === selectedWork)
@@ -988,7 +988,7 @@ export default function OperationsPage() {
     cancelAutoAdvance();
     if (hasStartedOperation) {
       if (!workName.trim()) focusCustomerName();
-      else setBackNavigationNotice('أكمل العملية أو انقلها قبل الرجوع إلى اختيار نوع العمل.');
+      else setBackNavigationNotice(translateKey('completeOrMoveBeforeReturning'));
       return;
     }
     setBackNavigationNotice('');
@@ -1135,7 +1135,7 @@ export default function OperationsPage() {
       workTypeName: isArchiveEditing && archiveRecord
         ? archiveRecord.workTypeName
         : selectedWork === FREE_WORK_ORDER_ID
-        ? 'عمل حر'
+        ? translateKey('freeWork')
         : selectedWork
           ? (workById.get(selectedWork)?.name ?? (archiveRecord?.workTypeId === selectedWork ? archiveRecord.workTypeName : null))
           : null,
@@ -1183,7 +1183,7 @@ export default function OperationsPage() {
       const savedSource = isArchiveEditing ? archiveRecord : saveOperationToArchive(buildArchivedDraft());
       if (!savedSource) {
         setShowTransferPicker(false);
-        setTransferNotice('تعذر حفظ نسخة العملية الحالية؛ لم يتم نقلها.');
+        setTransferNotice(translateKey('failedToSaveBeforeMove'));
         return;
       }
 
@@ -1198,20 +1198,20 @@ export default function OperationsPage() {
         sectionsById: sectionById,
         entries,
       });
-      const targetName = orderedWorkChoices.find((choice) => choice.id === targetWork)?.name ?? 'نوع العمل المحدد';
+      const targetName = orderedWorkChoices.find((choice) => choice.id === targetWork)?.name ?? translateKey('selectedWorkType');
       const issueMessages = transfer.issues.map((issue: TransferIssue) => {
         if (issue.type === 'incompatible') {
-          return `تعذر نقل القسم رقم ${issue.position} (${issue.sourceName} إلى ${issue.targetName}) لأن طريقة الحساب غير متوافقة.`;
+          return translateKey('transferIncompatible').replace('{position}', formatWesternNumber(issue.position)).replace('{source}', issue.sourceName).replace('{target}', issue.targetName);
         }
         if (issue.type === 'missing-target') {
-          return `لم يُنقل القسم رقم ${issue.position} (${issue.sourceName}) لعدم وجود موضع مقابل؛ بياناته محفوظة في سجل المصدر بالأرشيف.`;
+          return translateKey('transferNoTargetPosition').replace('{position}', formatWesternNumber(issue.position)).replace('{source}', issue.sourceName);
         }
         return issue.fallback
-          ? `لم تتوفر مادة القسم المحددة في الموضع رقم ${issue.position}؛ استُخدمت المادة الافتراضية في ${issue.targetName}.`
-          : `لم تتوفر المادة المحددة للقسم ${issue.targetName} في الموضع رقم ${issue.position}؛ تُرك اختيار المادة فارغًا.`;
+          ? translateKey('transferDefaultMaterial').replace('{position}', formatWesternNumber(issue.position)).replace('{target}', issue.targetName)
+          : translateKey('transferEmptyMaterial').replace('{target}', issue.targetName).replace('{position}', formatWesternNumber(issue.position));
       });
       if (transfer.unfilledTargetPositions.length > 0) {
-        issueMessages.push(`الأقسام في المواضع ${transfer.unfilledTargetPositions.join('، ')} لا يقابلها مصدر وبقيت فارغة.`);
+        issueMessages.push(translateKey('transferUnfilledPositions').replace('{positions}', transfer.unfilledTargetPositions.join('، ')));
       }
 
       setSelectedWork(targetWork);
@@ -1222,10 +1222,10 @@ export default function OperationsPage() {
       setActiveSectionId(transfer.entries[0]?.sectionId ?? null);
       setWorkNameValidationError('');
       setShowTransferPicker(false);
-      setTransferNotice(`نُقلت العملية إلى ${targetName}، وحُفظت نسخة ${savedSource.workTypeName ?? 'العمل السابق'} في الأرشيف.${issueMessages.length ? ` ${issueMessages.join(' ')}` : ''}`);
+      setTransferNotice(`نُقلت العملية إلى ${targetName}، وحُفظت نسخة ${savedSource.workTypeName ?? 'العمل {translateKey('previous')}'} في الأرشيف.${issueMessages.length ? ` ${issueMessages.join(' ')}` : ''}`);
     } catch {
       setShowTransferPicker(false);
-      setTransferNotice('تعذر حفظ نسخة العملية الحالية؛ لم يتم نقلها.');
+      setTransferNotice(translateKey('failedToSaveBeforeMove'));
     } finally {
       transferInProgressRef.current = false;
     }
@@ -1243,7 +1243,7 @@ export default function OperationsPage() {
     if (isArchiveEditing && archiveRecord) {
       const updated = updateOperationInArchive(archiveRecord.id, draft);
       if (!updated) {
-        setArchiveSaveError('تعذر تحديث السجل؛ ربما انتهت مدة الاحتفاظ به. ارجع إلى الأرشيف للتحقق.');
+        setArchiveSaveError(translateKey('theRecordCouldNotBeUpdatedItsRetentionPeriodMayHaveExpi'));
         setShowFinishConfirm(false);
         return;
       }
@@ -1288,7 +1288,7 @@ export default function OperationsPage() {
   };
 
   const orderWorkItems = draftOrder.workOrder
-    .map((id) => id === FREE_WORK_ORDER_ID ? { id: FREE_WORK_ORDER_ID, label: 'عمل حر' } : workById.get(id) ? { id, label: workById.get(id)!.name } : null)
+    .map((id) => id === FREE_WORK_ORDER_ID ? { id: FREE_WORK_ORDER_ID, label: translateKey('freeWork') } : workById.get(id) ? { id, label: workById.get(id)!.name } : null)
     .filter((item): item is OrderListItem => Boolean(item));
   const orderSectionItems = draftOrder.sectionOrder
     .map((id) => sectionById.get(id) ? { id, label: sectionById.get(id)!.name } : null)
@@ -1320,7 +1320,7 @@ export default function OperationsPage() {
       data-testid="button-finish-operation"
     >
       <Check size={16} aria-hidden="true" />
-      {isArchiveEditing ? 'حفظ التعديلات' : 'إنهاء العملية'}
+      {isArchiveEditing ? translateKey('saveChanges') : translateKey('finishOperation')}
     </Button>
   );
 
@@ -1345,9 +1345,9 @@ export default function OperationsPage() {
                 </Button>
               )}
               <div className="min-w-0 flex-1">
-                <p className="eyebrow">{isArchiveEditing ? 'تعديل عملية محفوظة' : 'العمل الحالي'}</p>
+                <p className="eyebrow">{isArchiveEditing ? translateKey('editSavedOperation') : translateKey('currentWork')}</p>
                 <h1 className="operation-toolbar-title" data-testid="current-work-title">
-                  {selectedWork === FREE_WORK_ORDER_ID ? 'عمل حر' : selectedWorkRecord?.name ?? archiveRecord?.workTypeName ?? 'نوع العمل'}
+                  {selectedWork === FREE_WORK_ORDER_ID ? translateKey('freeWork') : selectedWorkRecord?.name ?? archiveRecord?.workTypeName ?? translateKey('workType')}
                 </h1>
               </div>
               <DropdownMenu>
@@ -1371,7 +1371,7 @@ export default function OperationsPage() {
                   </DropdownMenuItem>
                   <DropdownMenuItem onSelect={() => requestFinishOperation(true)} data-testid="button-finish-operation-menu">
                     <Check size={15} />
-                    {isArchiveEditing ? 'حفظ التعديلات' : 'إنهاء العملية'}
+                    {isArchiveEditing ? translateKey('saveChanges') : translateKey('finishOperation')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onSelect={openOrderEditor} data-testid="button-open-operations-order">
                     <ListOrdered size={15} />
@@ -1387,9 +1387,9 @@ export default function OperationsPage() {
                   <span className="flex size-7 items-center justify-center rounded-lg bg-[hsl(var(--accent)/.13)]"><Calculator size={14} /></span>
                   <span>{translateKey('operationCalculator')}</span>
                 </div>
-                <h1 className="text-2xl font-extrabold tracking-[-.06em] sm:text-3xl">{isArchiveEditing ? 'تعديل عملية محفوظة' : 'اختر نوع العمل'}</h1>
+                <h1 className="text-2xl font-extrabold tracking-[-.06em] sm:text-3xl">{isArchiveEditing ? translateKey('editSavedOperation') : translateKey('chooseWorkType')}</h1>
                 <p className="mt-2 max-w-md text-xs leading-6 text-[hsl(var(--muted-foreground))]">
-                  {isArchiveEditing ? 'عدّل مدخلات السجل، وستُعاد جميع النتائج تلقائيًا قبل حفظه في الأرشيف.' : 'اختر نوع العمل للبدء مباشرة.'}
+                  {isArchiveEditing ? translateKey('editTheRecordInputsAllResultsWillBeRecalculatedAutomati') : translateKey('chooseAWorkTypeToStart')}
                 </p>
               </div>
               {!isArchiveEditing && (
@@ -1406,7 +1406,7 @@ export default function OperationsPage() {
           <>
             {noWorkTypes && !isArchiveEditing && (
               <div className="operations-notice" data-testid="notice-no-work-types">
-                <span>{translateKey("لا توجد أنواع أعمال محفوظة. يمكنك استخدام «عمل حر» أو فتح الإعدادات لإنشاء قالب.")}</span>
+                <span>{translateKey("لا توجد أنواع أعمال محفوظة. يمكنك استخدام «عمل حر» أو {translateKey('openSettings')} لإنشاء قالب.")}</span>
                 <Link href="/settings" className="operation-link" data-testid="link-notice-settings">
                   <Settings2 size={14} />
                   الإعدادات
@@ -1475,9 +1475,9 @@ export default function OperationsPage() {
               )}
 
               {selectedWork && (noSectionsForWork || orderedAvailableSections.length === 0) ? (
-                <EmptyState title="لا توجد أقسام لهذا العمل" detail="اربط قسمًا بنوع العمل من الإعدادات، ثم عد إلى الحاسبة." />
+                <EmptyState title="لا توجد أقسام لهذا العمل" detail=translateKey('linkASectionToThisWorkTypeInSettingsThenReturnToTheCalc') />
               ) : selectedWork && entries.length === 0 ? (
-                <EmptyState title="جارٍ تجهيز القسم الأول" detail="ستظهر بيانات القسم الحالي هنا." />
+                <EmptyState title=translateKey('preparingTheFirstSection') detail=translateKey('currentSectionDataWillAppearHere') />
               ) : selectedWork ? (
                 <div className="mt-3 space-y-2">
                   {visibleSections.map((section) => {
@@ -1598,11 +1598,11 @@ export default function OperationsPage() {
       <AppBottomNav />
       {showFinishConfirm && (
         <FinishOperationModal
-          title={isArchiveEditing ? 'هل تريد حفظ تعديلات هذا السجل؟' : 'هل تريد إنهاء العملية الحالية؟'}
+          title={isArchiveEditing ? translateKey('doYouWantToSaveChangesToThisRecord') : translateKey('doYouWantToFinishTheCurrentOperation')}
           description={isArchiveEditing
-            ? 'سيُحدّث السجل الحالي في الأرشيف ويبدأ احتساب مدة الاحتفاظ به لثلاثة أيام من جديد.'
-            : 'إذا أضفت اسمًا للعمل فسيُحفظ ملخصه في الأرشيف. ستُصفّر الكميات والنتائج وتُزال الأقسام المؤقتة.'}
-          confirmLabel={isArchiveEditing ? 'حفظ التعديلات' : 'إنهاء العملية'}
+            ? translateKey('theCurrentRecordWillBeUpdatedInTheArchiveAndItsThreeDay')
+            : translateKey('ifYouAddAWorkNameItsSummaryWillBeSavedToTheArchiveQuant')}
+          confirmLabel={isArchiveEditing ? translateKey('saveChanges') : translateKey('finishOperation')}
           onClose={() => setShowFinishConfirm(false)}
           onConfirm={finishOperation}
         />
