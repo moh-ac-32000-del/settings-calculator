@@ -197,7 +197,7 @@ export default function ArchivePage() {
                   </div>
                   <div className="mt-2 flex items-center justify-between gap-3 text-[11px]">
                     <span className="text-[hsl(var(--muted-foreground))]">
-                      مصاريف الشحن ({record.shipping.mode === 'manual' ? translateKey('manual') : translateKey('automatic')})
+                      {translateKey('archiveShipping').replace('{mode}', record.shipping.mode === 'manual' ? translateKey('manual') : translateKey('automatic'))}
                     </span>
                     <strong className="font-mono" dir="ltr">
                       {record.shipping.included ? formatWesternNumber(record.shipping.amount) : translateKey('notIncluded')}
@@ -206,7 +206,7 @@ export default function ArchivePage() {
                   {record.shipping.mode === 'manual' && (
                     <p className="mt-1 text-[10px] text-[hsl(var(--muted-foreground))]">
                       {translateKey('automatic2')}<span className="font-mono" dir="ltr">{formatWesternNumber(record.shipping.automaticAmount)}</span>
-                      {' · {translateKey('manual2')}<span className="font-mono" dir="ltr">{formatWesternNumber(record.shipping.manualAmount)}</span>
+                      {' · '}{translateKey('manual2')}<span className="font-mono" dir="ltr">{formatWesternNumber(record.shipping.manualAmount)}</span>
                     </p>
                   )}
                   {(record.additionalExpenses ?? 0) > 0 && (
@@ -228,11 +228,11 @@ export default function ArchivePage() {
                     data-testid={`button-edit-archive-${record.id}`}
                   >
                     <Pencil size={14} />
-                    تعديل العملية
+                    {translateKey('editOperation')}
                   </Link>
                   <button type="button" className="operation-link flex-1" onClick={() => window.open("https://wa.me/?text=" + encodeURIComponent(buildWhatsAppMessage(record)), "_blank", "noopener,noreferrer")} data-testid="button-share-whatsapp">
                     <Share2 size={14} />
-                    مشاركة واتساب
+                    {translateKey('shareOnWhatsapp')}
                   </button>
                 </div>
               </div>
