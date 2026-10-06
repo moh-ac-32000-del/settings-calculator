@@ -319,6 +319,16 @@ const originalTextByNode = new WeakMap<Text, string>();
 function translateValue(value: string, dictionary: Dictionary) {
   const exact = dictionary[value];
   if (exact) return exact;
+
+  // Source components contain both Arabic and English strings. Resolve either
+  // language through the Arabic canonical key so switching is complete.
+  for (const canonical of Object.keys(dictionaries.tr)) {
+    if (dictionaries.tr[canonical] === value) return dictionary[canonical] ?? value;
+  }
+  for (const canonical of Object.keys(dictionaries.en)) {
+    if (dictionaries.en[canonical] === value) return dictionary[canonical] ?? value;
+  }
+
   if (value.startsWith('تعديل كمية ')) return dictionary['تعديل كمية هذا القسم فقط']?.replace('هذا القسم', value.slice('تعديل كمية '.length)) ?? value;
   if (value.startsWith('إزالة ')) return (dictionary['إزالة'] ?? 'إزالة') + ' ' + value.slice('إزالة '.length);
   if (value.startsWith('حذف ')) return (languageLabel(dictionary, 'حذف') ?? 'حذف') + ' ' + value.slice('حذف '.length);
