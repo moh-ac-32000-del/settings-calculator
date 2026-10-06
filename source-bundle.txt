@@ -33,6 +33,7 @@ export type ArchivedOperationDraft = {
     mode: 'automatic' | 'manual';
     included: boolean;
   };
+  additionalExpenses?: number;
   finalTotal: number;
 };
 
@@ -94,6 +95,7 @@ function isArchivedOperation(value: unknown): value is ArchivedOperation {
         ))
     ))
     && (record.workTypeId === undefined || record.workTypeId === null || typeof record.workTypeId === 'string')
+    && (record.additionalExpenses === undefined || (typeof record.additionalExpenses === 'number' && Number.isFinite(record.additionalExpenses) && record.additionalExpenses >= 0))
     && shipping !== undefined
     && typeof shipping.amount === 'number'
     && typeof shipping.automaticAmount === 'number'
@@ -1181,6 +1183,7 @@ export default function OperationsPage() {
   const [includeShipping, setIncludeShipping] = useState(true);
   const [manualShippingEnabled, setManualShippingEnabled] = useState(false);
   const [manualShippingValue, setManualShippingValue] = useState('0');
+  const [additionalExpensesValue, setAdditionalExpensesValue] = useState('0');
   const [autoAdvanceEnabled, setAutoAdvanceEnabled] = useState(true);
   const [autoAdvanceCountdown, setAutoAdvanceCountdown] = useState<number | null>(null);
   const autoAdvanceTimerRef = useRef<number | null>(null);
@@ -1211,6 +1214,7 @@ export default function OperationsPage() {
         setIncludeShipping(true);
         setManualShippingEnabled(false);
         setManualShippingValue('0');
+        setAdditionalExpensesValue('0');
         setArchiveSaveError('');
         setWorkNameValidationError('');
         setBackNavigationNotice('');
@@ -1240,6 +1244,7 @@ export default function OperationsPage() {
     setIncludeShipping(record.shipping.included);
     setManualShippingEnabled(record.shipping.mode === 'manual');
     setManualShippingValue(String(record.shipping.manualAmount));
+    setAdditionalExpensesValue(String(record.additionalExpenses ?? 0));
     setArchiveSaveError('');
     setWorkNameValidationError('');
   }, [archiveEditId, settings.workTypes, setLocation]);
@@ -1340,13 +1345,15 @@ export default function OperationsPage() {
     manualShippingAmount,
     includeShipping,
   );
-  const finalTotal = sectionTotal + shippingTotal;
+  const additionalExpensesAmount = Math.max(0, Number(formatWesternNumber(additionalExpensesValue).replace(/,/g, '')) || 0);
+  const finalTotal = sectionTotal + shippingTotal + additionalExpensesAmount;
   const hasStartedOperation = entries.some((entry) => (
     quantityValue(entry.quantity) > 0 || (entry.materialSelectionTouched && entry.selectedMaterialIds.length > 0)
   ))
     || !includeShipping
     || manualShippingEnabled
-    || (Number.isFinite(manualShippingAmount) && manualShippingAmount !== 0);
+    || (Number.isFinite(manualShippingAmount) && manualShippingAmount !== 0)
+    || additionalExpensesAmount !== 0;
 
   const focusCustomerName = (afterMenuClose = false) => {
     focusCustomerNameAfterMenuCloseRef.current = afterMenuClose;
@@ -1557,6 +1564,7 @@ export default function OperationsPage() {
         mode: manualShippingEnabled ? 'manual' : 'automatic',
         included: includeShipping,
       },
+      additionalExpenses: additionalExpensesAmount,
       finalTotal,
     };
     return draft;
@@ -1965,6 +1973,21 @@ export default function OperationsPage() {
                       </p>
                     </div>
                   )}
+                  <div className="mt-3 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card)/.55)] p-3" data-testid="additional-expenses">
+                    <div className="flex items-center justify-between gap-3">
+                      <label className="shipping-option m-0 flex-1">
+                        <input type="checkbox" checked={additionalExpensesAmount > 0} onChange={(event) => { cancelAutoAdvance(); if (!event.target.checked) setAdditionalExpensesValue('0'); }} data-testid="checkbox-additional-expenses" />
+                        <span>مصاريف إضافية</span>
+                      </label>
+                      <strong className="font-mono text-xs" dir="ltr">{formatWesternNumber(additionalExpensesAmount.toLocaleString('en-US'))}</strong>
+                    </div>
+                    {(additionalExpensesAmount > 0 || additionalExpensesValue !== '0') && (
+                      <div className="mt-2">
+                        <label htmlFor="input-additional-expenses" className="text-xs font-bold">قيمة المصاريف الإضافية لهذه العملية</label>
+                        <input id="input-additional-expenses" type="text" inputMode="decimal" dir="ltr" className="field-input mt-2 text-left font-mono" value={additionalExpensesValue} onChange={(event) => { cancelAutoAdvance(); setAdditionalExpensesValue(event.target.value); }} data-testid="input-additional-expenses" />
+                      </div>
+                    )}
+                  </div>
                   <div className="final-total" data-testid="final-total">
                     <div className="final-total-summary">
                       <div>
@@ -2021,6 +2044,7 @@ import { cn } from '@/lib/utils';
 import { CalculationMode, createId, loadSettings, Material, saveSettings, Section, SettingsState, ShippingExpenseSetting, WorkType, SETTINGS_SCHEMA_VERSION } from '@/lib/settings-store';
 import { createSettingsCode, parseSettingsCode } from '@/lib/settings-transfer';
 import { reconcileOperationsOrderAfterSettingsChange } from '@/lib/operations-order-store';
+import { loadLanguage, saveLanguage, type AppLanguage } from '@/lib/language-store';
 import AppBottomNav from '@/components/app-bottom-nav';
 
 type Area = 'materials' | 'sections' | 'work';
@@ -2322,9 +2346,10 @@ export default function SettingsPage() {
   const [activeArea, setActiveArea] = useState<Area>('materials');
   const [savedAt, setSavedAt] = useState<Date | null>(null);
   const [transferMessage, setTransferMessage] = useState<{ type: 'error' | 'success'; text: string } | null>(null);
+  const [language, setLanguage] = useState<AppLanguage>(() => loadLanguage());
 
   useEffect(() => { saveSettings(state); setSavedAt(new Date()); }, [state]);
-  useEffect(() => { document.documentElement.lang = 'ar'; document.documentElement.dir = 'rtl'; }, []);
+  useEffect(() => { saveLanguage(language); document.documentElement.lang = language; document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr'; }, [language]);
 
   const materialById = useMemo(() => new Map(state.materials.map((material) => [material.id, material])), [state.materials]);
   const counts = `${formatWesternNumber(state.materials.length)} مواد · ${formatWesternNumber(state.sections.length)} أقسام · ${formatWesternNumber(state.workTypes.length)} أنواع أعمال`;
@@ -2456,6 +2481,20 @@ export default function SettingsPage() {
             <div className="flex items-center gap-2"><CircleHelp size={15} className="shrink-0 text-[hsl(var(--accent-foreground))]" /><span>تُحفظ التغييرات تلقائيًا على هذا المتصفح.</span></div>
             {savedAt && <span className="hidden font-mono text-[10px] sm:inline">آخر حفظ {formatWesternNumber(savedAt.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }))}</span>}
           </div>
+          <section className="mb-5 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card)/.45)] p-4 sm:p-5" data-testid="language-settings">
+            <div className="flex items-start gap-3">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[hsl(var(--accent)/.13)] text-[hsl(var(--accent-foreground))]"><Settings2 size={17} /></div>
+              <div className="flex-1">
+                <h2 className="text-sm font-extrabold">اللغة / Language / Dil</h2>
+                <p className="mt-1 text-xs leading-6 text-[hsl(var(--muted-foreground))]">اختر لغة واجهة التطبيق.</p>
+                <select value={language} onChange={(event) => setLanguage(event.target.value as AppLanguage)} className="field-input mt-3" data-testid="select-language">
+                  <option value="ar">العربية</option>
+                  <option value="tr">Türkçe</option>
+                  <option value="en">English</option>
+                </select>
+              </div>
+            </div>
+          </section>
           <section className="mb-5 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card)/.45)] p-4 sm:p-5">
             <div className="flex items-start gap-3">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[hsl(var(--accent)/.13)] text-[hsl(var(--accent-foreground))]"><Share2 size={17} /></div>
@@ -2517,7 +2556,7 @@ export default function SettingsPage() {
     </div>
   );
 }\n===== src/pages/archive-page.tsx =====\nimport { useEffect, useMemo, useState } from 'react';
-import { Archive, ChevronDown, Clock3, Layers3, Pencil, Search } from 'lucide-react';
+import { Archive, ChevronDown, Clock3, Layers3, Pencil, Search, Share2 } from 'lucide-react';
 import { Link } from 'wouter';
 import { cleanupOperationsArchive, type ArchivedOperation } from '@/lib/operations-archive-store';
 import { formatAmount, formatWesternNumber } from '@/lib/operations-utils';
@@ -2530,6 +2569,21 @@ function formatArchiveDate(timestamp: number) {
     year: 'numeric',
     numberingSystem: 'latn',
   }).format(new Date(timestamp));
+}
+
+function buildWhatsAppMessage(record: ArchivedOperation) {
+  const lines = ["اسم العمل: " + record.name];
+  if (record.workTypeName) lines.push("نوع العمل: " + record.workTypeName);
+  lines.push("", "المواد والأقسام:");
+  for (const section of record.sections) {
+    lines.push(section.name + " — الكمية: " + formatWesternNumber(section.quantity) + " — المجموع: " + formatAmount(section.result));
+    for (const material of section.materials) lines.push("  " + material.name + ": " + formatAmount(material.price));
+  }
+  if (record.shipping.included) lines.push("", "مصاريف الشحن: " + formatWesternNumber(record.shipping.amount));
+  if ((record.additionalExpenses ?? 0) > 0) lines.push("مصاريف إضافية: " + formatWesternNumber(record.additionalExpenses ?? 0));
+  lines.push("المجموع النهائي: " + formatAmount(record.finalTotal));
+  return lines.join("
+");
 }
 
 function formatArchiveTime(timestamp: number) {
@@ -2694,12 +2748,19 @@ export default function ArchivePage() {
                       {' · '}اليدوي: <span className="font-mono" dir="ltr">{formatWesternNumber(record.shipping.manualAmount)}</span>
                     </p>
                   )}
+                  {(record.additionalExpenses ?? 0) > 0 && (
+                    <div className="mt-2 flex items-center justify-between gap-3 text-[11px]">
+                      <span className="text-[hsl(var(--muted-foreground))]">مصاريف إضافية</span>
+                      <strong className="font-mono" dir="ltr">{formatWesternNumber(record.additionalExpenses ?? 0)}</strong>
+                    </div>
+                  )}
                   <div className="mt-3 flex items-center justify-between gap-3 border-t border-[hsl(var(--border))] pt-3 text-xs">
                     <span className="font-bold">المجموع النهائي</span>
                     <strong className="font-mono text-[hsl(var(--accent-foreground))]" dir="ltr">{formatAmount(record.finalTotal)}</strong>
                   </div>
                 </div>
-                <Link
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Link
                   href={`/operations/edit/${encodeURIComponent(record.id)}`}
                   className="operation-link mt-4"
                   aria-label={`تعديل العملية ${record.name}`}
