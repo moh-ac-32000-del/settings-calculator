@@ -28,7 +28,7 @@ jobs:
 
       - name: Extract standalone app
         run: |
-          tar -xzf project-backup.tar.gz -C .
+          if [ ! -d src ] || [ ! -f package.json ]; then tar -xzf project-backup.tar.gz -C .; else echo "Using tracked extracted application source"; fi
           echo "Application package:"
           find . -maxdepth 4 -path "*/package.json" -print
 
@@ -39,15 +39,13 @@ jobs:
           echo "=== EXPENSE/SHIPPING/LANGUAGE MATCHES ==="
           grep -RniE "مصاريف|الشحن|shipping|language|اللغة|نوع العمل|archive|localStorage" src --include='*.tsx' --include='*.ts' | head -n 300 || true
 
-      - name: Inspect extracted calculator source
+      - name: Persist extracted application source
         run: |
-          find src -type f \( -name "*.tsx" -o -name "*.ts" \) -print | sort > source-files.txt
-          { echo "=== FILES ==="; cat source-files.txt; echo "=== MATCHES ==="; grep -RniE "مصاريف|الشحن|shipping|language|اللغة|نوع العمل|archive|localStorage|saveOperationToArchive" src --include='*.tsx' --include='*.ts' || true; } > source-inspect.txt
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add source-inspect.txt source-files.txt
-          git diff --cached --quiet || git commit -m "chore: inspect extracted calculator source"
-          git push
+          git add src package.json package-lock.json vite.config.* tsconfig.json index.html public 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "chore: persist calculator source"
+          git push || true
 
       - name: Add PWA files
         run: |
