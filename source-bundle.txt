@@ -431,12 +431,12 @@ import { cn } from '@/lib/utils';
 import { loadSettings, Material, Section, SettingsState } from '@/lib/settings-store';
 import { appendQuantityKey, calculateShippingExpense, formatAmount, formatWesternNumber, quantityValue, resolveShippingExpense } from '@/lib/operations-utils';
 import { getOperationFromArchive, saveOperationToArchive, updateOperationInArchive, type ArchivedOperation, type ArchivedOperationDraft } from '@/lib/operations-archive-store';
-import { FREE_WORK_ORDER_ID, getSectionOrderForWork, loadOperationsOrder, normalizeOperationsOrder, OperationsOrder, saveOperationsOrder } from '@/lib/operations-order-store';
+import { getSectionOrderForWork, loadOperationsOrder, normalizeOperationsOrder, OperationsOrder, saveOperationsOrder } from '@/lib/operations-order-store';
 import { transferEntriesByPosition, type TransferIssue } from '@/lib/operation-transfer';
 import AppBottomNav from '@/components/app-bottom-nav';
 import { translateKey } from '@/lib/i18n';
 
-type WorkChoice = 'free' | string;
+type WorkChoice = string;
 type OperationEntry = {
   sectionId: string;
   quantity: string;
@@ -1030,12 +1030,7 @@ function OrderEditorModal({
                   items={activeWork.items}
                   showPositionNumbers
                   onChange={(sectionOrder) => onChange(
-                    activeWork.workId === FREE_WORK_ORDER_ID
-                      ? { ...order, sectionOrder }
-                      : {
-                        ...order,
-                        workSectionOrders: { ...order.workSectionOrders, [activeWork.workId]: sectionOrder },
-                      },
+                    { ...order, workSectionOrders: { ...order.workSectionOrders, [activeWork.workId]: sectionOrder } },
                   )}
                 />
               )}
@@ -1045,7 +1040,7 @@ function OrderEditorModal({
               <div className="order-editor-heading">
                 <div>
                   <p className="text-xs font-bold">{translateKey('orderWorkTypes')}</p>
-                  <p className="mt-1 text-[10px] text-[hsl(var(--muted-foreground))]">{translateKey('freeWorkIsIncludedAsAnIndependentOptionTapAnyRowToOrder')}</p>
+                  <p className="mt-1 text-[10px] text-[hsl(var(--muted-foreground))]">{translateKey('orderSectionsForWork')}</p>
                 </div>
                 <Calculator size={17} className="text-[hsl(var(--accent-foreground))]" />
               </div>
@@ -1232,7 +1227,7 @@ export default function OperationsPage() {
     setCustomerNameVisible(true);
     const matchingWork = settings.workTypes.find((work) => work.id === record.workTypeId)
       ?? settings.workTypes.find((work) => work.name === record.workTypeName);
-    setSelectedWork(record.workTypeId ?? matchingWork?.id ?? FREE_WORK_ORDER_ID);
+    setSelectedWork(record.workTypeId ?? matchingWork?.id ?? null);
     setEntries(record.sections.map((section) => ({
       sectionId: section.id,
       quantity: String(section.quantity),
@@ -1290,21 +1285,17 @@ export default function OperationsPage() {
   }, [archiveRecord, materialById, settings.sections]);
   const workById = useMemo(() => new Map(settings.workTypes.map((work) => [work.id, work])), [settings.workTypes]);
   const orderedWorkChoices = operationOrder.workOrder
-    .map((id) => id === FREE_WORK_ORDER_ID ? { id: FREE_WORK_ORDER_ID, name: translateKey('freeWork') } : workById.get(id))
+    .map((id) => workById.get(id))
     .filter((work): work is { id: string; name: string } => Boolean(work));
-  const selectedWorkRecord = selectedWork && selectedWork !== 'free'
-    ? settings.workTypes.find((work) => work.id === selectedWork)
-    : undefined;
+  const selectedWorkRecord = selectedWork ? settings.workTypes.find((work) => work.id === selectedWork) : undefined;
   const availableSectionIds = isArchiveEditing && archiveRecord
     ? archiveRecord.sections.map((section) => section.id)
-    : selectedWork === 'free'
-      ? settings.sections.map((section) => section.id)
-      : (selectedWorkRecord?.sectionIds ?? []);
+    : (selectedWorkRecord?.sectionIds ?? []);
   const availableSections = availableSectionIds
     .map((id) => sectionById.get(id))
     .filter((section): section is Section => Boolean(section));
   const sectionOrderIndex = useMemo(() => {
-    if (selectedWork && selectedWork !== FREE_WORK_ORDER_ID) {
+    if (selectedWork) {
       return new Map(getSectionOrderForWork(operationOrder, selectedWork, selectedWorkRecord?.sectionIds ?? []).map((id, index) => [id, index]));
     }
     return new Map(operationOrder.sectionOrder.map((id, index) => [id, index]));
@@ -1550,14 +1541,12 @@ export default function OperationsPage() {
       name: workName,
       workTypeName: isArchiveEditing && archiveRecord
         ? archiveRecord.workTypeName
-        : selectedWork === FREE_WORK_ORDER_ID
-        ? translateKey('freeWork')
         : selectedWork
-          ? (workById.get(selectedWork)?.name ?? (archiveRecord?.workTypeId === selectedWork ? archiveRecord.workTypeName : null))
+          ? (workById.get(selectedWork)?.name ?? null)
           : null,
       workTypeId: isArchiveEditing && archiveRecord
         ? archiveRecord.workTypeId ?? null
-        : selectedWork && selectedWork !== FREE_WORK_ORDER_ID ? selectedWork : null,
+        : selectedWork ?? null,
       sections: archivedSections,
       sectionTotal,
       shipping: {
@@ -1603,11 +1592,9 @@ export default function OperationsPage() {
         return;
       }
 
-      const targetWorkRecord = targetWork === FREE_WORK_ORDER_ID ? undefined : workById.get(targetWork);
-      const targetSectionIds = targetWork === FREE_WORK_ORDER_ID
-        ? operationOrder.sectionOrder.filter((id) => sectionById.has(id))
-        : getSectionOrderForWork(operationOrder, targetWork, targetWorkRecord?.sectionIds ?? [])
-          .filter((id) => sectionById.has(id));
+      const targetWorkRecord = workById.get(targetWork);
+      const targetSectionIds = getSectionOrderForWork(operationOrder, targetWork, targetWorkRecord?.sectionIds ?? [])
+        .filter((id) => sectionById.has(id));
       const transfer = transferEntriesByPosition({
         sourceSectionIds: orderedAvailableSections.map((section) => section.id),
         targetSectionIds,
@@ -1704,18 +1691,14 @@ export default function OperationsPage() {
   };
 
   const orderWorkItems = draftOrder.workOrder
-    .map((id) => id === FREE_WORK_ORDER_ID ? { id: FREE_WORK_ORDER_ID, label: translateKey('freeWork') } : workById.get(id) ? { id, label: workById.get(id)!.name } : null)
+    .map((id) => workById.get(id) ? { id, label: workById.get(id)!.name } : null)
     .filter((item): item is OrderListItem => Boolean(item));
   const orderSectionItems = draftOrder.sectionOrder
     .map((id) => sectionById.get(id) ? { id, label: sectionById.get(id)!.name } : null)
     .filter((item): item is OrderListItem => Boolean(item));
   const orderWorkSectionItems = orderWorkItems.map((workItem) => {
-    const work = workItem.id === FREE_WORK_ORDER_ID
-      ? undefined
-      : workById.get(workItem.id);
-    const sectionIds = workItem.id === FREE_WORK_ORDER_ID
-      ? draftOrder.sectionOrder
-      : getSectionOrderForWork(draftOrder, workItem.id, work?.sectionIds ?? []);
+    const work = workById.get(workItem.id);
+    const sectionIds = getSectionOrderForWork(draftOrder, workItem.id, work?.sectionIds ?? []);
     return {
       workId: workItem.id,
       workLabel: workItem.label,
@@ -1763,7 +1746,7 @@ export default function OperationsPage() {
               <div className="min-w-0 flex-1">
                 <p className="eyebrow">{isArchiveEditing ? translateKey('editSavedOperation') : translateKey('currentWork')}</p>
                 <h1 className="operation-toolbar-title" data-testid="current-work-title">
-                  {selectedWork === FREE_WORK_ORDER_ID ? translateKey('freeWork') : selectedWorkRecord?.name ?? archiveRecord?.workTypeName ?? translateKey('workType')}
+                  {selectedWorkRecord?.name ?? archiveRecord?.workTypeName ?? translateKey('workType')}
                 </h1>
               </div>
               <DropdownMenu>
@@ -1822,7 +1805,7 @@ export default function OperationsPage() {
           <>
             {noWorkTypes && !isArchiveEditing && (
               <div className="operations-notice" data-testid="notice-no-work-types">
-                <span>{translateKey('noSavedWorkTypesFreeWork')}</span>
+                <span>{translateKey('noWorkTypesYet')}</span>
                 <Link href="/settings" className="operation-link" data-testid="link-notice-settings">
                   <Settings2 size={14} />
                   {translateKey('openSettings')}
