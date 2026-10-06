@@ -1,5 +1,6 @@
 import { Archive, Calculator, Settings2 } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
+import { translateText } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 export default function AppBottomNav() {
@@ -9,7 +10,7 @@ export default function AppBottomNav() {
   const settingsActive = location === '/settings';
 
   return (
-    <nav className="app-bottom-nav" aria-label="التنقل الرئيسي">
+    <nav className="app-bottom-nav" aria-label={translateText("التنقل الرئيسي")}>
       <Link
         href="/operations"
         className={cn('app-bottom-nav-item', operationsActive && 'app-bottom-nav-item-active')}
@@ -18,7 +19,7 @@ export default function AppBottomNav() {
         data-testid="bottom-nav-operations"
       >
         <Calculator size={17} strokeWidth={1.8} />
-        <span>العمليات</span>
+        <span>{translateText("العمليات")}</span>
       </Link>
       <Link
         href="/archive"
@@ -28,7 +29,7 @@ export default function AppBottomNav() {
         data-testid="bottom-nav-archive"
       >
         <Archive size={17} strokeWidth={1.8} />
-        <span>الأرشيف</span>
+        <span>{translateText("الأرشيف")}</span>
       </Link>
       <Link
         href="/settings"
@@ -38,7 +39,7 @@ export default function AppBottomNav() {
         data-testid="bottom-nav-settings"
       >
         <Settings2 size={17} strokeWidth={1.8} />
-        <span>الإعدادات</span>
+        <span>{translateText("الإعدادات")}</span>
       </Link>
     </nav>
   );
