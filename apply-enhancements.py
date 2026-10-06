@@ -57,7 +57,12 @@ patch("src/pages/archive-page.tsx",'''                <Link
                   href={''','''                <div className="mt-4 flex flex-wrap gap-2">
                   <Link
                   href={''')
-patch("src/pages/archive-page.tsx","                  تعديل العملية\n                </Link>","                  تعديل العملية\n                  </Link>\n                  <button type="button" className="operation-link flex-1" onClick={() => window.open("https://wa.me/?text=" + encodeURIComponent(buildWhatsAppMessage(record)), "_blank", "noopener,noreferrer")} data-testid="button-share-whatsapp"><Share2 size={14} />مشاركة واتساب</button>\n                </div>")
+patch("src/pages/archive-page.tsx",
+      "                  تعديل العملية\\n                </Link>",
+      '''                  تعديل العملية
+                  </Link>
+                  <button type="button" className="operation-link flex-1" onClick={() => window.open("https://wa.me/?text=" + encodeURIComponent(buildWhatsAppMessage(record)), "_blank", "noopener,noreferrer")} data-testid="button-share-whatsapp"><Share2 size={14} />مشاركة واتساب</button>
+                </div>''')
 
 Path("src/lib/language-store.ts").write_text("""export type AppLanguage = 'ar' | 'tr' | 'en';
 export const LANGUAGE_STORAGE_KEY = 'settings-calculator-language';
