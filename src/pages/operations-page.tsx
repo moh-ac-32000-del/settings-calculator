@@ -1,5 +1,5 @@
 import { type CSSProperties, useEffect, useMemo, useRef, useState } from 'react';
-import { AlertTriangle, ArrowDown, ArrowRight, ArrowUp, Calculator, Check, ChevronLeft, Delete, GripVertical, Layers3, ListOrdered, MoreVertical, MoveRight, Settings2, SlidersHorizontal, X } from 'lucide-react';
+import { AlertTriangle, ArrowDown, ArrowRight, ArrowUp, Calculator, Check, ChevronLeft, Delete, GripVertical, Layers3, ListOrdered, MoreVertical, MoveRight, Settings2, Share2, SlidersHorizontal, X } from 'lucide-react';
 import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,6 +17,8 @@ import { getSectionOrderForWork, loadOperationsOrder, normalizeOperationsOrder, 
 import { transferEntriesByPosition, type TransferIssue } from '@/lib/operation-transfer';
 import AppBottomNav from '@/components/app-bottom-nav';
 import { translateKey } from '@/lib/i18n';
+import ShareOptionsModal from '@/components/share-options-modal';
+import { buildOperationShareText } from '@/lib/operation-share';
 
 type WorkChoice = string;
 type OperationEntry = {
@@ -766,6 +768,8 @@ export default function OperationsPage() {
   const autoAdvanceTimerRef = useRef<number | null>(null);
   const [backNavigationNotice, setBackNavigationNotice] = useState('');
   const [showFinishConfirm, setShowFinishConfirm] = useState(false);
+  const [showShareOptions, setShowShareOptions] = useState(false);
+  const [pendingShareAfterName, setPendingShareAfterName] = useState(false);
   const [showTransferPicker, setShowTransferPicker] = useState(false);
   const [transferNotice, setTransferNotice] = useState('');
   const transferInProgressRef = useRef(false);
@@ -1259,6 +1263,19 @@ export default function OperationsPage() {
     setShowFinishConfirm(true);
   };
 
+  const requestShareOperation = () => {
+    cancelAutoAdvance();
+    if (!workName.trim()) {
+      setPendingShareAfterName(true);
+      focusCustomerName();
+      return;
+    }
+    setPendingShareAfterName(false);
+    setWorkNameValidationError('');
+    setShowShareOptions(true);
+  };
+
+
   const openOrderEditor = () => {
     cancelAutoAdvance();
     setDraftOrder(operationOrder);
@@ -1331,6 +1348,17 @@ export default function OperationsPage() {
                   {selectedWorkRecord?.name ?? archiveRecord?.workTypeName ?? translateKey('workType')}
                 </h1>
               </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="operation-menu-button"
+                onClick={requestShareOperation}
+                aria-label={translateKey('share')}
+                data-testid="button-share-current-operation"
+              >
+                <Share2 size={17} />
+              </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button type="button" variant="outline" size="icon" className="operation-menu-button" aria-label={translateKey('operationActions')} data-testid="button-open-operation-menu">
@@ -1409,6 +1437,10 @@ export default function OperationsPage() {
                     if (nextName.trim()) {
                       setWorkNameValidationError('');
                       setBackNavigationNotice('');
+                      if (pendingShareAfterName) {
+                        setPendingShareAfterName(false);
+                        setShowShareOptions(true);
+                      }
                     }
                   }}
                   placeholder={translateKey('exampleAhmed')}
@@ -1577,6 +1609,12 @@ export default function OperationsPage() {
         </main>
       </div>
       <AppBottomNav />
+      {showShareOptions && (
+        <ShareOptionsModal
+          text={buildOperationShareText(buildArchivedDraft())}
+          onClose={() => setShowShareOptions(false)}
+        />
+      )}
       {showFinishConfirm && (
         <FinishOperationModal
           title={isArchiveEditing ? translateKey('doYouWantToSaveChangesToThisRecord') : translateKey('doYouWantToFinishTheCurrentOperation')}
