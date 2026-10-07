@@ -5,45 +5,14 @@ import { cleanupOperationsArchive, type ArchivedOperation } from '@/lib/operatio
 import { formatAmount, formatWesternNumber } from '@/lib/operations-utils';
 import { loadLanguage } from '@/lib/language-store';
 import { translateKey } from '@/lib/i18n';
+import ShareOptionsModal from '@/components/share-options-modal';
+import { buildOperationShareText } from '@/lib/operation-share';
 import AppBottomNav from '@/components/app-bottom-nav';
 
 function formatArchiveDate(timestamp: number) {
   const language = loadLanguage();
   const locale = language === 'tr' ? 'tr-TR' : language === 'en' ? 'en-US' : 'ar-SA';
   return new Intl.DateTimeFormat(locale, { day: '2-digit', month: 'long', year: 'numeric', numberingSystem: 'latn' }).format(new Date(timestamp));
-}
-
-function buildWhatsAppMessage(record: ArchivedOperation) {
-  const language = loadLanguage();
-  const labels = language === 'tr'
-    ? { title: '🧾 İşlem detayları', work: '👤', type: '🔧', materials: '📦 Malzemeler', shipping: '🚚 Nakliye', extra: '➕ Ek masraf', final: '💰 Genel toplam' }
-    : language === 'en'
-      ? { title: '🧾 Operation details', work: '👤', type: '🔧', materials: '📦 Materials', shipping: '🚚 Shipping', extra: '➕ Additional expense', final: '💰 Final total' }
-      : { title: translateKey('whatsappTitle'), work: '👤', type: '🔧', materials: translateKey('whatsappMaterials'), shipping: translateKey('whatsappShipping'), extra: translateKey('whatsappAdditional'), final: translateKey('whatsappFinal') };
-
-  const lines = [
-    titleLine(labels.title),
-    labels.work + ' ' + record.name,
-  ];
-  if (record.workTypeName) lines.push(labels.type + ' ' + record.workTypeName);
-  lines.push('', labels.materials);
-
-  for (const section of record.sections) {
-    const primary = section.materials[0];
-    const unitPrice = section.quantity ? section.result / section.quantity : 0;
-    const quantity = formatWesternNumber(section.quantity);
-    const total = formatAmount(section.result);
-    lines.push('• *' + section.name + '* — ' + quantity + ' × ' + formatAmount(unitPrice) + ' = *' + total + '*');
-    const extras = section.materials.map((material) => material.name + ' ' + formatAmount(material.price)).join(' · ');
-    if (extras) lines.push('  ' + extras);
-    lines.push('---');
-  }
-
-  if (record.sections.length > 0) lines.pop();
-  if (record.shipping.included) lines.push(labels.shipping + ': *' + formatWesternNumber(record.shipping.amount) + '*');
-  if ((record.additionalExpenses ?? 0) > 0) lines.push(labels.extra + ': *' + formatWesternNumber(record.additionalExpenses ?? 0) + '*');
-  lines.push(labels.final + ': *' + formatAmount(record.finalTotal) + '*');
-  return lines.join('\n');
 }
 
 function titleLine(value: string) {
@@ -59,6 +28,7 @@ function formatArchiveTime(timestamp: number) {
 export default function ArchivePage() {
   const [records, setRecords] = useState<ArchivedOperation[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [shareRecord, setShareRecord] = useState<ArchivedOperation | null>(null);
 
   useEffect(() => {
     setRecords(cleanupOperationsArchive());
@@ -230,9 +200,9 @@ export default function ArchivePage() {
                     <Pencil size={14} />
                     {translateKey('editOperation')}
                   </Link>
-                  <button type="button" className="operation-link flex-1" onClick={() => window.open("https://wa.me/?text=" + encodeURIComponent(buildWhatsAppMessage(record)), "_blank", "noopener,noreferrer")} data-testid="button-share-whatsapp">
+                  <button type="button" className="operation-link flex-1" onClick={() => setShareRecord(record)} data-testid={`button-share-operation-${record.id}`}>
                     <Share2 size={14} />
-                    {translateKey('shareOnWhatsapp')}
+                    {translateKey('share')}
                   </button>
                 </div>
               </div>
@@ -241,6 +211,12 @@ export default function ArchivePage() {
         </main>
       </div>
       <AppBottomNav />
+      {shareRecord && (
+        <ShareOptionsModal
+          text={buildOperationShareText(shareRecord)}
+          onClose={() => setShareRecord(null)}
+        />
+      )}
     </div>
   );
 }
