@@ -1378,7 +1378,9 @@ export default function OperationsPage() {
 
   const selectWork = (choice: WorkChoice) => {
     if (choice === selectedWork) return;
-    if (hasStartedOperation && !workName.trim()) {
+    // Require a customer name only when switching away from an operation already in progress.
+    // Choosing the first work type from the home screen must never trigger the name prompt.
+    if (selectedWork && hasStartedOperation && !workName.trim()) {
       focusCustomerName();
       return;
     }
