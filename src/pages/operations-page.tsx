@@ -1087,8 +1087,13 @@ export default function OperationsPage() {
     return () => window.removeEventListener('keydown', handleKeyboardInput);
   }, [activeSectionId, handleQuantityKey, selectedWork, showFinishConfirm, showTransferPicker, showOrderEditor]);
 
-  const buildArchivedDraft = (): ArchivedOperationDraft => {
-    const archivedSections = entries.flatMap((entry) => {
+  const buildArchivedDraft = (options?: {
+    entriesOverride?: typeof entries;
+    workTypeIdOverride?: string | null;
+    useSelectedWork?: boolean;
+  }): ArchivedOperationDraft => {
+    const draftEntries = options?.entriesOverride ?? entries;
+    const archivedSections = draftEntries.flatMap((entry) => {
       const section = sectionById.get(entry.sectionId);
       if (!section) return [];
       const sectionMaterials = section.materialIds
@@ -1125,14 +1130,18 @@ export default function OperationsPage() {
     });
     const draft: ArchivedOperationDraft = {
       name: workName,
-      workTypeName: isArchiveEditing && archiveRecord
-        ? archiveRecord.workTypeName
-        : selectedWork
-          ? (workById.get(selectedWork)?.name ?? null)
-          : null,
-      workTypeId: isArchiveEditing && archiveRecord
-        ? archiveRecord.workTypeId ?? null
-        : selectedWork ?? null,
+      workTypeName: options?.useSelectedWork
+        ? (options.workTypeIdOverride ? workById.get(options.workTypeIdOverride)?.name ?? null : null)
+        : isArchiveEditing && archiveRecord
+          ? archiveRecord.workTypeName
+          : selectedWork
+            ? (workById.get(selectedWork)?.name ?? null)
+            : null,
+      workTypeId: options?.useSelectedWork
+        ? options.workTypeIdOverride ?? null
+        : isArchiveEditing && archiveRecord
+          ? archiveRecord.workTypeId ?? null
+          : selectedWork ?? null,
       sections: archivedSections,
       sectionTotal,
       shipping: {
@@ -1203,14 +1212,35 @@ export default function OperationsPage() {
         issueMessages.push(translateKey('transferUnfilledPositions').replace('{positions}', transfer.unfilledTargetPositions.join(', ')));
       }
 
+      setShowTransferPicker(false);
+      setWorkNameValidationError('');
+
+      // Editing an archived operation must never overwrite the original record.
+      // Preserve it unchanged, and save the transferred version as a separate archive record.
+      if (isArchiveEditing) {
+        const movedDraft = buildArchivedDraft({
+          entriesOverride: transfer.entries.map((entry) => ({
+            ...entry,
+            materialSelectionTouched: entry.selectedMaterialIds.length > 0,
+          })),
+          workTypeIdOverride: targetWork,
+          useSelectedWork: true,
+        });
+        const movedRecord = saveOperationToArchive(movedDraft);
+        if (!movedRecord) {
+          setTransferNotice(translateKey('failedToSaveBeforeMove'));
+          return;
+        }
+        setLocation('/archive');
+        return;
+      }
+
       setSelectedWork(targetWork);
       setEntries(transfer.entries.map((entry) => ({
         ...entry,
         materialSelectionTouched: entry.selectedMaterialIds.length > 0,
       })));
       setActiveSectionId(transfer.entries[0]?.sectionId ?? null);
-      setWorkNameValidationError('');
-      setShowTransferPicker(false);
       setTransferNotice(`${translateKey('transferSuccess').replace('{target}', targetName).replace('{source}', savedSource.workTypeName ?? '')}${issueMessages.length ? ` ${issueMessages.join(' ')}` : ''}`);
     } catch {
       setShowTransferPicker(false);
