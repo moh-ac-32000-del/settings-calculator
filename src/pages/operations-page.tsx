@@ -966,6 +966,9 @@ export default function OperationsPage() {
     }
     setWorkNameValidationError('');
     setBackNavigationNotice('');
+    // Do not leave the customer-name prompt visible from an earlier blocked action
+    // when starting or switching to a work type with no active work name.
+    if (!workName.trim()) setCustomerNameVisible(false);
     cancelAutoAdvance();
     setAutoAdvanceEnabled(true);
     setSelectedWork(choice);
