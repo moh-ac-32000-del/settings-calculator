@@ -748,6 +748,7 @@ export default function OperationsPage() {
   const [settings, setSettings] = useState<SettingsState>(() => loadSettings());
   const [operationOrder, setOperationOrder] = useState<OperationsOrder>(() => loadOperationsOrder(loadSettings()));
   const [archiveRecord, setArchiveRecord] = useState<ArchivedOperation | null>(null);
+  const [transferredFromArchive, setTransferredFromArchive] = useState(false);
   const initializedArchiveIdRef = useRef<string | null>(null);
   const [archiveSaveError, setArchiveSaveError] = useState('');
   const [workNameValidationError, setWorkNameValidationError] = useState('');
@@ -809,6 +810,7 @@ export default function OperationsPage() {
       return;
     }
     setArchiveRecord(record);
+    setTransferredFromArchive(false);
     setWorkName(record.name);
     setCustomerNameVisible(true);
     const matchingWork = settings.workTypes.find((work) => work.id === record.workTypeId)
@@ -874,7 +876,7 @@ export default function OperationsPage() {
     .map((id) => workById.get(id))
     .filter((work): work is { id: string; name: string } => Boolean(work));
   const selectedWorkRecord = selectedWork ? settings.workTypes.find((work) => work.id === selectedWork) : undefined;
-  const availableSectionIds = isArchiveEditing && archiveRecord
+  const availableSectionIds = isArchiveEditing && archiveRecord && !transferredFromArchive
     ? archiveRecord.sections.map((section) => section.id)
     : (selectedWorkRecord?.sectionIds ?? []);
   const availableSections = availableSectionIds
@@ -1215,32 +1217,34 @@ export default function OperationsPage() {
       setShowTransferPicker(false);
       setWorkNameValidationError('');
 
-      // Editing an archived operation must never overwrite the original record.
-      // Preserve it unchanged, and save the transferred version as a separate archive record.
-      if (isArchiveEditing) {
-        const movedDraft = buildArchivedDraft({
-          entriesOverride: transfer.entries.map((entry) => ({
-            ...entry,
-            materialSelectionTouched: entry.selectedMaterialIds.length > 0,
-          })),
-          workTypeIdOverride: targetWork,
-          useSelectedWork: true,
-        });
-        const movedRecord = saveOperationToArchive(movedDraft);
-        if (!movedRecord) {
-          setTransferNotice(translateKey('failedToSaveBeforeMove'));
-          return;
+      // Use the same in-screen transfer flow for archived and active operations.
+      // Keep every destination section so sections with no source counterpart remain available at quantity 0.
+      const transferredBySection = new Map(transfer.entries.map((entry) => [entry.sectionId, entry]));
+      const destinationEntries = targetSectionIds.map((sectionId) => {
+        const transferred = transferredBySection.get(sectionId);
+        if (transferred) {
+          return {
+            ...transferred,
+            materialSelectionTouched: transferred.selectedMaterialIds.length > 0,
+          };
         }
-        setLocation('/archive');
-        return;
-      }
+        const section = sectionById.get(sectionId);
+        return {
+          sectionId,
+          quantity: '0',
+          selectedMaterialIds: section?.calculationMode === 'SELECT_ONE_MULTIPLY' && section.materialIds[0]
+            ? [section.materialIds[0]]
+            : [],
+          materialSelectionTouched: false,
+        };
+      });
 
+      if (isArchiveEditing) setTransferredFromArchive(true);
       setSelectedWork(targetWork);
-      setEntries(transfer.entries.map((entry) => ({
-        ...entry,
-        materialSelectionTouched: entry.selectedMaterialIds.length > 0,
-      })));
-      setActiveSectionId(transfer.entries[0]?.sectionId ?? null);
+      setEntries(destinationEntries);
+      setActiveSectionId(targetSectionIds[0] ?? null);
+      setWorkNameValidationError('');
+      setShowTransferPicker(false);
       setTransferNotice(`${translateKey('transferSuccess').replace('{target}', targetName).replace('{source}', savedSource.workTypeName ?? '')}${issueMessages.length ? ` ${issueMessages.join(' ')}` : ''}`);
     } catch {
       setShowTransferPicker(false);
@@ -1258,8 +1262,10 @@ export default function OperationsPage() {
       setShowFinishConfirm(false);
       return;
     }
-    const draft = buildArchivedDraft();
-    if (isArchiveEditing && archiveRecord) {
+    const draft = transferredFromArchive
+      ? buildArchivedDraft({ useSelectedWork: true, workTypeIdOverride: selectedWork })
+      : buildArchivedDraft();
+    if (isArchiveEditing && archiveRecord && !transferredFromArchive) {
       const updated = updateOperationInArchive(archiveRecord.id, draft);
       if (!updated) {
         setArchiveSaveError(translateKey('theRecordCouldNotBeUpdatedItsRetentionPeriodMayHaveExpi'));
@@ -1269,7 +1275,16 @@ export default function OperationsPage() {
       setLocation('/archive');
       return;
     }
-    saveOperationToArchive(draft);
+    const savedOperation = saveOperationToArchive(draft);
+    if (!savedOperation) {
+      setArchiveSaveError(translateKey('failedToSaveBeforeMove'));
+      setShowFinishConfirm(false);
+      return;
+    }
+    if (isArchiveEditing && transferredFromArchive) {
+      setLocation('/archive');
+      return;
+    }
     setSelectedWork(null);
     setEntries([]);
     setWorkName('');
