@@ -1269,7 +1269,16 @@ export default function OperationsPage() {
       setLocation('/archive');
       return;
     }
-    saveOperationToArchive(draft);
+    const savedOperation = saveOperationToArchive(draft);
+    if (!savedOperation) {
+      setArchiveSaveError(translateKey('failedToSaveBeforeMove'));
+      setShowFinishConfirm(false);
+      return;
+    }
+    if (isArchiveEditing && transferredFromArchive) {
+      setLocation('/archive');
+      return;
+    }
     setSelectedWork(null);
     setEntries([]);
     setWorkName('');
