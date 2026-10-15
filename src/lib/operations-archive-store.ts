@@ -1,6 +1,31 @@
 export const OPERATIONS_ARCHIVE_STORAGE_KEY = 'settings-calculator-archive';
 export const OPERATIONS_ARCHIVE_SCHEMA_VERSION = 2;
-export const OPERATIONS_ARCHIVE_MAX_AGE_MS = 3 * 24 * 60 * 60 * 1000;
+export type ArchiveRetention = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '30' | 'permanent';
+export const ARCHIVE_RETENTION_STORAGE_KEY = 'settings-calculator-archive-retention';
+export const DEFAULT_ARCHIVE_RETENTION: ArchiveRetention = '3';
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+export function loadArchiveRetention(): ArchiveRetention {
+  if (typeof window === 'undefined') return DEFAULT_ARCHIVE_RETENTION;
+  const value = window.localStorage.getItem(ARCHIVE_RETENTION_STORAGE_KEY);
+  return value === '1' || value === '2' || value === '3' || value === '4' || value === '5'
+    || value === '6' || value === '7' || value === '30' || value === 'permanent'
+    ? value : DEFAULT_ARCHIVE_RETENTION;
+}
+
+export function saveArchiveRetention(value: ArchiveRetention) {
+  if (typeof window !== 'undefined') window.localStorage.setItem(ARCHIVE_RETENTION_STORAGE_KEY, value);
+}
+
+export function getArchiveRetentionDurationMs(value = loadArchiveRetention()): number | null {
+  return value === 'permanent' ? null : Number(value) * DAY_MS;
+}
+
+export function getArchiveRetentionLabelKey(value = loadArchiveRetention()) {
+  return value === 'permanent' ? 'archiveRetentionPermanent'
+    : value === '30' ? 'archiveRetentionMonth'
+      : 'archiveRetentionDays';
+}
 
 export type ArchivedMaterial = {
   id: string;
@@ -138,8 +163,9 @@ function persistArchive(records: ArchivedOperation[]) {
 
 export function cleanupOperationsArchive(now = Date.now()) {
   const state = getArchiveState();
+  const duration = getArchiveRetentionDurationMs();
   const records = state.records
-    .filter((record) => now - record.createdAt < OPERATIONS_ARCHIVE_MAX_AGE_MS)
+    .filter((record) => duration === null || now - record.createdAt < duration)
     .sort((a, b) => b.createdAt - a.createdAt);
   if (state.canWrite) persistArchive(records);
   return records;
