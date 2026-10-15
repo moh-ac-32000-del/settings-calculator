@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Archive, ChevronDown, Clock3, Layers3, Pencil, Search, Share2 } from 'lucide-react';
+import { Archive, ChevronDown, Clock3, Layers3, Pencil, Search, Share2, Trash2, X } from 'lucide-react';
 import { Link } from 'wouter';
-import { cleanupOperationsArchive, type ArchivedOperation } from '@/lib/operations-archive-store';
+import { cleanupOperationsArchive, deleteAllOperationsFromArchive, deleteOperationFromArchive, type ArchivedOperation } from '@/lib/operations-archive-store';
 import { formatAmount, formatWesternNumber } from '@/lib/operations-utils';
 import { loadLanguage } from '@/lib/language-store';
 import { translateKey } from '@/lib/i18n';
@@ -29,10 +29,30 @@ export default function ArchivePage() {
   const [records, setRecords] = useState<ArchivedOperation[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [shareRecord, setShareRecord] = useState<ArchivedOperation | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<ArchivedOperation | null>(null);
+  const [confirmDeleteAll, setConfirmDeleteAll] = useState(false);
+  const [deleteMessage, setDeleteMessage] = useState('');
 
   useEffect(() => {
     setRecords(cleanupOperationsArchive());
   }, []);
+
+  const removeRecord = () => {
+    if (!pendingDelete) return;
+    if (deleteOperationFromArchive(pendingDelete.id)) {
+      setRecords((current) => current.filter((record) => record.id !== pendingDelete.id));
+      setDeleteMessage(translateKey('archiveRecordDeleted'));
+    }
+    setPendingDelete(null);
+  };
+
+  const removeAllRecords = () => {
+    if (deleteAllOperationsFromArchive()) {
+      setRecords([]);
+      setConfirmDeleteAll(false);
+      setDeleteMessage(translateKey('archiveAllRecordsDeleted'));
+    }
+  };
 
   const filteredRecords = useMemo(() => {
     const query = searchQuery.trim().toLocaleLowerCase();
@@ -65,6 +85,12 @@ export default function ArchivePage() {
           <p className="mt-2 max-w-md text-xs leading-6 text-[hsl(var(--muted-foreground))]">
             {translateKey('namedArchiveDescription')}
           </p>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <button type="button" className="operation-link" onClick={() => setConfirmDeleteAll(true)} disabled={records.length === 0} data-testid="button-delete-all-archive">
+              <Trash2 size={14} />{translateKey('deleteAllArchiveRecords')}
+            </button>
+          </div>
+          {deleteMessage && <p role="status" className="mt-3 text-xs text-[hsl(var(--accent-foreground))]">{deleteMessage}</p>}
         </header>
 
         <section className="work-picker mb-4" aria-label={translateKey('searchArchive')}>
@@ -204,6 +230,10 @@ export default function ArchivePage() {
                     <Share2 size={14} />
                     {translateKey('share')}
                   </button>
+                  <button type="button" className="operation-link flex-1" onClick={() => setPendingDelete(record)} data-testid={`button-delete-archive-${record.id}`}>
+                    <Trash2 size={14} />
+                    {translateKey('delete')}
+                  </button>
                 </div>
               </div>
             </details>
@@ -211,6 +241,24 @@ export default function ArchivePage() {
         </main>
       </div>
       <AppBottomNav />
+      {pendingDelete && (
+        <div className="dialog-backdrop fixed inset-0 z-50 flex items-end justify-center bg-[hsl(225_30%_2%/.72)] p-4 sm:items-center" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setPendingDelete(null); }}>
+          <section className="dialog-panel w-full max-w-md rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-5 shadow-2xl" role="alertdialog" aria-modal="true" aria-labelledby="archive-delete-title">
+            <div className="flex items-center justify-between gap-3"><h2 id="archive-delete-title" className="text-base font-extrabold">{translateKey('confirmDeleteArchiveRecord')}</h2><button type="button" className="operation-link" onClick={() => setPendingDelete(null)} aria-label={translateKey('close')}><X size={16}/></button></div>
+            <p className="mt-3 text-sm leading-6">{translateKey('deleteArchiveRecordPrompt').replace('{name}', pendingDelete.name)}</p>
+            <div className="mt-5 flex gap-2"><button type="button" className="operation-link" onClick={removeRecord} data-testid="button-confirm-delete-archive"><Trash2 size={14}/>{translateKey('delete')}</button><button type="button" className="operation-link" onClick={() => setPendingDelete(null)}>{translateKey('cancel')}</button></div>
+          </section>
+        </div>
+      )}
+      {confirmDeleteAll && (
+        <div className="dialog-backdrop fixed inset-0 z-50 flex items-end justify-center bg-[hsl(225_30%_2%/.72)] p-4 sm:items-center" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setConfirmDeleteAll(false); }}>
+          <section className="dialog-panel w-full max-w-md rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-5 shadow-2xl" role="alertdialog" aria-modal="true" aria-labelledby="archive-delete-all-title">
+            <div className="flex items-center justify-between gap-3"><h2 id="archive-delete-all-title" className="text-base font-extrabold">{translateKey('confirmDeleteAllArchiveRecords')}</h2><button type="button" className="operation-link" onClick={() => setConfirmDeleteAll(false)} aria-label={translateKey('close')}><X size={16}/></button></div>
+            <p className="mt-3 text-sm leading-6">{translateKey('deleteAllArchiveRecordsPrompt').replace('{count}', formatWesternNumber(records.length))}</p>
+            <div className="mt-5 flex gap-2"><button type="button" className="operation-link" onClick={removeAllRecords} data-testid="button-confirm-delete-all-archive"><Trash2 size={14}/>{translateKey('deleteAllArchiveRecords')}</button><button type="button" className="operation-link" onClick={() => setConfirmDeleteAll(false)}>{translateKey('cancel')}</button></div>
+          </section>
+        </div>
+      )}
       {shareRecord && (
         <ShareOptionsModal
           text={buildOperationShareText(shareRecord)}
