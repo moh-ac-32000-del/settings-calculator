@@ -186,6 +186,22 @@ export function saveOperationToArchive(draft: ArchivedOperationDraft, now = Date
   return record;
 }
 
+export function deleteOperationFromArchive(id: string) {
+  const state = getArchiveState();
+  if (!state.canWrite) return false;
+  const records = state.records.filter((record) => record.id !== id);
+  if (records.length === state.records.length) return false;
+  persistArchive(records);
+  return true;
+}
+
+export function deleteAllOperationsFromArchive() {
+  const state = getArchiveState();
+  if (!state.canWrite) return false;
+  persistArchive([]);
+  return true;
+}
+
 export function getOperationFromArchive(id: string) {
   return cleanupOperationsArchive().find((record) => record.id === id) ?? null;
 }
