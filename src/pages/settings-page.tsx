@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { AlertTriangle, Check, ChevronDown, CircleHelp, Clipboard, ClipboardPaste, Coins, Hammer, Layers3, Minus, PackageOpen, Pencil, Plus, Settings2, Share2, Trash2, Truck, X } from 'lucide-react';
+import { AlertTriangle, Check, ChevronDown, Clock3, CircleHelp, Clipboard, ClipboardPaste, Coins, Hammer, Layers3, Minus, PackageOpen, Pencil, Plus, Settings2, Share2, Trash2, Truck, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CalculationMode, createId, loadSettings, Material, saveSettings, Section, SettingsState, ShippingExpenseSetting, WorkType, SETTINGS_SCHEMA_VERSION } from '@/lib/settings-store';
 import { createSettingsCode, parseSettingsCode } from '@/lib/settings-transfer';
@@ -7,6 +7,7 @@ import { reconcileOperationsOrderAfterSettingsChange } from '@/lib/operations-or
 import { loadLanguage, saveLanguage, type AppLanguage } from '@/lib/language-store';
 import { getLanguageLocale, translateKey, type TranslationKey } from '@/lib/i18n';
 import AppBottomNav from '@/components/app-bottom-nav';
+import { loadArchiveRetention, saveArchiveRetention, type ArchiveRetention } from '@/lib/operations-archive-store';
 
 type Area = 'materials' | 'sections' | 'work';
 type EntityKind = 'material' | 'section' | 'work';
@@ -293,6 +294,7 @@ export default function SettingsPage() {
   const [savedAt, setSavedAt] = useState<Date | null>(null);
   const [transferMessage, setTransferMessage] = useState<{ type: 'error' | 'success'; text: string } | null>(null);
   const [language, setLanguage] = useState<AppLanguage>(() => loadLanguage());
+  const [archiveRetention, setArchiveRetention] = useState<ArchiveRetention>(() => loadArchiveRetention());
 
   useEffect(() => { saveSettings(state); setSavedAt(new Date()); }, [state]);
   useEffect(() => { saveLanguage(language); document.documentElement.lang = language; document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr'; window.dispatchEvent(new Event('settings-calculator-language-change')); }, [language]);
@@ -437,6 +439,26 @@ export default function SettingsPage() {
                   <option value="ar">{translateKey('arabic')}</option>
                   <option value="tr">{translateKey('turkish')}</option>
                   <option value="en">{translateKey('english')}</option>
+                </select>
+              </div>
+            </div>
+          </section>
+          <section className="mb-5 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card)/.45)] p-4 sm:p-5" data-testid="archive-retention-settings">
+            <div className="flex items-start gap-3">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[hsl(var(--accent)/.13)] text-[hsl(var(--accent-foreground))]"><Clock3 size={17} /></div>
+              <div className="flex-1">
+                <h2 className="text-sm font-extrabold">{translateKey('archiveRetentionTitle')}</h2>
+                <p className="mt-1 text-xs leading-6 text-[hsl(var(--muted-foreground))]">{translateKey('archiveRetentionDescription')}</p>
+                <select value={archiveRetention} onChange={(event) => { const value = event.target.value as ArchiveRetention; setArchiveRetention(value); saveArchiveRetention(value); window.dispatchEvent(new Event('settings-calculator-archive-retention-change')); }} className="field-input mt-3" data-testid="select-archive-retention">
+                  <option value="1">{translateKey('archiveRetentionOneDay')}</option>
+                  <option value="2">{translateKey('archiveRetentionTwoDays')}</option>
+                  <option value="3">{translateKey('archiveRetentionThreeDays')}</option>
+                  <option value="4">{translateKey('archiveRetentionFourDays')}</option>
+                  <option value="5">{translateKey('archiveRetentionFiveDays')}</option>
+                  <option value="6">{translateKey('archiveRetentionSixDays')}</option>
+                  <option value="7">{translateKey('archiveRetentionSevenDays')}</option>
+                  <option value="30">{translateKey('archiveRetentionMonth')}</option>
+                  <option value="permanent">{translateKey('archiveRetentionPermanent')}</option>
                 </select>
               </div>
             </div>
